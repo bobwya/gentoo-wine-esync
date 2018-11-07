@@ -32,19 +32,19 @@ Based on wine-esync pre-release version **esync**_??????_ (where is _??????_ is 
 ## ```wine-esync-common.awk wine-esync-preprocess.awk esync_generate_rebasing_patchsets.sh```
 
 Awk scripts that can be used to process the stock 83 wine-esync patches, so that these apply on any version of **>=app-emulation/wine-vanilla-3.0_rc1** or **>=app-emulation/wine-staging-3.3**.
-A BASH script that uses the Awk scripts to generate multiple rebased directories. These are separated hierarchically:
+A BASH script that uses the Awk scripts to generate multiple rebased directories. These are separated hierarchically by:
 
-1. by esync version
-2. package name
-3. Wine Git commit (rebase point for this patchset)
+1. root directory: esync version
+2. intermediate directory: package name
+3. leaf directory: Wine Git commit (rebase point for this patchset)
 
 The leaf directories contain sets of patches that can be applied to stock 83 wine-esync patches (corresponding wine-esync version). Thereby enabling
-the 83 wine-esync patches to be applied, without any fuzzing, to all current Wine, and Wine Staging, **3.**? releases.
+the 83 wine-esync patches to be applied, without any fuzzing, to all current Wine (≥3.0-rc1) and Wine Staging (≥3.3) releases.
 
 # wine-esync
 
 Full credit, for developing this patchset, must go to the original author Zebediah Figura [@zfigura](https://github.com/zfigura).
-See: [Github: zfigura / wine](https://github.com/zfigura/wine/blob/esync/README.esync).
+See: [Github: zfigura / wine : README.esync](https://github.com/zfigura/wine/blob/esync/README.esync).
 Also see: [Github: daniel-santos / wine](https://github.com/daniel-santos/wine/tree/hybrid-sync).
 
 Thanks also to the Arch Linux packaging work done by: **Etienne Juvigny** [@Tk-Glitch](https://github.com/Tk-Glitch).
