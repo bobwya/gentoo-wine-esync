@@ -1,0 +1,10 @@
+--- a/0074-ntdll-server-Abort-if-esync-is-enabled-for-the-serve.patch	2018-10-07 03:47:11.000000000 +0100
++++ b/0074-ntdll-server-Abort-if-esync-is-enabled-for-the-serve.patch	2018-11-07 16:09:09.745383208 +0000
+@@ -74,6 +74,7 @@
+ +    esync_init();
+  
+      NtCreateKeyedEvent( &keyed_event, GENERIC_READ | GENERIC_WRITE, NULL, 0 );
++ 
+  }
+ diff --git a/server/esync.c b/server/esync.c
+ index a0745a2..10001a2 100644

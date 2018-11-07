@@ -1,0 +1,27 @@
+--- a/0002-server-Create-server-objects-for-eventfd-based-synch.patch	2018-10-07 03:47:11.000000000 +0100
++++ b/0002-server-Create-server-objects-for-eventfd-based-synch.patch	2018-11-07 16:09:11.685411507 +0000
+@@ -58,14 +58,13 @@
+  };
+  union generic_reply
+  {
+-@@ -6529,6 +6547,7 @@ union generic_reply
++@@ -6529,5 +6547,6 @@ union generic_reply
+      struct set_job_limits_reply set_job_limits_reply;
+      struct set_job_completion_port_reply set_job_completion_port_reply;
+      struct terminate_job_reply terminate_job_reply;
+ +    struct create_esync_reply create_esync_reply;
+  };
+  
+- #define SERVER_PROTOCOL_VERSION 565
+ diff --git a/server/Makefile.in b/server/Makefile.in
+ index aaaa8d3..5d96d22 100644
+ --- a/server/Makefile.in
+@@ -294,7 +293,7 @@
+ +
+  static const dump_func req_dumpers[REQ_NB_REQUESTS] = {
+      (dump_func)dump_new_process_request,
+-     (dump_func)dump_get_new_process_info_request,
++     (dump_func)dump_exec_process_request,
+ @@ -4831,6 +4844,7 @@ static const dump_func req_dumpers[REQ_NB_REQUESTS] = {
+      (dump_func)dump_set_job_limits_request,
+      (dump_func)dump_set_job_completion_port_request,

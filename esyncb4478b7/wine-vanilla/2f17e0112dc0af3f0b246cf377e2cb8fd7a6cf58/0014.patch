@@ -1,0 +1,30 @@
+--- a/0014-server-Add-a-request-to-get-the-eventfd-file-descrip.patch	2018-10-07 03:47:11.000000000 +0100
++++ b/0014-server-Add-a-request-to-get-the-eventfd-file-descrip.patch	2018-11-07 16:09:11.277405555 +0000
+@@ -51,17 +51,13 @@
+  };
+  union generic_reply
+  {
+-@@ -6548,8 +6561,9 @@ union generic_reply
++@@ -6919,5 +6932,6 @@ union generic_reply
+      struct set_job_completion_port_reply set_job_completion_port_reply;
+      struct terminate_job_reply terminate_job_reply;
+      struct create_esync_reply create_esync_reply;
+ +    struct get_esync_fd_reply get_esync_fd_reply;
+  };
+  
+--#define SERVER_PROTOCOL_VERSION 565
+-+#define SERVER_PROTOCOL_VERSION 566
+- 
+- #endif /* __WINE_WINE_SERVER_PROTOCOL_H */
+ diff --git a/server/esync.c b/server/esync.c
+ index e761475..e775b3b 100644
+ --- a/server/esync.c
+@@ -157,7 +153,7 @@
+ +
+  static const dump_func req_dumpers[REQ_NB_REQUESTS] = {
+      (dump_func)dump_new_process_request,
+-     (dump_func)dump_get_new_process_info_request,
++     (dump_func)dump_exec_process_request,
+ @@ -4845,6 +4850,7 @@ static const dump_func req_dumpers[REQ_NB_REQUESTS] = {
+      (dump_func)dump_set_job_completion_port_request,
+      (dump_func)dump_terminate_job_request,

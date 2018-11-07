@@ -1,0 +1,11 @@
+--- a/0013-server-Add-an-object-operation-to-grab-the-esync-fil.patch	2018-10-07 03:47:11.000000000 +0100
++++ b/0013-server-Add-an-object-operation-to-grab-the-esync-fil.patch	2018-11-07 16:09:14.997459833 +0000
+@@ -423,7 +423,7 @@
+ +    NULL,                             /* get_esync_fd */
+      no_satisfied,                     /* satisfied */
+      no_signal,                        /* signal */
+-     named_pipe_device_get_fd,         /* get_fd */
++     no_get_fd,                        /* get_fd */
+ diff --git a/server/object.h b/server/object.h
+ index b5c50e1..b3d4e33 100644
+ --- a/server/object.h

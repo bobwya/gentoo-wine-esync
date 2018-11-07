@@ -1,0 +1,17 @@
+--- a/0040-server-Create-eventfd-descriptors-for-timers.patch	2018-10-07 03:47:11.000000000 +0100
++++ b/0040-server-Create-eventfd-descriptors-for-timers.patch	2018-11-07 16:09:12.833428256 +0000
+@@ -35,14 +35,6 @@
+      ESYNC_MANUAL_SERVER,
+      ESYNC_QUEUE,
+  };
+-@@ -6599,6 +6600,6 @@ union generic_reply
+-     struct get_esync_fd_reply get_esync_fd_reply;
+- };
+- 
+--#define SERVER_PROTOCOL_VERSION 570
+-+#define SERVER_PROTOCOL_VERSION 571
+- 
+- #endif /* __WINE_WINE_SERVER_PROTOCOL_H */
+ diff --git a/server/protocol.def b/server/protocol.def
+ index 33665fc..7ad44d0 100644
+ --- a/server/protocol.def

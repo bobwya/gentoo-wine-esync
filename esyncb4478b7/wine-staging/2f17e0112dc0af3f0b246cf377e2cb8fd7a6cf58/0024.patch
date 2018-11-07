@@ -1,0 +1,26 @@
+--- a/0024-server-ntdll-Also-wait-on-the-queue-fd-when-waiting-.patch	2018-10-07 03:47:11.000000000 +0100
++++ b/0024-server-ntdll-Also-wait-on-the-queue-fd-when-waiting-.patch	2018-11-07 16:09:14.597453996 +0000
+@@ -166,14 +166,6 @@
+  };
+  
+  
+-@@ -6564,6 +6575,6 @@ union generic_reply
+-     struct get_esync_fd_reply get_esync_fd_reply;
+- };
+- 
+--#define SERVER_PROTOCOL_VERSION 566
+-+#define SERVER_PROTOCOL_VERSION 567
+- 
+- #endif /* __WINE_WINE_SERVER_PROTOCOL_H */
+ diff --git a/server/esync.c b/server/esync.c
+ index 4682163..ef02170 100644
+ --- a/server/esync.c
+@@ -371,7 +363,7 @@
+ +
+  static const dump_func req_dumpers[REQ_NB_REQUESTS] = {
+      (dump_func)dump_new_process_request,
+-     (dump_func)dump_get_new_process_info_request,
++     (dump_func)dump_exec_process_request,
+ @@ -5145,7 +5150,7 @@ static const dump_func reply_dumpers[REQ_NB_REQUESTS] = {
+      NULL,
+      NULL,

@@ -1,0 +1,22 @@
+--- a/0033-ntdll-server-Implement-NtOpenSemaphore.patch	2018-10-07 03:47:11.000000000 +0100
++++ b/0033-ntdll-server-Implement-NtOpenSemaphore.patch	2018-11-07 16:09:13.725441271 +0000
+@@ -165,7 +165,7 @@
+      struct get_esync_fd_request get_esync_fd_request;
+  };
+  union generic_reply
+-@@ -6575,9 +6595,10 @@ union generic_reply
++@@ -6883,6 +6903,7 @@ union generic_reply
+      struct set_job_completion_port_reply set_job_completion_port_reply;
+      struct terminate_job_reply terminate_job_reply;
+      struct create_esync_reply create_esync_reply;
+@@ -173,10 +173,6 @@
+      struct get_esync_fd_reply get_esync_fd_reply;
+  };
+  
+--#define SERVER_PROTOCOL_VERSION 569
+-+#define SERVER_PROTOCOL_VERSION 570
+- 
+- #endif /* __WINE_WINE_SERVER_PROTOCOL_H */
+ diff --git a/server/esync.c b/server/esync.c
+ index 6cc212e..2c89152 100644
+ --- a/server/esync.c

@@ -1,0 +1,12 @@
+--- a/0006-ntdll-Close-esync-objects.patch	2018-10-07 03:47:11.000000000 +0100
++++ b/0006-ntdll-Close-esync-objects.patch	2018-11-07 16:09:08.445364249 +0000
+@@ -62,8 +62,8 @@
+  #include "ntdll_misc.h"
+ +#include "esync.h"
+  #include "wine/server.h"
+- #include "wine/exception.h"
+  
++ WINE_DEFAULT_DEBUG_CHANNEL(ntdll);
+ @@ -390,6 +391,9 @@ NTSTATUS close_handle( HANDLE handle )
+      NTSTATUS ret;
+      int fd = server_remove_fd_from_cache( handle );

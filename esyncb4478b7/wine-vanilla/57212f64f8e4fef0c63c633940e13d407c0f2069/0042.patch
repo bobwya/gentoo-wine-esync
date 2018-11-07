@@ -1,0 +1,12 @@
+--- a/0042-ntdll-Use-shared-memory-segments-to-store-semaphore-.patch	2018-10-07 03:47:11.000000000 +0100
++++ b/0042-ntdll-Use-shared-memory-segments-to-store-semaphore-.patch	2018-11-07 16:09:10.513394411 +0000
+@@ -677,8 +677,8 @@
+ +        esync_init();
+ +
+      NtCreateKeyedEvent( &keyed_event, GENERIC_READ | GENERIC_WRITE, NULL, 0 );
+- }
+  
++     return exe_file;
+ -- 
+ 2.7.4
+ 
