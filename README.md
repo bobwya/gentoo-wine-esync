@@ -34,9 +34,9 @@ Based on wine-esync pre-release version **esync**_??????_ (where is _??????_ is 
 Awk scripts that can be used to process the stock 83 wine-esync patches, so that these apply on any version of **>=app-emulation/wine-vanilla-3.0_rc1** or **>=app-emulation/wine-staging-3.3**.
 A BASH script that uses the Awk scripts to generate multiple rebased directories. These are separated hierarchically:
 
- 1 by esync version
- 2 package name
- 3 Wine Git commit (rebase point for this patchset)
+1. by esync version
+2. package name
+3. Wine Git commit (rebase point for this patchset)
 
 The leaf directories contain sets of patches that can be applied to stock 83 wine-esync patches (corresponding wine-esync version). Thereby enabling
 the 83 wine-esync patches to be applied, without any fuzzing, to all current Wine, and Wine Staging, **3.**? releases.
