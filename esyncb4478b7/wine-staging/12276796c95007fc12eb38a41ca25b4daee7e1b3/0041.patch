@@ -1,11 +1,11 @@
 --- a/0041-server-Allocate-shared-memory-segments-for-semaphore.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0041-server-Allocate-shared-memory-segments-for-semaphore.patch	2018-11-07 16:09:12.369421486 +0000
++++ b/0041-server-Allocate-shared-memory-segments-for-semaphore.patch	2018-11-08 13:09:54.149291433 +0000
 @@ -31,7 +31,9 @@
  index 68945ec..c262bee 100644
  --- a/include/wine/server_protocol.h
  +++ b/include/wine/server_protocol.h
 -@@ -5660,6 +5660,8 @@ struct create_esync_reply
-+@@ -5632,8 +5632,10 @@ struct create_esync_reply
++@@ -5602,8 +5602,10 @@ struct create_esync_reply
 + struct create_esync_reply
 + {
       struct reply_header __header;
@@ -16,7 +16,7 @@
   
   
 -@@ -5678,6 +5680,8 @@ struct open_esync_reply
-+@@ -5650,8 +5652,10 @@ struct open_esync_reply
++@@ -5620,8 +5622,10 @@ struct open_esync_reply
 + struct open_esync_reply
 + {
       struct reply_header __header;

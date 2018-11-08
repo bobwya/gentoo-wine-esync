@@ -1,5 +1,5 @@
 --- a/0045-server-ntdll-Implement-alertable-waits.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0045-server-ntdll-Implement-alertable-waits.patch	2018-11-07 16:09:10.537394760 +0000
++++ b/0045-server-ntdll-Implement-alertable-waits.patch	2018-11-08 13:09:52.309263452 +0000
 @@ -269,17 +269,13 @@
   };
   union generic_reply

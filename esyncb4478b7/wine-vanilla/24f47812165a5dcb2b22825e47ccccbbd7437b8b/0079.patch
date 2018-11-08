@@ -1,5 +1,5 @@
 --- a/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2018-10-07 03:47:12.000000000 +0100
-+++ b/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2018-11-07 16:09:11.169403980 +0000
++++ b/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2018-11-08 13:09:52.953273246 +0000
 @@ -147,17 +147,13 @@
   };
   union generic_reply

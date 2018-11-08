@@ -1,5 +1,5 @@
 --- a/0078-ntdll-server-Initialize-the-shared-memory-portion-on.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0078-ntdll-server-Initialize-the-shared-memory-portion-on.patch	2018-11-07 16:09:12.101417576 +0000
++++ b/0078-ntdll-server-Initialize-the-shared-memory-portion-on.patch	2018-11-08 13:09:53.877287297 +0000
 @@ -218,14 +218,6 @@
   };
   struct create_esync_reply

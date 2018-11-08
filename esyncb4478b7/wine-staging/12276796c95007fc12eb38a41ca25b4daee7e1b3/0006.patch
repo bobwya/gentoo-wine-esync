@@ -1,5 +1,5 @@
 --- a/0006-ntdll-Close-esync-objects.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0006-ntdll-Close-esync-objects.patch	2018-11-07 16:09:12.173418626 +0000
++++ b/0006-ntdll-Close-esync-objects.patch	2018-11-08 13:09:53.953288453 +0000
 @@ -62,8 +62,8 @@
   #include "ntdll_misc.h"
  +#include "esync.h"

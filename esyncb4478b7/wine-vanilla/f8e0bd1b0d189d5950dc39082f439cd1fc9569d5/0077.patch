@@ -1,5 +1,5 @@
 --- a/0077-ntdll-server-Specify-EFD_SEMAPHORE-on-the-server-sid.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0077-ntdll-server-Specify-EFD_SEMAPHORE-on-the-server-sid.patch	2018-11-07 16:09:08.829369848 +0000
++++ b/0077-ntdll-server-Specify-EFD_SEMAPHORE-on-the-server-sid.patch	2018-11-08 13:09:50.593237357 +0000
 @@ -122,14 +122,6 @@
   };
   struct create_esync_reply

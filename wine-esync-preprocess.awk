@@ -1243,6 +1243,7 @@ function process_patch_file_0041(file_array,
 	complete, diff_file, idiff, ihunk, indent, line, line_text, new_diff_file)
 {
 	exit_start_line=0
+	diff_offset=staging ? -28 : -58
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		if (new_diff_file = is_new_diff_file(file_array[line])) {
@@ -1263,7 +1264,7 @@ function process_patch_file_0041(file_array,
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
 				if ((idiff == 1) && (is_new_hunk(file_array[line]))) {
-					split("-28 2 -28 2", array_diff_lines)
+					split((diff_offset " 2 " diff_offset " 2"), array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
 					line_text=" struct create_esync_reply"
 					insert_array_entry(file_array, ++line, line_text)
@@ -1278,7 +1279,7 @@ function process_patch_file_0041(file_array,
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
 				if ((idiff == 1) && (is_new_hunk(file_array[line]))) {
-					split("-28 2 -28 2", array_diff_lines)
+					split((diff_offset " 2 " diff_offset " 2"), array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
 					line_text=" struct open_esync_reply"
 					insert_array_entry(file_array, ++line, line_text)
