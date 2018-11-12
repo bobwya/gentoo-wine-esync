@@ -45,12 +45,12 @@ function text2regexp(text,
 		startmarker=sub("^\\^", "", regexp)
 		endmarker=sub("\\$$", "", regexp)
 		# Escape all control regex characters
-		gsub("\\\\", "\x5c\x5c&", regexp)
-		gsub("\\!|\\\"|\\#|\\$|\\%|\\&|\x27|\\(|\\)|\\+|\\,|\\-|\\.|\\/|\\:|\\;|\x3c|\\=|\x3e|\\?|\\@|\\[|\\]|\\{|\\|\\}|\\~", "\x5c\x5c&", regexp)
+		gsub("\\\\", "[&]", regexp)
+		gsub("\\!|\\\"|\\#|\\$|\\%|\\&|\x27|\\(|\\)|\\+|\\,|\\-|\\.|\\/|\\:|\\;|\x3c|\\=|\x3e|\\?|\\@|\\[|\\]|\\{|\\|\\}|\\~", "[&]", regexp)
 		gsub("\\*", ".*", regexp)
 		gsub("\x20", "[[:blank:]][[:blank:]]*", regexp)
 		regexp=((startmarker ? "^" : "") regexp (endmarker ? "$" : ""))
-		gsub("\\|", "\x5c\x5c&", regexp)
+		gsub("\\|", "[&]", regexp)
 
 		return regexp
 }

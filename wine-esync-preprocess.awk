@@ -519,14 +519,13 @@ function process_staging_patch_file_0014(file_array,
 }
 
 function process_patch_file_0015(file_array,
-	complete, diff_file, idiff_file, idiff, ihunk, indent, line, line_text, new_diff_file)
+	complete, diff_file, idiff, ihunk, indent, line, line_text, new_diff_file)
 {
 	exit_start_line=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		if (new_diff_file = is_new_diff_file(file_array[line])) {
 			diff_file = new_diff_file
-			++idiff_file
 			idiff=1
 			ihunk=0
 		}
@@ -535,11 +534,9 @@ function process_patch_file_0015(file_array,
 			idiff=1
 		}
 
-		if (idiff_file == 3) {
-			if (!exit_start_line)
-				exit_start_line=line
-			if (diff_file)
-				exit_diff_file=diff_file
+		if (diff_file == "/server/process.c") {
+			exit_start_line=exit_start_line ? exit_start_line : line
+			exit_diff_file=diff_file
 
 			if (ihunk == 5) {
 				exit_hunk=ihunk
@@ -735,7 +732,7 @@ function process_staging_patch_file_0020(file_array,
 			else if ((ihunk == 6) && (complete >= 3)) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && sub(text2regexp("return (mythread->state == TERMINATED);$"), "return (mythread->state == TERMINATED \&\& !mythread->exit_poll);", file_array[line])) {
+				if ((idiff == 1) && sub(text2regexp("return (mythread->state == TERMINATED);$"), "return (mythread->state == TERMINATED [&][&] !mythread->exit_poll);", file_array[line])) {
 					++idiff
 					++complete
 				}
@@ -1001,10 +998,10 @@ function process_staging_patch_file_0023(file_array,
 					change_array_entry_diff(file_array, line, array_diff_lines)
 					++idiff
 				}
-				else if ((idiff == 2) && sub(text2regexp("pthread_attr_init( &attr );$"), "pthread_attr_init( \&pthread_attr );", file_array[line])) {
+				else if ((idiff == 2) && sub(text2regexp("pthread_attr_init( &attr );$"), "pthread_attr_init( [&]pthread_attr );", file_array[line])) {
 					++idiff
 				}
-				else if ((idiff == 3) && sub(text2regexp("pthread_attr_setstack( &attr, teb->DeallocationStack,$"), "pthread_attr_setstack( \&pthread_attr, teb->DeallocationStack,", file_array[line])) {
+				else if ((idiff == 3) && sub(text2regexp("pthread_attr_setstack( &attr, teb->DeallocationStack,$"), "pthread_attr_setstack( [&]pthread_attr, teb->DeallocationStack,", file_array[line])) {
 					++idiff
 					++complete
 				}
@@ -1136,7 +1133,7 @@ function process_staging_patch_file_0024(file_array,
 			else if (ihunk == 2) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && sub(text2regexp("return (mythread->state == TERMINATED);$"), "return (mythread->state == TERMINATED \&\& !mythread->exit_poll);", file_array[line])) {
+				if ((idiff == 1) && sub(text2regexp("return (mythread->state == TERMINATED);$"), "return (mythread->state == TERMINATED [&][&] !mythread->exit_poll);", file_array[line])) {
 					++idiff
 					++complete
 				}
@@ -1551,10 +1548,10 @@ function process_staging_patch_file_0045(file_array,
 					idiff += 2
 					++complete
 				}
-				else if ((idiff == 2) && sub(text2regexp("pthread_attr_init( &attr );$"), "pthread_attr_init( \&pthread_attr );", file_array[line])) {
+				else if ((idiff == 2) && sub(text2regexp("pthread_attr_init( &attr );$"), "pthread_attr_init( [&]pthread_attr );", file_array[line])) {
 					++idiff
 				}
-				else if ((idiff == 3) && sub(text2regexp("pthread_attr_setstack( &attr, teb->DeallocationStack,$"), "pthread_attr_setstack( \&pthread_attr, teb->DeallocationStack,", file_array[line])) {
+				else if ((idiff == 3) && sub(text2regexp("pthread_attr_setstack( &attr, teb->DeallocationStack,$"), "pthread_attr_setstack( [&]pthread_attr, teb->DeallocationStack,", file_array[line])) {
 					++idiff
 					++complete
 				}
