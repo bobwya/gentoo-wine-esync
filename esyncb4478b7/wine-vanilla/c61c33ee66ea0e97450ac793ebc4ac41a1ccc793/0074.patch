@@ -1,5 +1,5 @@
 --- a/0074-ntdll-server-Abort-if-esync-is-enabled-for-the-serve.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0074-ntdll-server-Abort-if-esync-is-enabled-for-the-serve.patch	2018-11-08 13:09:51.977258403 +0000
++++ b/0074-ntdll-server-Abort-if-esync-is-enabled-for-the-serve.patch	2018-11-17 23:00:32.991686171 +0000
 @@ -74,6 +74,7 @@
  +    esync_init();
   
