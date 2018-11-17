@@ -138,7 +138,7 @@ function generate_rebased_esync_patchset()
 			-vtarget_esync_directory="${__target_esync_directory}" \
 			-f "${__awk_scripts_directory}/wine-esync-common.awk" \
 			-f "${__awk_scripts_directory}/wine-esync-preprocess.awk" \
-			"${__patch_file_path}" 
+			"${__patch_file_path}"
 		then
 			:
 		elif (($?==255)); then
@@ -156,8 +156,12 @@ function generate_rebased_esync_patchset()
 		diff -Nau "${__patch_file_path}" "${__target_esync_patch_file}" > "${__target_esync_directory}/${__target_patch}"
 		[[ -f "${__target_esync_directory}/${__target_patch}" ]] || die "diff failed"
 		rm -f "${__target_esync_patch_file}" || die "rm failed"
-		sed -i -e "s|${__source_esync_directory}|a|g" -e "s|${__target_esync_directory}|b|g" \
-			"${__target_esync_directory}/${__target_patch}" || die "sed failed"
+		if [[ ! -s "${__target_esync_directory}/${__target_patch}" ]]; then
+			rm -f "${__target_esync_directory}/${__target_patch}" || die "rm failed"
+		else
+			sed -i -e "s|${__source_esync_directory}|a|g" -e "s|${__target_esync_directory}|b|g" \
+				"${__target_esync_directory}/${__target_patch}" || die "sed failed"
+		fi
 	done
 }
 
