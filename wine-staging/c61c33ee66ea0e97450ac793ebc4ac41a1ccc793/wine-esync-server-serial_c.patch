@@ -1,0 +1,12 @@
+diff --git a/server/serial.c b/server/serial.c
+index 089f47c2ae7..e7e5fad13b8 100644
+--- a/server/serial.c
++++ b/server/serial.c
+@@ -92,6 +92,7 @@ static const struct object_ops serial_ops =
+     add_queue,                    /* add_queue */
+     remove_queue,                 /* remove_queue */
+     default_fd_signaled,          /* signaled */
++    NULL,                         /* get_esync_fd */
+     no_satisfied,                 /* satisfied */
+     no_signal,                    /* signal */
+     serial_get_fd,                /* get_fd */

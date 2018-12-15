@@ -1,0 +1,12 @@
+diff --git a/server/mutex.c b/server/mutex.c
+index 7ca41316ab0..f236a7034fa 100644
+--- a/server/mutex.c
++++ b/server/mutex.c
+@@ -61,6 +61,7 @@ static const struct object_ops mutex_ops =
+     add_queue,                 /* add_queue */
+     remove_queue,              /* remove_queue */
+     mutex_signaled,            /* signaled */
++    NULL,                      /* get_esync_fd */
+     mutex_satisfied,           /* satisfied */
+     mutex_signal,              /* signal */
+     no_get_fd,                 /* get_fd */
