@@ -1,6 +1,25 @@
 --- a/0077-ntdll-server-Specify-EFD_SEMAPHORE-on-the-server-sid.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0077-ntdll-server-Specify-EFD_SEMAPHORE-on-the-server-sid.patch	2018-11-17 23:00:42.191826436 +0000
-@@ -122,14 +122,6 @@
++++ b/0077-ntdll-server-Specify-EFD_SEMAPHORE-on-the-server-sid.patch	2018-12-14 23:01:59.691478138 +0000
+@@ -3,10 +3,8 @@
+ Date: Sun, 29 Jul 2018 16:53:58 -0500
+ Subject: [PATCH 77/83] ntdll, server: Specify EFD_SEMAPHORE on the server
+  side.
+-
+ This just makes things cleaner; since we already pass the type to the server
+ there's no reason to pass this as well.
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  dlls/ntdll/esync.c             | 21 +++++++--------------
+@@ -16,7 +14,6 @@
+  server/request.h               |  5 ++---
+  server/trace.c                 |  1 -
+  6 files changed, 18 insertions(+), 25 deletions(-)
+-
+ diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
+ index 0bced88..e3434e7 100644
+ --- a/dlls/ntdll/esync.c
+@@ -122,14 +119,6 @@
   };
   struct create_esync_reply
   {
@@ -15,3 +34,8 @@
  diff --git a/server/esync.c b/server/esync.c
  index 10001a2..3e78387 100644
  --- a/server/esync.c
+@@ -209,4 +198,3 @@
+  }
+ -- 
+ 2.7.4
+-

@@ -1,6 +1,30 @@
 --- a/0024-server-ntdll-Also-wait-on-the-queue-fd-when-waiting-.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0024-server-ntdll-Also-wait-on-the-queue-fd-when-waiting-.patch	2018-11-17 23:00:39.507785516 +0000
-@@ -166,14 +166,6 @@
++++ b/0024-server-ntdll-Also-wait-on-the-queue-fd-when-waiting-.patch	2018-12-14 23:01:58.211455642 +0000
+@@ -3,15 +3,12 @@
+ Date: Sat, 9 Jun 2018 14:44:54 -0500
+ Subject: [PATCH 24/83] server, ntdll: Also wait on the queue fd when waiting
+  for driver events.
+-
+ Normally the server handles this, by polling on the fd during its main loop.
+ The problem there is that the server only polls when the thread is waiting
+ for messages. We want to replicate that behaviour, otherwise wineserver spins
+ forever trying to wake up a thread that just doesn't care.
+-
+ With this patch, I'm finally able to interact with winecfg. Next step is to
+ fix the 'drives' tab.
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  dlls/ntdll/esync.c             | 44 ++++++++++++++++++++++++++++++------------
+@@ -26,7 +23,6 @@
+  server/thread.c                |  5 +++--
+  server/trace.c                 |  7 ++++++-
+  11 files changed, 80 insertions(+), 26 deletions(-)
+-
+ diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
+ index c4faf69..cb206bc 100644
+ --- a/dlls/ntdll/esync.c
+@@ -166,14 +162,6 @@
   };
   
   
@@ -15,3 +39,58 @@
  diff --git a/server/esync.c b/server/esync.c
  index 4682163..ef02170 100644
  --- a/server/esync.c
+@@ -252,8 +240,9 @@
+ index 71bf85b..fa97774 100644
+ --- a/server/process.c
+ +++ b/server/process.c
+-@@ -65,7 +65,7 @@ static int process_signaled( struct object *obj, struct wait_queue_entry *entry
++@@ -65,8 +65,8 @@ static int process_signaled( struct object *obj, struct wait_queue_entry *entry
+  static unsigned int process_map_access( struct object *obj, unsigned int access );
++ static struct security_descriptor *process_get_sd( struct object *obj );
+  static void process_poll_event( struct fd *fd, int event );
+  static void process_destroy( struct object *obj );
+ -static int process_get_esync_fd( struct object *obj );
+@@ -277,7 +266,7 @@
+ index 5defc73..2cae53b 100644
+ --- a/server/protocol.def
+ +++ b/server/protocol.def
+-@@ -3865,4 +3865,14 @@ struct handle_info
++@@ -3978,6 +3978,16 @@ struct handle_info
+  @REQ(get_esync_fd)
+      obj_handle_t handle;        /* handle to the object */
+  @REPLY
+@@ -292,6 +281,8 @@
+ +    ESYNC_MANUAL_SERVER,
+ +    ESYNC_QUEUE,
+ +};
++ 
++ 
+ diff --git a/server/queue.c b/server/queue.c
+ index df327cf..f883ed9 100644
+ --- a/server/queue.c
+@@ -335,9 +326,10 @@
+ index 722c133..56bef76 100644
+ --- a/server/thread.c
+ +++ b/server/thread.c
+-@@ -131,7 +131,7 @@ static const struct object_ops thread_apc_ops =
++@@ -131,8 +131,8 @@ static const struct object_ops thread_apc_ops =
+  
+  static void dump_thread( struct object *obj, int verbose );
++ static struct object_type *thread_get_type( struct object *obj );
+  static int thread_signaled( struct object *obj, struct wait_queue_entry *entry );
+ -static int thread_get_esync_fd( struct object *obj );
+ +static int thread_get_esync_fd( struct object *obj, enum esync_type *type );
+@@ -345,7 +337,7 @@
+  static void thread_poll_event( struct fd *fd, int event );
+  static void destroy_thread( struct object *obj );
+ @@ -378,9 +378,10 @@ static int thread_signaled( struct object *obj, struct wait_queue_entry *entry )
+-     return (mythread->state == TERMINATED);
++     return (mythread->state == TERMINATED && !mythread->exit_poll);
+  }
+  
+ -static int thread_get_esync_fd( struct object *obj )
+@@ -383,4 +375,3 @@
+  static const char * const req_names[REQ_NB_REQUESTS] = {
+ -- 
+ 2.7.4
+-

@@ -1,6 +1,45 @@
 --- a/0045-server-ntdll-Implement-alertable-waits.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0045-server-ntdll-Implement-alertable-waits.patch	2018-11-17 23:00:38.771774294 +0000
-@@ -269,17 +269,13 @@
++++ b/0045-server-ntdll-Implement-alertable-waits.patch	2018-12-14 23:01:57.795449319 +0000
+@@ -2,9 +2,7 @@
+ From: Zebediah Figura <z.figura12@gmail.com>
+ Date: Fri, 15 Jun 2018 14:12:22 -0500
+ Subject: [PATCH 45/83] server, ntdll: Implement alertable waits.
+-
+ We do this quite simply by waiting on an extra eventfd descriptor, which the server signals when a user APC is queued.
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  dlls/ntdll/esync.c             | 94 ++++++++++++++++++++++++++++++++++++------
+@@ -19,7 +17,6 @@
+  server/thread.h                |  1 +
+  server/trace.c                 |  7 ++++
+  11 files changed, 146 insertions(+), 18 deletions(-)
+-
+ diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
+ index 360a980..395c8d3 100644
+ --- a/dlls/ntdll/esync.c
+@@ -203,9 +200,10 @@
+ index 7ee4f8c..12f10a6 100644
+ --- a/dlls/ntdll/ntdll_misc.h
+ +++ b/dlls/ntdll/ntdll_misc.h
+-@@ -235,6 +235,7 @@ struct ntdll_thread_data
++@@ -284,7 +284,8 @@ struct ntdll_thread_data
+      BOOL               wow64_redir;   /* Wow64 filesystem redirection flag */
+      pthread_t          pthread_id;    /* pthread thread id */
++     void              *pthread_stack; /* pthread stack */
+      int                esync_queue_fd;/* fd to wait on for driver events */
+ +    int                esync_apc_fd;  /* fd to wait on for user APCs */
+  };
+@@ -223,7 +221,7 @@
+  
+      signal_init_thread( teb );
+      virtual_init_threading();
+-@@ -665,6 +666,7 @@ NTSTATUS WINAPI RtlCreateUserThread( HANDLE process, SECURITY_DESCRIPTOR *descr,
++@@ -836,6 +837,7 @@ NTSTATUS WINAPI RtlCreateUserThread( HANDLE process, SECURITY_DESCRIPTOR *descr,
+      thread_data->wait_fd[1]  = -1;
+      thread_data->start_stack = (char *)teb->Tib.StackBase;
+      thread_data->esync_queue_fd = -1;
+@@ -269,17 +267,14 @@
   };
   union generic_reply
   {
@@ -16,6 +55,38 @@
 -+#define SERVER_PROTOCOL_VERSION 574
 - 
 - #endif /* __WINE_WINE_SERVER_PROTOCOL_H */
++diff --git a/server/esync.c b/server/esync.c
  diff --git a/server/esync.c b/server/esync.c
  index 6adf996..8bf6e44 100644
  --- a/server/esync.c
+@@ -390,9 +385,9 @@
+      thread->token           = NULL;
+      thread->esync_fd        = -1;
+ +    thread->esync_apc_fd    = -1;
+- 
+-     thread->creation_time = current_time;
+-     thread->exit_time     = 0;
++     thread->exit_poll       = NULL;
++     thread->shm_fd          = -1;
++     thread->shm             = NULL;
+ @@ -289,7 +290,10 @@ struct thread *create_thread( int fd, struct process *process, const struct secu
+      }
+  
+@@ -438,9 +433,9 @@
+      struct token          *token;         /* security token associated with this thread */
+      int                    esync_fd;      /* esync file descriptor (signalled on exit) */
+ +    int                    esync_apc_fd;  /* esync apc fd (signalled when APCs are present) */
+- };
+- 
+- struct thread_snapshot
++     struct timeout_user   *exit_poll;     /* poll if the thread/process has exited already */
++     int                    shm_fd;        /* file descriptor for thread local shared memory */
++     shmlocal_t            *shm;           /* thread local shared memory pointer */
+ diff --git a/server/trace.c b/server/trace.c
+ index 26a84ba..5b1c7e1 100644
+ --- a/server/trace.c
+@@ -482,4 +477,3 @@
+  static const struct
+ -- 
+ 2.7.4
+-

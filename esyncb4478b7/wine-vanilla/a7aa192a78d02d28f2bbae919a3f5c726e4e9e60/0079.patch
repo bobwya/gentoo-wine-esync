@@ -1,6 +1,31 @@
 --- a/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2018-10-07 03:47:12.000000000 +0100
-+++ b/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2018-11-17 23:00:32.055671901 +0000
-@@ -147,17 +147,13 @@
++++ b/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2018-12-14 23:01:54.795403719 +0000
+@@ -6,16 +6,13 @@
+ MIME-Version: 1.0
+ Content-Type: text/plain; charset=UTF-8
+ Content-Transfer-Encoding: 8bit
+-
+ By manually notifying the server every time we enter and exit a message wait.
+-
+ The hung queue logic keeps breaking. In the case of bug #9 it was breaking
+ because we were waiting for more than 5 seconds on our queue and then someone
+ sent us a message with SMTO_ABORTIFHUNG. Just stop fighting against the
+ server and try to coöperate with it instead. It takes two extra server calls,
+ but ideally the GUI thread isn't going to be in the same sort of performance-
+ critical code that this patchset was written for.
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  dlls/ntdll/esync.c             | 53 +++++++++++++++++++++++++++++++-----------
+@@ -25,7 +22,6 @@
+  server/request.h               |  5 +++-
+  server/trace.c                 |  8 +++++++
+  6 files changed, 100 insertions(+), 23 deletions(-)
+-
+ diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
+ index f678ae8..0ca8896 100644
+ --- a/dlls/ntdll/esync.c
+@@ -147,17 +143,13 @@
   };
   union generic_reply
   {
@@ -19,3 +44,8 @@
  diff --git a/server/protocol.def b/server/protocol.def
  index 1c7cf76..b3db323 100644
  --- a/server/protocol.def
+@@ -318,4 +310,3 @@
+  static const struct
+ -- 
+ 2.7.4
+-

@@ -1,0 +1,29 @@
+--- a/0048-kernel32-tests-Add-some-semaphore-tests.patch	2018-10-07 03:47:11.000000000 +0100
++++ b/0048-kernel32-tests-Add-some-semaphore-tests.patch	2018-12-14 23:01:57.819449684 +0000
+@@ -2,12 +2,10 @@
+ From: Zebediah Figura <z.figura12@gmail.com>
+ Date: Wed, 13 Jun 2018 22:40:47 -0500
+ Subject: [PATCH 48/83] kernel32/tests: Add some semaphore tests.
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  dlls/kernel32/tests/sync.c | 98 +++++++++++++++++++++++++++++++++++++++++++++-
+  1 file changed, 97 insertions(+), 1 deletion(-)
+-
+ diff --git a/dlls/kernel32/tests/sync.c b/dlls/kernel32/tests/sync.c
+ index aebb25d..354ccb8 100644
+ --- a/dlls/kernel32/tests/sync.c
+@@ -25,7 +23,7 @@
+      /* test case sensitivity */
+  
+ @@ -619,6 +622,99 @@ static void test_semaphore(void)
+-     ok( GetLastError() == ERROR_INVALID_PARAMETER, "wrong error %u\n", GetLastError());
++     ok( GetLastError() == ERROR_FILE_NOT_FOUND, "wrong error %u\n", GetLastError());
+  
+      CloseHandle( handle );
+ +
+@@ -126,4 +124,3 @@
+  static void test_waitable_timer(void)
+ -- 
+ 2.7.4
+-

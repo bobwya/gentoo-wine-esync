@@ -1,6 +1,24 @@
 --- a/0044-server-ntdll-Pass-the-shared-memory-index-back-from-.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0044-server-ntdll-Pass-the-shared-memory-index-back-from-.patch	2018-11-17 23:00:34.683711967 +0000
-@@ -60,14 +60,6 @@
++++ b/0044-server-ntdll-Pass-the-shared-memory-index-back-from-.patch	2018-12-14 23:01:56.143424208 +0000
+@@ -3,9 +3,7 @@
+ Date: Wed, 13 Jun 2018 15:08:26 -0500
+ Subject: [PATCH 44/83] server, ntdll: Pass the shared memory index back from
+  get_esync_fd.
+-
+ This should let DuplicateHandle() work completely correctly for semaphores and mutexes.
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  dlls/ntdll/esync.c             | 6 +++---
+@@ -15,7 +13,6 @@
+  server/request.h               | 1 +
+  server/trace.c                 | 1 +
+  6 files changed, 15 insertions(+), 5 deletions(-)
+-
+ diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
+ index 69f0eb5..360a980 100644
+ --- a/dlls/ntdll/esync.c
+@@ -60,14 +57,6 @@
   };
   
   enum esync_type
@@ -15,3 +33,8 @@
  diff --git a/server/esync.c b/server/esync.c
  index f1a46af..6adf996 100644
  --- a/server/esync.c
+@@ -124,4 +113,3 @@
+  static const dump_func req_dumpers[REQ_NB_REQUESTS] = {
+ -- 
+ 2.7.4
+-

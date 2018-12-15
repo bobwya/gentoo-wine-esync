@@ -1,0 +1,40 @@
+--- a/0013-server-Add-an-object-operation-to-grab-the-esync-fil.patch	2018-11-01 17:19:43.000000000 +0000
++++ b/0013-server-Add-an-object-operation-to-grab-the-esync-fil.patch	2018-12-14 23:01:56.995437159 +0000
+@@ -3,9 +3,7 @@
+ Date: Fri, 8 Jun 2018 18:51:40 -0500
+ Subject: [PATCH 13/83] server: Add an object operation to grab the esync file
+  descriptor.
+-
+ Split off to decrease patch size.
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  server/async.c      | 2 ++
+@@ -43,7 +41,6 @@
+  server/token.c      | 1 +
+  server/winstation.c | 2 ++
+  34 files changed, 61 insertions(+)
+-
+ diff --git a/server/async.c b/server/async.c
+ index f2674bbd45..97d86283e7 100644
+ --- a/server/async.c
+@@ -424,14 +421,6 @@
+      no_satisfied,                     /* satisfied */
+      no_signal,                        /* signal */
+      no_get_fd,                        /* get_fd */
+-@@ -280,6 +284,7 @@ static const struct object_ops named_pipe_device_file_ops =
+-     add_queue,                               /* add_queue */
+-     remove_queue,                            /* remove_queue */
+-     default_fd_signaled,                     /* signaled */
+-+    NULL,                                    /* get_esync_fd */
+-     no_satisfied,                            /* satisfied */
+-     no_signal,                               /* signal */
+-     named_pipe_device_file_get_fd,           /* get_fd */
+ diff --git a/server/object.h b/server/object.h
+ index b5c50e1cee..b3d4e33344 100644
+ --- a/server/object.h
+@@ -663,4 +652,3 @@
+      no_get_fd,                    /* get_fd */
+ -- 
+ 2.19.1
+-

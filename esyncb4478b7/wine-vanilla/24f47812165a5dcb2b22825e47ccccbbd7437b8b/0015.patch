@@ -1,0 +1,23 @@
+--- a/0015-server-Create-eventfd-file-descriptors-for-process-o.patch	2018-10-07 03:47:11.000000000 +0100
++++ b/0015-server-Create-eventfd-file-descriptors-for-process-o.patch	2018-12-14 23:01:55.947421229 +0000
+@@ -3,7 +3,6 @@
+ Date: Fri, 8 Jun 2018 18:57:12 -0500
+ Subject: [PATCH 15/83] server: Create eventfd file descriptors for process
+  objects.
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  server/esync.c   | 33 +++++++++++++++++++++++++++++++++
+@@ -12,7 +11,6 @@
+  server/process.h |  1 +
+  4 files changed, 72 insertions(+), 1 deletion(-)
+  create mode 100644 server/esync.h
+-
+ diff --git a/server/esync.c b/server/esync.c
+ index e775b3b..f50366a 100644
+ --- a/server/esync.c
+@@ -176,4 +174,3 @@
+  struct process_snapshot
+ -- 
+ 2.7.4
+-

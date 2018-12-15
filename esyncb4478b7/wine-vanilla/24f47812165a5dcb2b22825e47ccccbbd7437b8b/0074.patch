@@ -1,0 +1,31 @@
+--- a/0074-ntdll-server-Abort-if-esync-is-enabled-for-the-serve.patch	2018-10-07 03:47:11.000000000 +0100
++++ b/0074-ntdll-server-Abort-if-esync-is-enabled-for-the-serve.patch	2018-12-14 23:01:56.331427066 +0000
+@@ -3,14 +3,12 @@
+ Date: Sat, 4 Aug 2018 15:15:12 -0500
+ Subject: [PATCH 74/83] ntdll, server: Abort if esync is enabled for the server
+  but not the client, and vice versa.
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  dlls/ntdll/esync.c  | 28 +++++++++++++++++++++++++++-
+  dlls/ntdll/thread.c |  3 +--
+  server/esync.c      | 12 ++++++++++++
+  3 files changed, 40 insertions(+), 3 deletions(-)
+-
+ diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
+ index 32cb68a..4d3e294 100644
+ --- a/dlls/ntdll/esync.c
+@@ -74,7 +72,7 @@
+ +    esync_init();
+  
+      NtCreateKeyedEvent( &keyed_event, GENERIC_READ | GENERIC_WRITE, NULL, 0 );
+- }
++ 
+ diff --git a/server/esync.c b/server/esync.c
+ index a0745a2..10001a2 100644
+ --- a/server/esync.c
+@@ -100,4 +98,3 @@
+      if ((esync = create_esync( root, &name, objattr->attributes, req->initval, req->flags, req->type, sd )))
+ -- 
+ 2.7.4
+-

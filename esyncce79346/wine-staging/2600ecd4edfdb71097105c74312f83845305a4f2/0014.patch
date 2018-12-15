@@ -1,0 +1,57 @@
+--- a/0014-server-Add-a-request-to-get-the-eventfd-file-descrip.patch	2018-11-01 17:19:43.000000000 +0000
++++ b/0014-server-Add-a-request-to-get-the-eventfd-file-descrip.patch	2018-12-14 23:02:00.471489993 +0000
+@@ -3,7 +3,6 @@
+ Date: Fri, 8 Jun 2018 18:55:49 -0500
+ Subject: [PATCH 14/83] server: Add a request to get the eventfd file
+  descriptor associated with a waitable handle.
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  include/wine/server_protocol.h | 14 ++++++++++++++
+@@ -12,7 +11,6 @@
+  server/request.h               |  5 +++++
+  server/trace.c                 |  8 ++++++++
+  5 files changed, 61 insertions(+)
+-
+ diff --git a/include/wine/server_protocol.h b/include/wine/server_protocol.h
+ index 98470eca3c..554fa10835 100644
+ --- a/include/wine/server_protocol.h
+@@ -51,14 +49,13 @@
+  };
+  union generic_reply
+  {
+-@@ -6563,6 +6576,7 @@ union generic_reply
++@@ -6934,5 +6947,6 @@ union generic_reply
+      struct set_job_completion_port_reply set_job_completion_port_reply;
+      struct terminate_job_reply terminate_job_reply;
+      struct create_esync_reply create_esync_reply;
+ +    struct get_esync_fd_reply get_esync_fd_reply;
+  };
+  
+- #define SERVER_PROTOCOL_VERSION 570
+ diff --git a/server/esync.c b/server/esync.c
+ index e761475678..e775b3bd28 100644
+ --- a/server/esync.c
+@@ -99,7 +96,7 @@
+ index b743674ebd..250590573e 100644
+ --- a/server/protocol.def
+ +++ b/server/protocol.def
+-@@ -3865,3 +3865,9 @@ struct handle_info
++@@ -3978,5 +3978,11 @@ struct handle_info
+  @REPLY
+      obj_handle_t handle;        /* handle to the object */
+  @END
+@@ -109,6 +106,8 @@
+ +    obj_handle_t handle;        /* handle to the object */
+ +@REPLY
+ +@END
++ 
++ 
+ diff --git a/server/request.h b/server/request.h
+ index 242143d2c3..272f79dc04 100644
+ --- a/server/request.h
+@@ -181,4 +180,3 @@
+  static const struct
+ -- 
+ 2.19.1
+-
