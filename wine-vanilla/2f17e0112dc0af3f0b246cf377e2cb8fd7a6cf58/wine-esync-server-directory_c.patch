@@ -1,0 +1,20 @@
+diff --git a/server/directory.c b/server/directory.c
+index 6aa3a55f35e..1de2b6ee065 100644
+--- a/server/directory.c
++++ b/server/directory.c
+@@ -57,6 +57,7 @@ static const struct object_ops object_type_ops =
+     no_add_queue,                 /* add_queue */
+     NULL,                         /* remove_queue */
+     NULL,                         /* signaled */
++    NULL,                         /* get_esync_fd */
+     NULL,                         /* satisfied */
+     no_signal,                    /* signal */
+     no_get_fd,                    /* get_fd */
+@@ -92,6 +93,7 @@ static const struct object_ops directory_ops =
+     no_add_queue,                 /* add_queue */
+     NULL,                         /* remove_queue */
+     NULL,                         /* signaled */
++    NULL,                         /* get_esync_fd */
+     NULL,                         /* satisfied */
+     no_signal,                    /* signal */
+     no_get_fd,                    /* get_fd */
