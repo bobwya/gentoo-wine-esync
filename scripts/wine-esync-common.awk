@@ -134,37 +134,6 @@ function is_new_hunk(line_text)
 	return (line_text ~ "^@@[[:blank:]][-][[:digit:]][[:digit:]]*,[[:digit:]][[:digit:]]*[[:blank:]][+][[:digit:]][[:digit:]]*,[[:digit:]][[:digit:]]*[[:blank:]]@@( |$)")
 }
 
-# is_in_array(array, value, [start], [end])
-#
-# Parameters:
-#   1>  array      :  array                        ("polymorphic" array)
-#   2>  value      :  search / target value        ("polymorphic")
-#  [3>  start]     :  start array entry for search (integer, optional)
-#  [4>  end]       :  end array entry for search   (integer, optional)
-#
-# Description
-#   Searches the specified array for value.
-#   If neither start and end is specified (or are -1),
-#   then the search range is unrestricted.
-#   If only start is -1, then the search range
-#   is from the beginning of the range: [,end].
-#   If only end is not specified (or -1), then the search range
-#   is to the end of the range: [start,].
-function is_in_array(array, value, start, end,
-		i)
-{
-	if (!start)	start=-1
-	if (!end)	end=-1
-	for (i in array) {
-		if (((start != -1) && (i < start)) || ((end != -1) && (i > end)))
-			continue
-
-		if (array[i] == value) return 1
-	}
-
-	return 0
-}
-
 # change_array_entry_diff(file_array, target_line, line_text)
 #
 # Parameters:
@@ -229,7 +198,7 @@ function print_file(file_array, file_path,
 		line)
 {
 	for (line = 1 ; line <= file_array[0] ; ++line) {
-		if (line in file_array)
+		if ((line in file_array) && (file_array[line] != ""))
 			print file_array[line] >file_path
 	}
 }

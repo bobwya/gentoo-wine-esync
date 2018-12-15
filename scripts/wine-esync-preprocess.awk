@@ -136,29 +136,11 @@ function process_patch_file_0002(file_array,
 			}
 			
 		}
-		else if (diff_file == "/server/trace.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_file=diff_file
-
-			if ((ihunk == 1) && (complete >= 1)) {
-				exit_hunk=ihunk
-				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && is_in_array(array_esync_wine_commits, esync_rebase_patchset, 1, 6)) {
-					++idiff
-					++complete
-				}
-				else if ((idiff == 1) && sub(text2regexp("(dump_func)dump_get_new_process_info_request,"), "(dump_func)dump_exec_process_request,", file_array[line])) {
-					++idiff
-					++complete
-				}
-				exit_end_line=line
-			}
-		}
 	}
 
 	if (!exit_end_line) exit_end_line=line
 
-	if (complete != 2) exit_code=idiff
+	if (complete != 1) exit_code=idiff
 }
 
 function process_staging_patch_file_0002(file_array,
@@ -196,7 +178,7 @@ function process_staging_patch_file_0002(file_array,
 					++complete
 				}
 				exit_end_line=line
-			}			
+			}
 		}
 		else if (diff_file == "/server/protocol.def") {
 			exit_start_line=exit_start_line ? exit_start_line : line
@@ -211,7 +193,7 @@ function process_staging_patch_file_0002(file_array,
 					++idiff
 				}
 				else if ((idiff == 2) && (file_array[line] ~ text2regexp("^+@END$"))) {
-					line_text=" "
+					line_text = " "
 					insert_array_entry(file_array, ++line, line_text)
 					insert_array_entry(file_array, ++line, line_text)
 					++idiff
@@ -364,29 +346,54 @@ function process_patch_file_0013(file_array,
 			idiff=1
 		}
 
-		if (diff_file = "/server/named_pipe.c") {
+		if (diff_file == "/server/named_pipe.c") {
 			exit_start_line=exit_start_line ? exit_start_line : line
 			exit_diff_file=diff_file
 
 			if (ihunk == 4) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && sub(text2regexp("named_pipe_device_get_fd, /* get_fd */"), "no_get_fd,                        /* get_fd */", file_array[line])) {
-					++idiff
-					++complete
+				if (idiff == 1) {
+					if (esync_rebase_index != 6) {
+						++idiff
+						++complete
+					}
+					else if ((esync_rebase_index == 6) && sub(text2regexp("no_get_fd, /* get_fd */"), "named_pipe_device_get_fd,         /* get_fd */", file_array[line])) {
+						++idiff
+						++complete
+					}
+					else if (sub(text2regexp("named_pipe_device_get_fd, /* get_fd */"), "no_get_fd,                        /* get_fd */", file_array[line])) {
+						++idiff
+						++complete
+					}
+					exit_end_line=line
 				}
-				exit_end_line=line
+			}
+			else if (ihunk == 5) {
+				exit_hunk=ihunk
+				if (is_new_hunk(file_array[line])) exit_start_line=line
+				if ((idiff == 1) && (complete >= 1)) {
+					if (is_new_hunk(file_array[line])) {
+						while(!is_new_diff_file(file_array[line]))
+							delete file_array[line++]
+						++idiff
+						++complete
+					}
+					exit_end_line=line
+				}
 			}
 		}
 	}
 
 	if (!exit_end_line) exit_end_line=line
 
-	if (complete != 1) exit_code=idiff
+	if (esync_rebase_index < 6)
+		++complete
+	if (complete != 2) exit_code=idiff
 }
 
 function process_patch_file_0014(file_array,
-	complete, diff_file, idiff, ihunk, indent, line, line_text, new_diff_file)
+	complete, diff_file, idiff, ihunk, indent, line, line_count, line_text, new_diff_file)
 {
 	exit_start_line=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
@@ -408,32 +415,21 @@ function process_patch_file_0014(file_array,
 			if (ihunk == 4) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && (is_new_hunk(file_array[line]))) {
-					split("371 -3 371 -3", array_diff_lines)
-					change_array_entry_diff(file_array, line, array_diff_lines)
+				if ((idiff == 1) && is_new_hunk(file_array[line])) {
+					saved_line=line
 					++idiff
 				}
-				else if ((idiff == 2) && (file_array[line] ~ text2regexp("^-#define SERVER_PROTOCOL_VERSION "))) {
-					while(!is_new_diff_file(file_array[line]))
-						delete file_array[line++]
-					++idiff
-					++complete
-				}
-				exit_end_line=line
-			}
-		}
-		else if (diff_file == "/server/trace.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_file=diff_file
-
-			if ((ihunk == 1) && (complete >= 1)) {
-				exit_hunk=ihunk
-				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && is_in_array(array_esync_wine_commits, esync_rebase_patchset, 1, 6)) {
-					++idiff
-					++complete
-				}
-				else if ((idiff == 1) && sub(text2regexp("(dump_func)dump_get_new_process_info_request,"), "(dump_func)dump_exec_process_request,", file_array[line])) {
+				else if ((idiff == 2) && (file_array[line] ~ text2regexp("^*#define SERVER_PROTOCOL_VERSION "))) {
+					line_count=0
+					while(!is_new_diff_file(file_array[line])) {
+						delete file_array[line]
+						++line
+						line_count-=1
+					}
+					if (saved_line) {
+						split(("371 " line_count " 371 " line_count), array_diff_lines)
+						change_array_entry_diff(file_array, saved_line, array_diff_lines)
+					}
 					++idiff
 					++complete
 				}
@@ -444,7 +440,7 @@ function process_patch_file_0014(file_array,
 
 	if (!exit_end_line) exit_end_line=line
 
-	if (complete != 2) exit_code=idiff
+	if (complete != 1) exit_code=idiff
 }
 
 function process_staging_patch_file_0014(file_array,
@@ -470,14 +466,16 @@ function process_staging_patch_file_0014(file_array,
 			if (ihunk == 4) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && is_new_hunk(file_array[line])) {
-					split("-401 0 -401 0", array_diff_lines)
-					change_array_entry_diff(file_array, line, array_diff_lines)
-					++idiff
-				}
-				else if ((idiff == 2) && is_in_array(array_esync_wine_commits, esync_rebase_patchset, 1, 8)) {
-					idiff += 2
-					++complete
+				if (idiff == 1) {
+					if ((esync_rebase_index <= 2) || (staging && ((esync_rebase_index >= 3) || (esync_rebase_index <= 5))) || (esync_rebase_index >= 6)) {
+						idiff += 3
+						++complete
+					}
+					else if (is_new_hunk(file_array[line])) {
+						split("-401 0 -401 0", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						++idiff
+					}
 				}
 				else if ((idiff == 2) && sub(text2regexp("struct set_job_completion_port_reply set_job_completion_port_reply;$"), "struct suspend_process_reply suspend_process_reply;", file_array[line])) {
 					++idiff
@@ -502,7 +500,7 @@ function process_staging_patch_file_0014(file_array,
 					++idiff
 				}
 				else if ((idiff == 2) && (file_array[line] ~ text2regexp("^+@END$"))) {
-					line_text=" "
+					line_text = " "
 					insert_array_entry(file_array, ++line, line_text)
 					insert_array_entry(file_array, ++line, line_text)
 					++idiff
@@ -541,7 +539,7 @@ function process_patch_file_0015(file_array,
 			if (ihunk == 5) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && !staging && is_in_array(array_esync_wine_commits, esync_rebase_patchset, 6)) {
+				if ((idiff == 1) && !staging && (esync_rebase_index >= 5)) {
 					++idiff
 					++complete
 				}
@@ -732,7 +730,7 @@ function process_staging_patch_file_0020(file_array,
 			else if ((ihunk == 6) && (complete >= 3)) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && sub(text2regexp("return (mythread->state == TERMINATED);$"), "return (mythread->state == TERMINATED [&][&] !mythread->exit_poll);", file_array[line])) {
+				if ((idiff == 1) && sub(text2regexp("return (mythread->state == TERMINATED);$"), "return (mythread->state == TERMINATED \&\& !mythread->exit_poll);", file_array[line])) {
 					++idiff
 					++complete
 				}
@@ -898,7 +896,7 @@ function process_patch_file_0023(file_array,
 				}
 				else if ((idiff == 2) && (file_array[line] ~ text2regexp("^+@ cdecl __wine_esync_set_queue_fd(long)$"))) {					
 					if (staging) {
-						if (is_in_array(array_esync_wine_commits, esync_rebase_patchset, 1, 1))
+						if (esync_rebase_index == 0)
 							line_text=" @ cdecl __wine_user_shared_data()"
 						else
 							line_text = " "
@@ -989,7 +987,7 @@ function process_staging_patch_file_0023(file_array,
 			if ((ihunk == 2) && (complete >= 2)) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && is_in_array(array_esync_wine_commits, esync_rebase_patchset, 1, 4)) {
+				if ((idiff == 1) && (esync_rebase_index < 4)) {
 					idiff += 3
 					++complete
 				}
@@ -998,10 +996,10 @@ function process_staging_patch_file_0023(file_array,
 					change_array_entry_diff(file_array, line, array_diff_lines)
 					++idiff
 				}
-				else if ((idiff == 2) && sub(text2regexp("pthread_attr_init( &attr );$"), "pthread_attr_init( [&]pthread_attr );", file_array[line])) {
+				else if ((idiff == 2) && sub(text2regexp("pthread_attr_init( &attr );$"), "pthread_attr_init( \&pthread_attr );", file_array[line])) {
 					++idiff
 				}
-				else if ((idiff == 3) && sub(text2regexp("pthread_attr_setstack( &attr, teb->DeallocationStack,$"), "pthread_attr_setstack( [&]pthread_attr, teb->DeallocationStack,", file_array[line])) {
+				else if ((idiff == 3) && sub(text2regexp("pthread_attr_setstack( &attr, teb->DeallocationStack,$"), "pthread_attr_setstack( \&pthread_attr, teb->DeallocationStack,", file_array[line])) {
 					++idiff
 					++complete
 				}
@@ -1101,7 +1099,7 @@ function process_staging_patch_file_0024(file_array,
 					++idiff
 				}
 				else if ((idiff == 2) && (file_array[line] ~ text2regexp("^+};$"))) {
-					line_text=" "
+					line_text = " "
 					insert_array_entry(file_array, ++line, line_text)
 					insert_array_entry(file_array, ++line, line_text)
 					++idiff
@@ -1133,7 +1131,7 @@ function process_staging_patch_file_0024(file_array,
 			else if (ihunk == 2) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && sub(text2regexp("return (mythread->state == TERMINATED);$"), "return (mythread->state == TERMINATED [&][&] !mythread->exit_poll);", file_array[line])) {
+				if ((idiff == 1) && sub(text2regexp("return (mythread->state == TERMINATED);$"), "return (mythread->state == TERMINATED \&\& !mythread->exit_poll);", file_array[line])) {
 					++idiff
 					++complete
 				}
@@ -1361,7 +1359,22 @@ function process_patch_file_0042(file_array,
 			exit_start_line=exit_start_line ? exit_start_line : line
 			exit_diff_file=diff_file
 
-			if (ihunk == 2) {
+			if (ihunk == 1) {
+				exit_hunk=ihunk
+				if (is_new_hunk(file_array[line])) exit_start_line=line
+				if ((idiff == 1) && (esync_rebase_index > 0)) {
+					++idiff
+					++complete
+				}
+				else if ((idiff == 1) && (file_array[line] ~ text2regexp("^ WINE_DEFAULT_DEBUG_CHANNEL(thread);$"))) {
+					line_text=(" " "WINE_DECLARE_DEBUG_CHANNEL(relay);")
+					file_array[++line] = line_text
+					++idiff
+					++complete
+				}
+				exit_end_line=line
+			}
+			if ((ihunk == 2) && (complete >= 1)) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
 				if ((idiff == 1) && (file_array[line] ~ text2regexp("^ NtCreateKeyedEvent( &keyed_event, GENERIC_READ | GENERIC_WRITE, NULL, 0 );$"))) {
@@ -1381,7 +1394,7 @@ function process_patch_file_0042(file_array,
 
 	if (!exit_end_line) exit_end_line=line
 	
-	if (complete != 1) exit_code=idiff
+	if (complete != 2) exit_code=idiff
 }
 
 function process_staging_patch_file_0042(file_array,
@@ -1465,33 +1478,11 @@ function process_patch_file_0045(file_array,
 				exit_end_line=line
 			}
 		}
-		else if (diff_file == "/server/trace.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_file=diff_file
-
-			if ((ihunk == 1) && (complete >= 1)) {
-				exit_hunk=ihunk
-				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && !staging && is_in_array(array_esync_wine_commits, esync_rebase_patchset, 1, 6)) {
-					++idiff
-					++complete
-				}
-				else if ((idiff == 1) && staging && is_in_array(array_esync_wine_commits, esync_rebase_patchset, 1, 6)) {
-					++idiff
-					++complete
-				}
-				else if ((idiff == 1) && sub(text2regexp("(dump_func)dump_get_new_process_info_request,"), "(dump_func)dump_exec_process_request,", file_array[line])) {
-					++idiff
-					++complete
-				}
-				exit_end_line=line
-			}
-		}
 	}
 
 	if (!exit_end_line) exit_end_line=line
 	
-	if (complete != 2) exit_code=idiff
+	if (complete != 1) exit_code=idiff
 }
 
 function process_staging_patch_file_0045(file_array,
@@ -1544,14 +1535,14 @@ function process_staging_patch_file_0045(file_array,
 					change_array_entry_diff(file_array, line, array_diff_lines)
 					++idiff
 				}
-				else if ((idiff == 2) && is_in_array(array_esync_wine_commits, esync_rebase_patchset, 1, 4)) {
+				else if ((idiff == 2) && (esync_rebase_index < 4)) {
 					idiff += 2
 					++complete
 				}
-				else if ((idiff == 2) && sub(text2regexp("pthread_attr_init( &attr );$"), "pthread_attr_init( [&]pthread_attr );", file_array[line])) {
+				else if ((idiff == 2) && sub(text2regexp("pthread_attr_init( &attr );$"), "pthread_attr_init( \&pthread_attr );", file_array[line])) {
 					++idiff
 				}
-				else if ((idiff == 3) && sub(text2regexp("pthread_attr_setstack( &attr, teb->DeallocationStack,$"), "pthread_attr_setstack( [&]pthread_attr, teb->DeallocationStack,", file_array[line])) {
+				else if ((idiff == 3) && sub(text2regexp("pthread_attr_setstack( &attr, teb->DeallocationStack,$"), "pthread_attr_setstack( \&pthread_attr, teb->DeallocationStack,", file_array[line])) {
 					++idiff
 					++complete
 				}
@@ -1665,9 +1656,16 @@ function process_patch_file_0064(file_array,
 			if (ihunk == 2) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && (file_array[line] ~ text2regexp("^ struct async_queue wait_q; /* other async waiters of this fd */$"))) {
-					delete file_array[line]
-					++idiff
+				if (idiff == 1) {
+					if (!staging || (esync_rebase_index >= 6)) {
+						idiff+=2
+						++complete
+					}
+					else if (is_new_hunk(file_array[line])) {
+						split("0 1 0 1", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						++idiff
+					}
 				}
 				else if ((idiff == 2) && (file_array[line] ~ text2regexp("^ apc_param_t comp_key; /* completion key to set in completion events */$"))) {
 					line_text = (indent "unsigned int         comp_flags;  /* completion flags */")
@@ -1675,12 +1673,15 @@ function process_patch_file_0064(file_array,
 					++idiff
 					++complete
 				}
-				exit_end_line=line
 			}
-			else if ((ihunk == 4) && (complete >= 1)) {
+			else if (ihunk == 4) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && (file_array[line] ~ text2regexp("^ fd->fs_locks = 1;$"))) {
+				if ((idiff == 1) && staging && (esync_rebase_index >= 6)) {
+					idiff+=2
+					++complete
+				}
+				else if ((idiff == 1) && (file_array[line] ~ text2regexp("^ fd->fs_locks = 1;$"))) {
 					delete file_array[line]
 					++idiff
 				}
@@ -1692,10 +1693,10 @@ function process_patch_file_0064(file_array,
 				}
 				exit_end_line=line
 			}
-			else if ((ihunk == 5) && (complete >= 2)) {
+			else if ((ihunk == 5) && (complete >= 1)) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && !staging && is_in_array(array_esync_wine_commits, esync_rebase_patchset, 1, 6)) {
+				if ((idiff == 1) && staging && (esync_rebase_index >= 6)) {
 					++idiff
 					++complete
 				}
@@ -1741,8 +1742,11 @@ function process_patch_file_0074(file_array,
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
 				if ((idiff == 1) && (file_array[line] ~ text2regexp("^ NtCreateKeyedEvent( &keyed_event, GENERIC_READ | GENERIC_WRITE, NULL, 0 );$"))) {
-					line_text=" "
-					insert_array_entry(file_array, ++line, line_text)
+					line_text = " "
+					if (esync_rebase_index == 5)
+						file_array[++line] = line_text
+					else
+						insert_array_entry(file_array, ++line, line_text)
 					++idiff
 					++complete
 				}
@@ -1832,29 +1836,11 @@ function process_patch_file_0079(file_array,
 				exit_end_line=line
 			}
 		}
-		else if ((diff_file == "/server/trace.c") && (complete >= 1)) {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_file=diff_file
-
-			if ((ihunk == 1) && (complete >= 1)) {
-				exit_hunk=ihunk
-				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && is_in_array(array_esync_wine_commits, esync_rebase_patchset, 1, 6)) {
-					++idiff
-					++complete
-				}
-				else if ((idiff == 1) && sub(text2regexp("(dump_func)dump_get_new_process_info_request,"), "(dump_func)dump_exec_process_request,", file_array[line])) {
-					++idiff
-					++complete
-				}
-				exit_end_line=line
-			}
-		}
 	}
 
 	if (!exit_end_line) exit_end_line=line
 
-	if (complete != 2) exit_code=idiff
+	if (complete != 1) exit_code=idiff
 }
 
 function process_staging_patch_file_0079(file_array,
@@ -1889,7 +1875,7 @@ function process_staging_patch_file_0079(file_array,
 					line_text = (indent "unsigned int           ignore_post_msg; /* ignore post messages newer than this unique id */")
 					insert_array_entry(file_array, ++line, line_text)
 					++idiff
-					++complete					
+					++complete
 				}
 				exit_end_line=line
 			}
@@ -1944,7 +1930,7 @@ function process_patch_file(file_array)
 {
 	printf("Pre-processing patch file: '%s' ...\n", file_name)
 
-	if (staging && (patch_number == "0001") && is_in_array(array_esync_wine_commits, esync_rebase_patchset, 1, 3)) {
+	if (staging && (patch_number == "0001") && (esync_rebase_index < 3)) {
 		process_staging_patch_file_0001(file_array)
 	}
 	else if (patch_number == "0002") {
@@ -1955,21 +1941,20 @@ function process_patch_file(file_array)
 		process_staging_patch_file_0003(file_array)
 	}
 	else if (patch_number == "0006") {
-		if (!staging && is_in_array(array_esync_wine_commits, esync_rebase_patchset, 1, 3))
+		if (!staging && (esync_rebase_index < 3))
 			process_patch_file_0006(file_array)
 		else if (staging)
 			process_staging_patch_file_0006(file_array)
 	}
 	else if (patch_number == "0013") {
-		if (is_in_array(array_esync_wine_commits, esync_rebase_patchset, 8))
-			process_patch_file_0013(file_array)
+		process_patch_file_0013(file_array)
 	}
 	else if (patch_number == "0014") {
 		process_patch_file_0014(file_array)
 		if (!exit_code && staging) process_staging_patch_file_0014(file_array)
 	}
 	else if (patch_number == "0015") {
-		if (is_in_array(array_esync_wine_commits, esync_rebase_patchset, 1, 5))
+		if (esync_rebase_index < 5)
 			process_patch_file_0015(file_array)
 		if (!exit_code && staging) process_staging_patch_file_0015(file_array)
 	}
@@ -1983,28 +1968,28 @@ function process_patch_file(file_array)
 		process_staging_patch_file_0022(file_array)
 	}
 	else if (patch_number == "0023") {
-		if (is_in_array(array_esync_wine_commits, esync_rebase_patchset, 1, 1))
+		if (esync_rebase_index == 0)
 			process_patch_file_0023(file_array)
 		if (!exit_code && staging) process_staging_patch_file_0023(file_array)
 	}
 	else if (patch_number == "0024") {
-		if (is_in_array(array_esync_wine_commits, esync_rebase_patchset, 7))
-			process_patch_file_0024(file_array)
+# 		if (esync_rebase_index >= 6)
+# 		process_patch_file_0024(file_array)
 		if (!exit_code && staging)
 			process_staging_patch_file_0024(file_array)
-		if (!exit_code)
+		if (!exit_code && (esync_rebase_index < 6))
 			process_patch_file_delete_target_hunk(file_array, "/include/wine/server_protocol.h", 2)
 	}
 	else if (staging && (patch_number == "0025")) {
 		process_staging_patch_file_0025(file_array)
 	}
-	else if (patch_number == "0026") {
+	else if ((patch_number == "0026") && (esync_rebase_index < 6)) {
 		process_patch_file_delete_target_hunk(file_array, "/include/wine/server_protocol.h", 2)
 	}
-	else if (patch_number == "0032") {
+	else if ((patch_number == "0032") && (esync_rebase_index < 6)) {
 		process_patch_file_delete_target_hunk(file_array, "/include/wine/server_protocol.h", 2)
 	}
-	else if (patch_number == "0033") {
+	else if ((patch_number == "0033") && (esync_rebase_index < 6)) {
 		process_patch_file_0033(file_array)
 	}
 	else if (patch_number == "0040") {
@@ -2018,7 +2003,7 @@ function process_patch_file(file_array)
 			process_patch_file_delete_target_hunk(file_array, "/include/wine/server_protocol.h", 3)
 	}
 	else if (patch_number == "0042") {
-		if (is_in_array(array_esync_wine_commits, esync_rebase_patchset, 1, 5))
+		if (esync_rebase_index < 6)
 			process_patch_file_0042(file_array)
 		if (!exit_code && staging)
 			process_staging_patch_file_0042(file_array)
@@ -2031,14 +2016,14 @@ function process_patch_file(file_array)
 		if (!exit_code && staging) process_staging_patch_file_0045(file_array)
 	}
 	else if (patch_number == "0048") {
-		if (is_in_array(array_esync_wine_commits, esync_rebase_patchset, 1, 2))
+		if ((esync_rebase_index < 2) || (staging && (esync_rebase_index == 2)))
 			process_patch_file_0048(file_array)
 	}
-	else if (patch_number == "0064" && (is_in_array(array_esync_wine_commits, esync_rebase_patchset, 7) || staging)) {
+	else if ((patch_number == "0064") && staging) {
 		process_patch_file_0064(file_array)
 	}
 	else if (patch_number == "0074") {
-		if (is_in_array(array_esync_wine_commits, esync_rebase_patchset, 1, 5))
+		if (esync_rebase_index < 6)
 			process_patch_file_0074(file_array)
 		if (!exit_code && staging) process_staging_patch_file_0074(file_array)
 	}
@@ -2064,7 +2049,6 @@ function process_patch_file(file_array)
 }
 
 BEGIN{
-	split(esync_patchset_commits, array_esync_wine_commits)
 	supported_patches="0002 0006 0013 0014 0015 0023 0024 0026 0032 0033 0040 0041 0042 0044 0045 0048 0064 0074 0077 0078 0079"
 	if (staging) supported_patches=(supported_patches " 0001 0003 0017 0020 0022 0025")
 }
