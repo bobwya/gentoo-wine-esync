@@ -1,8 +1,8 @@
 diff --git a/server/named_pipe.c b/server/named_pipe.c
-index 19a5426b1ff..925ae5ebedd 100644
+index a1f37237295..878c15ab6bf 100644
 --- a/server/named_pipe.c
 +++ b/server/named_pipe.c
-@@ -124,6 +124,7 @@ static const struct object_ops named_pipe_ops =
+@@ -128,6 +128,7 @@ static const struct object_ops named_pipe_ops =
      no_add_queue,                 /* add_queue */
      NULL,                         /* remove_queue */
      NULL,                         /* signaled */
@@ -10,7 +10,7 @@ index 19a5426b1ff..925ae5ebedd 100644
      NULL,                         /* satisfied */
      no_signal,                    /* signal */
      no_get_fd,                    /* get_fd */
-@@ -166,6 +167,7 @@ static const struct object_ops pipe_server_ops =
+@@ -168,6 +169,7 @@ static const struct object_ops pipe_server_ops =
      add_queue,                    /* add_queue */
      remove_queue,                 /* remove_queue */
      default_fd_signaled,          /* signaled */
@@ -18,7 +18,7 @@ index 19a5426b1ff..925ae5ebedd 100644
      no_satisfied,                 /* satisfied */
      no_signal,                    /* signal */
      pipe_end_get_fd,              /* get_fd */
-@@ -207,6 +209,7 @@ static const struct object_ops pipe_client_ops =
+@@ -214,6 +216,7 @@ static const struct object_ops pipe_client_ops =
      add_queue,                    /* add_queue */
      remove_queue,                 /* remove_queue */
      default_fd_signaled,          /* signaled */
@@ -26,19 +26,11 @@ index 19a5426b1ff..925ae5ebedd 100644
      no_satisfied,                 /* satisfied */
      no_signal,                    /* signal */
      pipe_end_get_fd,              /* get_fd */
-@@ -252,6 +255,7 @@ static const struct object_ops named_pipe_device_ops =
+@@ -262,6 +265,7 @@ static const struct object_ops named_pipe_device_ops =
      no_add_queue,                     /* add_queue */
      NULL,                             /* remove_queue */
      NULL,                             /* signaled */
 +    NULL,                             /* get_esync_fd */
      no_satisfied,                     /* satisfied */
      no_signal,                        /* signal */
-     no_get_fd,                        /* get_fd */
-@@ -280,6 +284,7 @@ static const struct object_ops named_pipe_device_file_ops =
-     add_queue,                               /* add_queue */
-     remove_queue,                            /* remove_queue */
-     default_fd_signaled,                     /* signaled */
-+    NULL,                                    /* get_esync_fd */
-     no_satisfied,                            /* satisfied */
-     no_signal,                               /* signal */
-     named_pipe_device_file_get_fd,           /* get_fd */
+     named_pipe_device_get_fd,         /* get_fd */

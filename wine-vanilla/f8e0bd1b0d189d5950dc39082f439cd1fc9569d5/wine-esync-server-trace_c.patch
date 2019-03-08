@@ -1,5 +1,5 @@
 diff --git a/server/trace.c b/server/trace.c
-index 6662d9af207..a6e53bfdb1e 100644
+index 6662d9af207..c3200bf674b 100644
 --- a/server/trace.c
 +++ b/server/trace.c
 @@ -4495,6 +4495,58 @@ static void dump_terminate_job_request( const struct terminate_job_request *req
@@ -97,3 +97,11 @@ index 6662d9af207..a6e53bfdb1e 100644
  };
  
  static const struct
+@@ -5433,6 +5500,7 @@ static const struct
+     { "INVALID_LOCK_SEQUENCE",       STATUS_INVALID_LOCK_SEQUENCE },
+     { "INVALID_OWNER",               STATUS_INVALID_OWNER },
+     { "INVALID_PARAMETER",           STATUS_INVALID_PARAMETER },
++    { "INVALID_PARAMETER_4",         STATUS_INVALID_PARAMETER_4 },
+     { "INVALID_SECURITY_DESCR",      STATUS_INVALID_SECURITY_DESCR },
+     { "IO_TIMEOUT",                  STATUS_IO_TIMEOUT },
+     { "KEY_DELETED",                 STATUS_KEY_DELETED },
