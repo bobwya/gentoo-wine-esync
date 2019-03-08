@@ -121,6 +121,8 @@ git_garbage_collect()
 	pushd "${__git_tree}" >/dev/null || die "pushd failed"
 	git am --abort &>/dev/null
 	git gc --auto || die "git gc failed"
+	git prune || die "git prune failed"
+	rm -f ".git/gc.log" &>/dev/null
 	popd >/dev/null || die "popd failed"
 }
 
@@ -143,6 +145,8 @@ git_create_branch()
 
 	pushd "${__git_tree}" >/dev/null || die "pushd failed"
 	if git branch --list | grep -q "${__git_branch}"; then
+		git reset --hard HEAD || die "git reset failed"
+		git clean -fxd || die "git clean failed"
 		git checkout master || die "git checkout failed"
 		git branch -D "${__git_branch}" || die "git branch failed"
 	fi
@@ -598,7 +602,7 @@ main()
 	git_garbage_collect "${__wine_staging_git_tree}"
 	git_create_branch "${__wine_git_tree}" "wine-esync"
 	git_create_branch "${__wine_staging_git_tree}" "wine-staging-esync"
-	find "${__esync_rebase_patches_root}" -type d -regextype posix-awk -regex ".*/${SHA1_REGEXP}" -print0 | \
+	find "${__esync_rebase_patches_root}" -mindepth 3 -type d -regextype posix-awk -regex ".*/${SHA1_REGEXP}" -print0 | \
 	while IFS= read -r -d '' __patchset_subdirectory; do
 		__patchset_subdirectory="${__patchset_subdirectory#${__esync_rebase_patches_root}}"
 		__patchset_subdirectory="${__patchset_subdirectory#/}"
@@ -611,7 +615,7 @@ main()
 		elif [[ "${__target_patchset_subdirectory}" =~ ^wine[-]vanilla ]]; then
 			__staging_directory="."
 		else
-			die "unknown Wine package base: ${__patchset_subdirectory%/*}"
+			die "unknown Wine package base: ${__patchset_subdirectory}"
 		fi
 		squash_esync_patchset "${__wine_git_tree}" "${__staging_directory}" \
 						"${__esync_sources_root}" \

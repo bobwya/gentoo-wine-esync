@@ -2,21 +2,29 @@
 
 
 declare -a ARRAY_ESYNC_PATCH_COMMITS=(
-		"f8e0bd1b0d189d5950dc39082f439cd1fc9569d5" "12276796c95007fc12eb38a41ca25b4daee7e1b3"
-		"a7aa192a78d02d28f2bbae919a3f5c726e4e9e60" "c61c33ee66ea0e97450ac793ebc4ac41a1ccc793"
-		"57212f64f8e4fef0c63c633940e13d407c0f2069" "24f47812165a5dcb2b22825e47ccccbbd7437b8b"
-		"2f17e0112dc0af3f0b246cf377e2cb8fd7a6cf58" "2600ecd4edfdb71097105c74312f83845305a4f2"
+		"f8e0bd1b0d189d5950dc39082f439cd1fc9569d5" # (00)  wine:3.0-rc1
+		"12276796c95007fc12eb38a41ca25b4daee7e1b3" # (01) [wine:3.3]
+		"a7aa192a78d02d28f2bbae919a3f5c726e4e9e60" # (02)  wine:3.3
+		"c61c33ee66ea0e97450ac793ebc4ac41a1ccc793" # (03)  wine:3.6
+		"433788736bcb68b43a35749c28d6272e4041c857" # (04)  wine:3.9
+		"57212f64f8e4fef0c63c633940e13d407c0f2069" # (05)  wine:3.14
+		"24f47812165a5dcb2b22825e47ccccbbd7437b8b" # (06)  wine:3.17
+		"2f17e0112dc0af3f0b246cf377e2cb8fd7a6cf58" # (07)  wine:3.19
+		"2600ecd4edfdb71097105c74312f83845305a4f2" # (08)  wine:3.20
 )
+declare ESYNC_ESYNCB4478B7_INDEX=0
+declare ESYNC_ESYNCCE79346_INDEX=8
 declare ESYNC_STAGING_SUPPORT_INDEX=2
-declare ESYNC_VANILLA_SUPPORT_INDEX=0
+declare ESYNC_VANILLA_SUPPORT_INDEX=$((ESYNC_ESYNCB4478B7_INDEX))
+
 declare ESYNC_BASE_URL="https://github.com/zfigura/wine/releases/download"
 declare ESYNC_VERSION_ARRAY=(
-    "esyncb4478b7"
-    "esyncce79346"
+	"esyncb4478b7"
+	"esyncce79346"
 )
 declare ESYNC_SHA256_ARRAY=(
-    "2cacc317e07531987c41c5aceb41862b06d4717840916dfc01c11513b359a962"
-    "c2a8dd2afc7be4d3ddaf3eeb4c4302e0ea80e1542eb11d6484290de5d36b9a78"
+	"2cacc317e07531987c41c5aceb41862b06d4717840916dfc01c11513b359a962"
+	"c2a8dd2afc7be4d3ddaf3eeb4c4302e0ea80e1542eb11d6484290de5d36b9a78"
 )
 declare TARBALL_EXT="tgz"
 declare SCRIPT_DIRECTORY SCRIPT_NAME
@@ -41,7 +49,10 @@ function die()
 	local usage="${2:-0}"
 
 	if ((usage)); then
-		printf "Usage:\\n%s: SOURCE-DIRECTORY TARGET-DIRECTORY [AWK-SCRIPT-DIRECTORY]\\n\\n" "${SCRIPT_NAME}" >&2
+		printf "Usage: %s SOURCE-ESYNC-DIRECTORY TARGET-DIRECTORY [AWK-SCRIPT-DIRECTORY]\\n\\n" "${SCRIPT_NAME}" >&2
+		printf "SOURCE-ESYNC-DIRECTORY : Target root directory, of the location to download, store and extract esync tarballs\\n" >&2
+		printf "TARGET-DIRECTORY       : Target root directory, under which to store all the rebasing esync patchsets\\n" >&2
+		printf "[AWK-SCRIPT-DIRECTORY] : Directory holding helper awk scripts (if different from main BASH script)\\n\\n" >&2
 	fi
 	printf "%s: %s: %s\\n" "${SCRIPT_NAME}" "${FUNCNAME[1]}()" "${1}" >&2
 	exit 1
@@ -65,19 +76,19 @@ function download_esync_patchset()
 
 	pushd "${_source_directory}" >/dev/null || die "pushd failed"
 	for _i in "${!ESYNC_VERSION_ARRAY[@]}"; do
-        _esync_tarball="${ESYNC_VERSION_ARRAY[_i]}.${TARBALL_EXT}"
-        if [[ -f "${_source_directory}/${_esync_tarball}" ]] \
-            && sha256sum -c --quiet <<< "${ESYNC_SHA256_ARRAY[_i]} ${_esync_tarball}"
-        then
-            continue
-        fi
+		_esync_tarball="${ESYNC_VERSION_ARRAY[_i]}.${TARBALL_EXT}"
+		if [[ -f "${_source_directory}/${_esync_tarball}" ]] \
+		    && sha256sum -c --quiet <<< "${ESYNC_SHA256_ARRAY[_i]} ${_esync_tarball}"
+		then
+		    continue
+		fi
 
-        wget "${ESYNC_BASE_URL}/${ESYNC_VERSION_ARRAY[_i]}/esync.${TARBALL_EXT}" -O "${_esync_tarball}" || die "wget failed"
+		wget "${ESYNC_BASE_URL}/${ESYNC_VERSION_ARRAY[_i]}/esync.${TARBALL_EXT}" -O "${_esync_tarball}" || die "wget failed"
 
-        if ! sha256sum -c --quiet <<< "${ESYNC_SHA256_ARRAY[_i]} ${_esync_tarball}"; then
-            die "sha256sum failed on esync tarball: '${_esync_tarball}'"
-        fi
-    done
+		if ! sha256sum -c --quiet <<< "${ESYNC_SHA256_ARRAY[_i]} ${_esync_tarball}"; then
+		    die "sha256sum failed on esync tarball: '${_esync_tarball}'"
+		fi
+	done
 	popd >/dev/null || die "popd failed"
 }
 
@@ -97,18 +108,18 @@ function unpack_esync_patchset()
 
 	pushd "${_source_directory}" >/dev/null || die "pushd failed"
 	for _i in "${!ESYNC_VERSION_ARRAY[@]}"; do
-        _esync_directory="${ESYNC_VERSION_ARRAY[_i]}"
-        _esync_tarball="${_esync_directory}.${TARBALL_EXT}"
-        if ! sha256sum -c --quiet <<< "${ESYNC_SHA256_ARRAY[_i]} ${_esync_tarball}"; then
-            die "sha256sum failed on esync tarball: '${_esync_tarball}'"
-        fi
-        rm -rf "${_source_directory:?}/${_esync_directory}" \
-            || die "rm -rf '${_source_directory}/${_esync_directory}' failed"
-        mkdir -p "${_source_directory:?}/${_esync_directory}" \
-            || die "mkdir -p '${_source_directory}/${_esync_directory}' failed"
-        tar xvfa "${_source_directory}/${_esync_tarball}" -C "${_source_directory}/${_esync_directory}" \
-            || die "tar xvfa '${_source_directory}/${_esync_tarball}' -C '${_source_directory}/${_esync_directory}' failed"
-    done
+		_esync_directory="${ESYNC_VERSION_ARRAY[_i]}"
+		_esync_tarball="${_esync_directory}.${TARBALL_EXT}"
+		if ! sha256sum -c --quiet <<< "${ESYNC_SHA256_ARRAY[_i]} ${_esync_tarball}"; then
+		    die "sha256sum failed on esync tarball: '${_esync_tarball}'"
+		fi
+		rm -rf "${_source_directory:?}/${_esync_directory:?}" \
+		    || die "rm -rf '${_source_directory}/${_esync_directory}' failed"
+		mkdir -p "${_source_directory:?}/${_esync_directory}" \
+		    || die "mkdir -p '${_source_directory}/${_esync_directory}' failed"
+		tar xvfa "${_source_directory}/${_esync_tarball}" -C "${_source_directory}/${_esync_directory}" \
+		    || die "tar xvfa '${_source_directory}/${_esync_tarball}' -C '${_source_directory}/${_esync_directory}' failed"
+	done
 	popd >/dev/null || die "popd failed"
 }
 
@@ -132,7 +143,7 @@ function generate_rebased_esync_patchset()
 	local  _source_directory="${1%/}" _target_directory="${2%/}" \
 			_awk_scripts_directory="${3%/}" _esync_rebase_index="${4}" \
 			_staging="${5}" _array_size="${#ARRAY_ESYNC_PATCH_COMMITS[@]}" \
-			_esync_tarball _esync_version _i \
+			_esync_tarball _esync_version _i=0 \
 			_patch_file _patch_file_path _source_esync_directory _target_esync_directory \
 			_target_esync_version _target_esync_patch_file _target_patch
 
@@ -144,19 +155,14 @@ function generate_rebased_esync_patchset()
 		_target_esync_version="wine-vanilla"
 	fi
 
-	case "${_esync_rebase_index}" in
-        [0-5])
-            _i=0;;
-        [6-7])
-            _i=1;;
-	esac
+	((_esync_rebase_index >= ESYNC_ESYNCCE79346_INDEX)) && _i=$((_i+1))
 
-    _esync_version="${ESYNC_VERSION_ARRAY[_i]}"
-    _esync_tarball="${_esync_version}.${TARBALL_EXT}"
+	_esync_version="${ESYNC_VERSION_ARRAY[_i]}"
+	_esync_tarball="${_esync_version}.${TARBALL_EXT}"
 	_source_esync_directory="${_source_directory}/${_esync_version}/esync"
 	_target_esync_directory="${_target_directory}/${_esync_version}/${_target_esync_version}/${ARRAY_ESYNC_PATCH_COMMITS[_esync_rebase_index]}"
 	mkdir -p "${_target_esync_directory}" || die "mkdir -p failed"
-
+		
 	printf "\\nRebasing esync patchset, for app-emulation/${_target_esync_version}, against Wine Git commit: %s\\n" "${ARRAY_ESYNC_PATCH_COMMITS[_esync_rebase_index]}"
 	for _patch_file_path in "${_source_esync_directory}/"{0001..0083}*.patch; do
 		if awk -vstaging="${_staging}" \
@@ -209,8 +215,14 @@ function generate_all_rebased_esync_patchsets()
 
 	local  _source_directory="${1%/}" _target_directory="${2%/}" \
 			_awk_scripts_directory="${3%/}" \
-			_array_size="${#ARRAY_ESYNC_PATCH_COMMITS[@]}" _esync_rebase_index _staging
+			_array_size="${#ARRAY_ESYNC_PATCH_COMMITS[@]}" _esync_rebase_index _esync_version _i _staging
 
+	for _i in "${!ESYNC_VERSION_ARRAY[@]}"; do
+		_esync_version="${ESYNC_VERSION_ARRAY[_i]}"
+		[[ -z "${_esync_version}" ]] && continue
+
+		rm -rf "${_target_directory:?}/${_esync_version:?}/"* || die "rm failed"
+	done
 	for _staging in {0..1}; do
 		# shellcheck disable=SC2051
 		for ((_esync_rebase_index=0 ; _esync_rebase_index < _array_size ; ++_esync_rebase_index)); do
@@ -244,22 +256,22 @@ function main()
 	local  _source_directory="${1%/}" _target_directory="${2%/}" _awk_scripts_directory="${3%/}"
 
 	if [[ ! -d "${_source_directory}" ]]; then
-        die "argument 1: not a valid directory: '${_source_directory}'" 1
-    else
-        _source_directory="$( readlink -f "${_source_directory}" )"
-    fi
+		die "argument 1: not a valid directory: '${_source_directory}'" 1
+	else
+		_source_directory="$( readlink -f "${_source_directory}" )"
+	fi
 	if [[ ! -d "${_target_directory}" ]]; then
-        die "argument 2: not a valid directory: '${_target_directory}'" 1
-    else
-        _target_directory="$( readlink -f "${_target_directory}" )"
-    fi
+		die "argument 2: not a valid directory: '${_target_directory}'" 1
+	else
+		_target_directory="$( readlink -f "${_target_directory}" )"
+	fi
 	[[ -z "${_awk_scripts_directory}" ]] && _awk_scripts_directory="${SCRIPT_DIRECTORY}"
 	if [[ ! -d "${_awk_scripts_directory}" ]]; then
 		die "argument 3: not a valid directory: '${_awk_scripts_directory}'" 1
 	elif [[ ! -f "${_awk_scripts_directory}/wine-esync-common.awk" ]]; then
 		die "argument 3: awk script: 'wine-esync-common.awk' missing from directory: '${_awk_scripts_directory}'" 1
 	elif [[ ! -f "${_awk_scripts_directory}/wine-esync-preprocess.awk" ]]; then
-        die "argument 3: awk script: 'wine-esync-preprocess.awk' missing from directory: '${_awk_scripts_directory}'" 1
+		die "argument 3: awk script: 'wine-esync-preprocess.awk' missing from directory: '${_awk_scripts_directory}'" 1
 	fi
 
 	download_esync_patchset "${_source_directory}"
