@@ -1,0 +1,26 @@
+--- a/0001-configure-Check-for-sys-eventfd.h-ppoll-and-shm_open.patch	2018-10-07 03:47:11.000000000 +0100
++++ b/0001-configure-Check-for-sys-eventfd.h-ppoll-and-shm_open.patch	2019-03-07 17:05:48.208418268 +0000
+@@ -3,18 +3,14 @@
+ Date: Wed, 13 Jun 2018 10:44:49 -0500
+ Subject: [PATCH 01/83] configure: Check for sys/eventfd.h, ppoll(), and
+  shm_open().
+-
+ We use ppoll() instead of poll() for the better time granularity.
+-
+ Although perhaps we shouldn't since the server doesn't do this.
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  configure           | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+  configure.ac        | 12 ++++++++++
+  include/config.h.in |  9 +++++++
+  3 files changed, 89 insertions(+)
+-
+ diff --git a/configure b/configure
+ index c2483c8..196acc6 100755
+ --- a/configure
+@@ -181,4 +177,3 @@
+  
+ -- 
+ 2.7.4
+-

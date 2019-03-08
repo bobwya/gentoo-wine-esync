@@ -1,5 +1,5 @@
 --- a/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2018-10-07 03:47:12.000000000 +0100
-+++ b/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2018-12-14 23:01:59.131469626 +0000
++++ b/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2019-03-07 17:05:48.972429378 +0000
 @@ -6,16 +6,13 @@
  MIME-Version: 1.0
  Content-Type: text/plain; charset=UTF-8
@@ -56,8 +56,16 @@
       int                    esync_fd;        /* esync file descriptor (signalled on message) */
  +    int                    esync_in_msgwait; /* our thread is currently waiting on us */
   };
-@@ -318,4 +311,3 @@
+@@ -316,6 +309,11 @@
+  };
+  
   static const struct
++@@ -5460,4 +5554,5 @@ static const struct
++     { "INVALID_OWNER",               STATUS_INVALID_OWNER },
++     { "INVALID_PARAMETER",           STATUS_INVALID_PARAMETER },
+++    { "INVALID_PARAMETER_4",         STATUS_INVALID_PARAMETER_4 },
++     { "INVALID_PIPE_STATE",          STATUS_INVALID_PIPE_STATE },
++     { "INVALID_READ_MODE",           STATUS_INVALID_READ_MODE },
  -- 
  2.7.4
 -

@@ -1,0 +1,46 @@
+--- a/0024-server-ntdll-Also-wait-on-the-queue-fd-when-waiting-.patch	2018-10-07 03:47:11.000000000 +0100
++++ b/0024-server-ntdll-Also-wait-on-the-queue-fd-when-waiting-.patch	2019-03-07 17:05:45.632380815 +0000
+@@ -3,15 +3,12 @@
+ Date: Sat, 9 Jun 2018 14:44:54 -0500
+ Subject: [PATCH 24/83] server, ntdll: Also wait on the queue fd when waiting
+  for driver events.
+-
+ Normally the server handles this, by polling on the fd during its main loop.
+ The problem there is that the server only polls when the thread is waiting
+ for messages. We want to replicate that behaviour, otherwise wineserver spins
+ forever trying to wake up a thread that just doesn't care.
+-
+ With this patch, I'm finally able to interact with winecfg. Next step is to
+ fix the 'drives' tab.
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  dlls/ntdll/esync.c             | 44 ++++++++++++++++++++++++++++++------------
+@@ -26,7 +23,6 @@
+  server/thread.c                |  5 +++--
+  server/trace.c                 |  7 ++++++-
+  11 files changed, 80 insertions(+), 26 deletions(-)
+-
+ diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
+ index c4faf69..cb206bc 100644
+ --- a/dlls/ntdll/esync.c
+@@ -166,14 +162,6 @@
+  };
+  
+  
+-@@ -6564,6 +6575,6 @@ union generic_reply
+-     struct get_esync_fd_reply get_esync_fd_reply;
+- };
+- 
+--#define SERVER_PROTOCOL_VERSION 566
+-+#define SERVER_PROTOCOL_VERSION 567
+- 
+- #endif /* __WINE_WINE_SERVER_PROTOCOL_H */
+ diff --git a/server/esync.c b/server/esync.c
+ index 4682163..ef02170 100644
+ --- a/server/esync.c
+@@ -383,4 +371,3 @@
+  static const char * const req_names[REQ_NB_REQUESTS] = {
+ -- 
+ 2.7.4
+-

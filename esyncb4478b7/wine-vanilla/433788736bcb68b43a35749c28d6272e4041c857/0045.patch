@@ -1,0 +1,44 @@
+--- a/0045-server-ntdll-Implement-alertable-waits.patch	2018-10-07 03:47:11.000000000 +0100
++++ b/0045-server-ntdll-Implement-alertable-waits.patch	2019-03-07 17:05:45.736382326 +0000
+@@ -2,9 +2,7 @@
+ From: Zebediah Figura <z.figura12@gmail.com>
+ Date: Fri, 15 Jun 2018 14:12:22 -0500
+ Subject: [PATCH 45/83] server, ntdll: Implement alertable waits.
+-
+ We do this quite simply by waiting on an extra eventfd descriptor, which the server signals when a user APC is queued.
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  dlls/ntdll/esync.c             | 94 ++++++++++++++++++++++++++++++++++++------
+@@ -19,7 +17,6 @@
+  server/thread.h                |  1 +
+  server/trace.c                 |  7 ++++
+  11 files changed, 146 insertions(+), 18 deletions(-)
+-
+ diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
+ index 360a980..395c8d3 100644
+ --- a/dlls/ntdll/esync.c
+@@ -269,17 +266,13 @@
+  };
+  union generic_reply
+  {
+-@@ -6602,8 +6615,9 @@ union generic_reply
++@@ -6885,5 +6898,6 @@ union generic_reply
+      struct create_esync_reply create_esync_reply;
+      struct open_esync_reply open_esync_reply;
+      struct get_esync_fd_reply get_esync_fd_reply;
+ +    struct get_esync_apc_fd_reply get_esync_apc_fd_reply;
+  };
+  
+--#define SERVER_PROTOCOL_VERSION 573
+-+#define SERVER_PROTOCOL_VERSION 574
+- 
+- #endif /* __WINE_WINE_SERVER_PROTOCOL_H */
+ diff --git a/server/esync.c b/server/esync.c
+ index 6adf996..8bf6e44 100644
+ --- a/server/esync.c
+@@ -482,4 +475,3 @@
+  static const struct
+ -- 
+ 2.7.4
+-

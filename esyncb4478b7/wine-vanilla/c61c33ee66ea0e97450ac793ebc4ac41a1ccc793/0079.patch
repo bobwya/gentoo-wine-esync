@@ -1,5 +1,5 @@
 --- a/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2018-10-07 03:47:12.000000000 +0100
-+++ b/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2018-12-14 23:01:55.311411562 +0000
++++ b/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2019-03-07 17:05:45.496378837 +0000
 @@ -6,16 +6,13 @@
  MIME-Version: 1.0
  Content-Type: text/plain; charset=UTF-8
@@ -44,8 +44,16 @@
  diff --git a/server/protocol.def b/server/protocol.def
  index 1c7cf76..b3db323 100644
  --- a/server/protocol.def
-@@ -318,4 +310,3 @@
+@@ -316,6 +308,11 @@
+  };
+  
   static const struct
++@@ -5460,4 +5554,5 @@ static const struct
++     { "INVALID_OWNER",               STATUS_INVALID_OWNER },
++     { "INVALID_PARAMETER",           STATUS_INVALID_PARAMETER },
+++    { "INVALID_PARAMETER_4",         STATUS_INVALID_PARAMETER_4 },
++     { "INVALID_SECURITY_DESCR",      STATUS_INVALID_SECURITY_DESCR },
++     { "IO_TIMEOUT",                  STATUS_IO_TIMEOUT },
  -- 
  2.7.4
 -
