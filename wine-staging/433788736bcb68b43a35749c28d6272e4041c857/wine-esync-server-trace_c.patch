@@ -1,8 +1,8 @@
 diff --git a/server/trace.c b/server/trace.c
-index 68e47d49b89..83b5e6b8ba5 100644
+index 261a8cc3b67..60ca4835803 100644
 --- a/server/trace.c
 +++ b/server/trace.c
-@@ -4542,6 +4542,58 @@ static void dump_terminate_job_request( const struct terminate_job_request *req
+@@ -4524,6 +4524,58 @@ static void dump_terminate_job_request( const struct terminate_job_request *req
      fprintf( stderr, ", status=%d", req->status );
  }
  
@@ -61,7 +61,7 @@ index 68e47d49b89..83b5e6b8ba5 100644
  static const dump_func req_dumpers[REQ_NB_REQUESTS] = {
      (dump_func)dump_new_process_request,
      (dump_func)dump_get_new_process_info_request,
-@@ -4833,6 +4885,11 @@ static const dump_func req_dumpers[REQ_NB_REQUESTS] = {
+@@ -4814,6 +4866,11 @@ static const dump_func req_dumpers[REQ_NB_REQUESTS] = {
      (dump_func)dump_set_job_limits_request,
      (dump_func)dump_set_job_completion_port_request,
      (dump_func)dump_terminate_job_request,
@@ -73,7 +73,7 @@ index 68e47d49b89..83b5e6b8ba5 100644
  };
  
  static const dump_func reply_dumpers[REQ_NB_REQUESTS] = {
-@@ -5126,6 +5183,11 @@ static const dump_func reply_dumpers[REQ_NB_REQUESTS] = {
+@@ -5106,6 +5163,11 @@ static const dump_func reply_dumpers[REQ_NB_REQUESTS] = {
      NULL,
      NULL,
      NULL,
@@ -85,7 +85,7 @@ index 68e47d49b89..83b5e6b8ba5 100644
  };
  
  static const char * const req_names[REQ_NB_REQUESTS] = {
-@@ -5419,6 +5481,11 @@ static const char * const req_names[REQ_NB_REQUESTS] = {
+@@ -5398,6 +5460,11 @@ static const char * const req_names[REQ_NB_REQUESTS] = {
      "set_job_limits",
      "set_job_completion_port",
      "terminate_job",
@@ -97,11 +97,11 @@ index 68e47d49b89..83b5e6b8ba5 100644
  };
  
  static const struct
-@@ -5486,6 +5553,7 @@ static const struct
+@@ -5465,6 +5532,7 @@ static const struct
      { "INVALID_LOCK_SEQUENCE",       STATUS_INVALID_LOCK_SEQUENCE },
      { "INVALID_OWNER",               STATUS_INVALID_OWNER },
      { "INVALID_PARAMETER",           STATUS_INVALID_PARAMETER },
 +    { "INVALID_PARAMETER_4",         STATUS_INVALID_PARAMETER_4 },
-     { "INVALID_PIPE_STATE",          STATUS_INVALID_PIPE_STATE },
      { "INVALID_READ_MODE",           STATUS_INVALID_READ_MODE },
      { "INVALID_SECURITY_DESCR",      STATUS_INVALID_SECURITY_DESCR },
+     { "IO_TIMEOUT",                  STATUS_IO_TIMEOUT },

@@ -1,0 +1,12 @@
+diff --git a/server/registry.c b/server/registry.c
+index 75f611d3700..37b90c35e97 100644
+--- a/server/registry.c
++++ b/server/registry.c
+@@ -167,6 +167,7 @@ static const struct object_ops key_ops =
+     no_add_queue,            /* add_queue */
+     NULL,                    /* remove_queue */
+     NULL,                    /* signaled */
++    NULL,                    /* get_esync_fd */
+     NULL,                    /* satisfied */
+     no_signal,               /* signal */
+     no_get_fd,               /* get_fd */
