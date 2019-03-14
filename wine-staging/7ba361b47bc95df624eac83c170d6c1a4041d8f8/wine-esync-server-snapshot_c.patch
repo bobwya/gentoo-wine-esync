@@ -1,0 +1,12 @@
+diff --git a/server/snapshot.c b/server/snapshot.c
+index 47316d05920..f3656dbda91 100644
+--- a/server/snapshot.c
++++ b/server/snapshot.c
+@@ -61,6 +61,7 @@ static const struct object_ops snapshot_ops =
+     no_add_queue,                 /* add_queue */
+     NULL,                         /* remove_queue */
+     NULL,                         /* signaled */
++    NULL,                         /* get_esync_fd */
+     NULL,                         /* satisfied */
+     no_signal,                    /* signal */
+     no_get_fd,                    /* get_fd */
