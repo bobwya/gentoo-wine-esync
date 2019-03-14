@@ -1,0 +1,38 @@
+--- a/0017-server-Create-eventfd-file-descriptors-for-event-obj.patch	2018-11-01 17:19:43.000000000 +0000
++++ b/0017-server-Create-eventfd-file-descriptors-for-event-obj.patch	2019-03-14 14:26:15.161892694 +0000
+@@ -3,18 +3,14 @@
+ Date: Fri, 8 Jun 2018 21:01:24 -0500
+ Subject: [PATCH 17/83] server: Create eventfd file descriptors for event
+  objects.
+-
+ We still need this, since there are some events which the server signals.
+-
+ This lets system processes shut down.
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  server/esync.c |  8 ++++++++
+  server/esync.h |  1 +
+  server/event.c | 28 ++++++++++++++++++++++++++--
+  3 files changed, 35 insertions(+), 2 deletions(-)
+-
+ diff --git a/server/esync.c b/server/esync.c
+ index 2e93493af1..e933d289b4 100644
+ --- a/server/esync.c
+@@ -81,9 +77,10 @@
+      event_satisfied,           /* satisfied */
+      event_signal,              /* signal */
+      no_get_fd,                 /* get_fd */
+-@@ -70,7 +74,7 @@ static const struct object_ops event_ops =
++@@ -70,8 +74,8 @@ static const struct object_ops event_ops =
+      default_unlink_name,       /* unlink_name */
+      no_open_file,              /* open_file */
++     no_alloc_handle,           /* alloc_handle */
+      no_close_handle,           /* close_handle */
+ -    no_destroy                 /* destroy */
+ +    event_destroy              /* destroy */
+@@ -140,4 +137,3 @@
+  {
+ -- 
+ 2.19.1
+-
