@@ -11,6 +11,8 @@ declare -a ARRAY_ESYNC_PATCH_COMMITS=(
 		"24f47812165a5dcb2b22825e47ccccbbd7437b8b" # (06)  wine:3.17
 		"2f17e0112dc0af3f0b246cf377e2cb8fd7a6cf58" # (07)  wine:3.19
 		"2600ecd4edfdb71097105c74312f83845305a4f2" # (08)  wine:3.20
+		"d3660e5901914daab38c95f6b2a7a43dfe6d3eee" # (09) [wine:4.4]
+		"7ba361b47bc95df624eac83c170d6c1a4041d8f8" # (10)  wine:4.4
 )
 declare ESYNC_ESYNCB4478B7_INDEX=0
 declare ESYNC_ESYNCCE79346_INDEX=8
@@ -31,6 +33,7 @@ declare SCRIPT_DIRECTORY SCRIPT_NAME
 SCRIPT_NAME="$(readlink -f "${0}")"
 SCRIPT_DIRECTORY="$(dirname "${SCRIPT_NAME}")"
 SCRIPT_NAME="$(basename "${SCRIPT_NAME}")"
+AWK="$(command -v "mawk" || command -v "awk")"
 
 # die()
 #
@@ -143,17 +146,22 @@ function generate_rebased_esync_patchset()
 	local  _source_directory="${1%/}" _target_directory="${2%/}" \
 			_awk_scripts_directory="${3%/}" _esync_rebase_index="${4}" \
 			_staging="${5}" _array_size="${#ARRAY_ESYNC_PATCH_COMMITS[@]}" \
-			_esync_tarball _esync_version _i=0 \
+			_esync_tarball _esync_version _i=0 _min_esync_rebase_index \
 			_patch_file _patch_file_path _source_esync_directory _target_esync_directory \
 			_target_esync_version _target_esync_patch_file _target_patch
 
 	if ((_staging)); then
-		((_esync_rebase_index < ESYNC_STAGING_SUPPORT_INDEX)) && return 0
+		_min_esync_rebase_index=$((ESYNC_STAGING_SUPPORT_INDEX))
 		_target_esync_version="wine-staging"
 	else
-		((_esync_rebase_index < ESYNC_VANILLA_SUPPORT_INDEX)) && return 0
+		_min_esync_rebase_index=$((ESYNC_VANILLA_SUPPORT_INDEX))
 		_target_esync_version="wine-vanilla"
 	fi
+	if ((_esync_rebase_index < _min_esync_rebase_index)); then
+		printf " skipping unsupported index: %02d\\n" "$((_esync_rebase_index+1))"
+		return 0
+	fi
+	printf "\\n"
 
 	((_esync_rebase_index >= ESYNC_ESYNCCE79346_INDEX)) && _i=$((_i+1))
 
@@ -165,7 +173,7 @@ function generate_rebased_esync_patchset()
 		
 	printf "\\nRebasing esync patchset, for app-emulation/${_target_esync_version}, against Wine Git commit: %s\\n" "${ARRAY_ESYNC_PATCH_COMMITS[_esync_rebase_index]}"
 	for _patch_file_path in "${_source_esync_directory}/"{0001..0083}*.patch; do
-		if awk -vstaging="${_staging}" \
+		if "${AWK}" -vstaging="${_staging}" \
 			-vesync_rebase_index="${_esync_rebase_index}" \
 			-vtarget_esync_directory="${_target_esync_directory}" \
 			-f "${_awk_scripts_directory}/wine-esync-common.awk" \
@@ -226,6 +234,8 @@ function generate_all_rebased_esync_patchsets()
 	for _staging in {0..1}; do
 		# shellcheck disable=SC2051
 		for ((_esync_rebase_index=0 ; _esync_rebase_index < _array_size ; ++_esync_rebase_index)); do
+			((_staging)) && printf "\\n\\nProcessing %02d / %02d ( wine-staging ) ..." "$((_esync_rebase_index+1))" "$((_array_size))"
+			((_staging)) || printf "\\n\\nProcessing %02d / %02d ( wine-vanilla ) ..." "$((_esync_rebase_index+1))" "$((_array_size))"
 			generate_rebased_esync_patchset  "${_source_directory}" "${_target_directory}" \
 									"${_awk_scripts_directory}" "${_esync_rebase_index}" "${_staging}"
 		done

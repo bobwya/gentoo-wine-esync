@@ -349,6 +349,235 @@ function process_staging_patch_file_0006(file_array,
 	if (complete != 1) exit_code=idiff
 }
 
+function process_patch_file_0009(file_array,
+	complete, diff_file, idiff, ihunk, indent, line, line_text, new_diff_file)
+{
+	exit_start_line=0
+	for (line = 1 ; line <= file_array[0] ; ++line) {
+		indent = get_indent(file_array[line])
+		if (new_diff_file = is_new_diff_file(file_array[line])) {
+			diff_file = new_diff_file
+			idiff=1
+			ihunk=0
+		}
+		else if (is_new_hunk(file_array[line])) {
+			++ihunk
+			idiff=1
+		}
+
+		if (diff_file == "/dlls/ntdll/sync.c") {
+			exit_start_line=exit_start_line ? exit_start_line : line
+			exit_diff_file=diff_file
+
+			if (ihunk == 1) {
+				exit_hunk=ihunk
+				if (is_new_hunk(file_array[line])) exit_start_line=line
+				if (idiff == 1) {
+					if (esync_rebase_index <= 8) {
+						idiff += 5
+						++complete
+					}
+					else if (is_new_hunk(file_array[line])) {
+						sub(text2regexp("NTSTATUS WINAPI NtSetEvent( HANDLE handle, PULONG NumberOfThreadsReleased )$"), "NTSTATUS WINAPI NtOpenEvent( HANDLE *handle, ACCESS_MASK access, const OBJECT_ATT", file_array[line])
+						split("+57 0 +57 0", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						++idiff
+					}
+					exit_end_line=line
+				}
+				else if (idiff == 2) {
+					if (file_array[line-1] ~ text2regexp(" @@ NTSTATUS WINAPI NtOpenEvent(*")) {
+						line_text = (indent "NTSTATUS WINAPI NtSetEvent( HANDLE handle, LONG *prev_state )")
+						insert_array_entry(file_array, line, line_text)
+						++idiff
+					}
+					exit_end_line=line
+				}
+				else if (idiff == 3) {
+					if ((esync_rebase_index <= 8) || ((esync_rebase_index == 9) && !staging)) {
+						idiff += 1
+					}
+					else if (file_array[line] ~ text2regexp("^     NTSTATUS ret;$")) {
+						delete file_array[++line]
+						++idiff
+					}
+				}
+				else if (idiff == 4) {
+					if (esync_rebase_index <= 8) {
+						idiff += 1
+						++complete
+					}
+					else if (file_array[line] ~ text2regexp("/* FIXME: set NumberOfThreadsReleased */$")) {
+						if ((esync_rebase_index == 9) && !staging) {
+							++idiff
+							++complete
+						}
+						else {
+							delete file_array[line]
+							delete file_array[++line]
+							++line
+							line_text=(indent "{")
+							insert_array_entry(file_array, ++line, line_text)
+							line_text=(indent indent "req->handle = wine_server_obj_handle( handle );")
+							insert_array_entry(file_array, ++line, line_text)
+							++idiff
+							++complete
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (!exit_end_line) exit_end_line=line
+
+	if (complete != 1) exit_code=idiff
+}
+
+function process_patch_file_0010(file_array,
+	complete, diff_file, idiff, ihunk, indent, line, line_text, new_diff_file)
+{
+	exit_start_line=0
+	for (line = 1 ; line <= file_array[0] ; ++line) {
+		indent = get_indent(file_array[line])
+		if (new_diff_file = is_new_diff_file(file_array[line])) {
+			diff_file = new_diff_file
+			idiff=1
+			ihunk=0
+		}
+		else if (is_new_hunk(file_array[line])) {
+			++ihunk
+			idiff=1
+		}
+
+		if (diff_file == "/dlls/ntdll/sync.c") {
+			exit_start_line=exit_start_line ? exit_start_line : line
+			exit_diff_file=diff_file
+
+			if (ihunk == 1) {
+				exit_hunk=ihunk
+				if (is_new_hunk(file_array[line])) exit_start_line=line
+				if (idiff == 1) {
+					if (esync_rebase_index <= 8) {
+						idiff += 4
+						++complete
+					}
+					else if (is_new_hunk(file_array[line])) {
+						if ((esync_rebase_index >= 10) || ((esync_rebase_index == 9) && staging))
+							sub(text2regexp("NTSTATUS WINAPI NtResetEvent( HANDLE handle, PULONG NumberOfThreadsReleased )$"), "NTSTATUS WINAPI NtSetEvent( HANDLE handle, LONG *prev_state )", file_array[line])
+						else
+							sub(text2regexp("NTSTATUS WINAPI NtResetEvent( HANDLE handle, PULONG NumberOfThreadsReleased )$"), "NTSTATUS WINAPI NtResetEvent( HANDLE handle, LONG *prev_state )", file_array[line])
+						split("+55 0 +55 0", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						if ((esync_rebase_index >= 10) || ((esync_rebase_index == 9) && staging)) {
+							line_text=" NTSTATUS WINAPI NtResetEvent( HANDLE handle, LONG *prev_state )"
+							insert_array_entry(file_array, ++line, line_text)
+						}
+						++idiff
+					}
+					exit_end_line=line
+				}
+				else if (idiff == 2) {
+					if ((esync_rebase_index <= 8) || ((esync_rebase_index == 9) && !staging)) {
+						++idiff
+					}
+					else if (file_array[line] ~ text2regexp("NTSTATUS ret;$")) {
+						delete file_array[++line]
+						++idiff
+					}
+					exit_end_line=line
+				}
+				else if (idiff == 3) {
+					if ((esync_rebase_index <= 8) || ((esync_rebase_index == 9) && !staging)) {
+						++idiff
+					}
+					else if (sub(text2regexp("/* resetting an event can't release any thread... */$"), "SERVER_START_REQ( event_op )", file_array[line])) {
+						++idiff
+					}
+					exit_end_line=line
+				}
+				else if (idiff == 4) {
+					if (file_array[line] ~ text2regexp("if (NumberOfThreadsReleased) *NumberOfThreadsReleased = 0;$")) {
+						if ((esync_rebase_index == 9) && !staging) {
+							line_text="if (prev_state) *prev_state = 0;"
+							file_array[line]=(indent line_text)
+							file_array[++line]=" "
+						}
+						else {
+							line_text="{"
+							file_array[line]=(indent line_text)
+							line_text= "req->handle = wine_server_obj_handle( handle );"
+							file_array[++line]=(indent indent line_text)
+						}
+						++idiff
+						++complete
+					}
+					exit_end_line=line
+				}
+			}
+		}
+	}
+
+	if (!exit_end_line) exit_end_line=line
+
+	if (complete != 1) exit_code=idiff
+}
+
+function process_patch_file_0011(file_array,
+	complete, diff_file, idiff, ihunk, indent, line, line_text, new_diff_file)
+{
+	exit_start_line=0
+	for (line = 1 ; line <= file_array[0] ; ++line) {
+		indent = get_indent(file_array[line])
+		if (new_diff_file = is_new_diff_file(file_array[line])) {
+			diff_file = new_diff_file
+			idiff=1
+			ihunk=0
+		}
+		else if (is_new_hunk(file_array[line])) {
+			++ihunk
+			idiff=1
+		}
+
+		if (diff_file == "/dlls/ntdll/sync.c") {
+			exit_start_line=exit_start_line ? exit_start_line : line
+			exit_diff_file=diff_file
+
+			if (ihunk == 1) {
+				exit_hunk=ihunk
+				if (is_new_hunk(file_array[line])) exit_start_line=line
+				if (idiff == 1) {
+					if (esync_rebase_index <= 8) {
+						idiff += 2
+						++complete
+					}
+					else if (sub(text2regexp("NTSTATUS WINAPI NtPulseEvent( HANDLE handle, PULONG PulseCount )$"), "NTSTATUS WINAPI NtPulseEvent( HANDLE handle, LONG *prev_state )", file_array[line])) {
+						++idiff
+					}
+					exit_end_line=line
+				}
+				else if (idiff == 2) {
+					if (file_array[line] ~ text2regexp("^     if (PulseCount)")) {
+						line_text=(indent "SERVER_START_REQ( event_op )")
+						file_array[line] = line_text
+						line_text=(indent "{")
+						file_array[++line] = line_text
+						line_text=(indent indent "req->handle = wine_server_obj_handle( handle );")
+						file_array[++line] = line_text
+						++idiff
+						++complete
+					}
+					exit_end_line=line
+				}
+			}
+		}
+	}
+
+	if (!exit_end_line) exit_end_line=line
+
+	if (complete != 1) exit_code=idiff
+}
+
 function process_patch_file_0013(file_array,
 	complete, diff_file, idiff, ihunk, indent, line, line_text, new_diff_file)
 {
@@ -677,7 +906,7 @@ function process_staging_patch_file_0017(file_array,
 	if (complete != 1) exit_code=idiff
 }
 
-function process_staging_patch_file_0020(file_array,
+function process_patch_file_0020(file_array,
 	complete, diff_file, idiff, ihunk, indent, line, line_text, new_diff_file)
 {
 	exit_start_line=0
@@ -700,59 +929,93 @@ function process_staging_patch_file_0020(file_array,
 			if (ihunk == 1) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && is_new_hunk(file_array[line])) {
-					delete file_array[++line]
-					++idiff
+				if (idiff == 1) {
+					if (!staging && (esync_rebase_index <= 8)) {
+						idiff += 2
+						++complete
+					}
+					else if (is_new_hunk(file_array[line])) {
+						delete file_array[++line]
+						++idiff
+					}
 				}
-				else if ((idiff == 2) && (file_array[line] ~ text2regexp("^ static void dump_thread( struct object *obj, int verbose );$"))) {
-					line_text = (indent "static struct object_type *thread_get_type( struct object *obj );")
-					insert_array_entry(file_array, ++line, line_text)
-					++idiff
-					++complete
+				else if (idiff == 2) {
+					if (file_array[line] ~ text2regexp("^ static void dump_thread( struct object *obj, int verbose );$")) {
+						line_text = (indent "static struct object_type *thread_get_type( struct object *obj );")
+						insert_array_entry(file_array, ++line, line_text)
+						++idiff
+						++complete
+					}
 				}
 				exit_end_line=line
 			}
 			else if ((ihunk == 3) && (complete >= 1)) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && is_new_hunk(file_array[line])) {
-					split("0 -2 0 -2", array_diff_lines)
-					change_array_entry_diff(file_array, line, array_diff_lines)
-					++idiff
+				if (idiff == 1) {
+					if (!staging) {
+						idiff += 2
+						++complete
+					}
+					else if (is_new_hunk(file_array[line])) {
+						split("0 -2 0 -2", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						++idiff
+					}
 				}
-				else if ((idiff == 2) && (file_array[line] ~ text2regexp("^+ thread->esync_fd = -1;$"))) {
-					line_text = (indent "thread->exit_poll       = NULL;")
-					file_array[++line] = line_text
-					delete file_array[++line]
-					delete file_array[++line]
-					++idiff
-					++complete
+				else if (idiff == 2) {
+					if (file_array[line] ~ text2regexp("^+ thread->esync_fd = -1;$")) {
+						line_text = (indent "thread->exit_poll       = NULL;")
+						file_array[++line] = line_text
+						delete file_array[++line]
+						delete file_array[++line]
+						++idiff
+						++complete
+					}
 				}
 				exit_end_line=line
 			}
 			else if ((ihunk == 5) && (complete >= 2)) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && is_new_hunk(file_array[line])) {
-					split("0 1 0 1", array_diff_lines)
-					change_array_entry_diff(file_array, line, array_diff_lines)
-					++idiff
+				if (idiff == 1) {
+					if (!staging) {
+						idiff += 2
+						++complete
+					}
+					else if (is_new_hunk(file_array[line])) {
+						split("0 1 0 1", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						++idiff
+					}
 				}
-				else if ((idiff == 2) && (file_array[line] ~ text2regexp("^ if (thread->id) free_ptid( thread->id );$"))) {
-					line_text = (indent "if (thread->exit_poll) remove_timeout_user( thread->exit_poll );")
-					insert_array_entry(file_array, line, line_text)
-					++line
-					++idiff
-					++complete
+				else if (idiff == 2) {
+					if (file_array[line] ~ text2regexp("^ if (thread->id) free_ptid( thread->id );$")) {
+						line_text = (indent "if (thread->exit_poll) remove_timeout_user( thread->exit_poll );")
+						insert_array_entry(file_array, line, line_text)
+						++line
+						++idiff
+						++complete
+					}
 				}
 				exit_end_line=line
 			}
 			else if ((ihunk == 6) && (complete >= 3)) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && sub(text2regexp("return (mythread->state == TERMINATED);$"), "return (mythread->state == TERMINATED \&\& !mythread->exit_poll);", file_array[line])) {
-					++idiff
-					++complete
+				if (idiff == 1) {
+					if (!staging) {
+						idiff += 1
+						++complete
+					}
+					else if ((esync_rebase_index <= 8) && sub(text2regexp("return (mythread->state == TERMINATED);$"), "return (mythread->state == TERMINATED \\&\\& !mythread->exit_poll);", file_array[line])) {
+						++idiff
+						++complete
+					}
+					else if (sub(text2regexp("return (mythread->state == TERMINATED);$"), "return mythread->state == TERMINATED \\&\\& !mythread->exit_poll;", file_array[line])) {
+						++idiff
+						++complete
+					}
 				}
 				exit_end_line=line
 			}
@@ -766,18 +1029,26 @@ function process_staging_patch_file_0020(file_array,
 			if ((ihunk == 1) && (complete >= 4)) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && is_new_hunk(file_array[line])) {
-					split("0 -2 0 -2", array_diff_lines)
-					change_array_entry_diff(file_array, line, array_diff_lines)
-					++idiff
+				if (idiff == 1) {
+					if (!staging) {
+						idiff += 2
+						++complete
+					}
+					else if (is_new_hunk(file_array[line])) {
+						split("0 -2 0 -2", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						++idiff
+					}
 				}
-				else if ((idiff == 2) && (file_array[line] ~ text2regexp("^+ int esync_fd; /* esync file descriptor (signalled on exit) */$"))) {
-					line_text = (indent "struct timeout_user   *exit_poll;     /* poll if the thread/process has exited already */")
-					file_array[++line] = line_text
-					delete file_array[++line]
-					delete file_array[++line]
-					++idiff
-					++complete
+				else if (idiff == 2) {
+					if (file_array[line] ~ text2regexp("^+ int esync_fd; /* esync file descriptor (signalled on exit) */$")) {
+						line_text = (indent "struct timeout_user   *exit_poll;     /* poll if the thread/process has exited already */")
+						file_array[++line] = line_text
+						delete file_array[++line]
+						delete file_array[++line]
+						++idiff
+						++complete
+					}
 				}
 				exit_end_line=line
 			}
@@ -1016,10 +1287,10 @@ function process_staging_patch_file_0023(file_array,
 					change_array_entry_diff(file_array, line, array_diff_lines)
 					++idiff
 				}
-				else if ((idiff == 2) && sub(text2regexp("pthread_attr_init( &attr );$"), "pthread_attr_init( \&pthread_attr );", file_array[line])) {
+				else if ((idiff == 2) && sub(text2regexp("pthread_attr_init( &attr );$"), "pthread_attr_init( \\&pthread_attr );", file_array[line])) {
 					++idiff
 				}
-				else if ((idiff == 3) && sub(text2regexp("pthread_attr_setstack( &attr, teb->DeallocationStack,$"), "pthread_attr_setstack( \&pthread_attr, teb->DeallocationStack,", file_array[line])) {
+				else if ((idiff == 3) && sub(text2regexp("pthread_attr_setstack( &attr, teb->DeallocationStack,$"), "pthread_attr_setstack( \\&pthread_attr, teb->DeallocationStack,", file_array[line])) {
 					++idiff
 					++complete
 				}
@@ -1048,16 +1319,70 @@ function process_patch_file_0024(file_array,
 			idiff=1
 		}
 
-		if (diff_file == "/server/trace.c") {
+		if (diff_file == "/server/thread.c") {
 			exit_start_line=exit_start_line ? exit_start_line : line
 			exit_diff_file=diff_file
 
 			if (ihunk == 1) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && sub(text2regexp("(dump_func)dump_get_new_process_info_request,"), "(dump_func)dump_exec_process_request,", file_array[line])) {
-					++idiff
-					++complete
+				if (idiff == 1) {
+					if (!staging && (esync_rebase_index <= 8)) {
+						idiff += 2
+						++complete
+					}
+					else if (is_new_hunk(file_array[line])) {
+						split("0 1 0 1", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						++idiff
+					}
+				}
+				else if (idiff == 2) {
+					if (file_array[line] ~ text2regexp("^ static void dump_thread( struct object *obj, int verbose );$")) {
+						line_text=" static struct object_type *thread_get_type( struct object *obj );"
+						insert_array_entry(file_array, ++line, line_text)
+						++idiff
+						++complete
+					}
+				}
+				exit_end_line=line
+			}
+			else if ((ihunk == 2) && (complete >= 1)) {
+				exit_hunk=ihunk
+				if (is_new_hunk(file_array[line])) exit_start_line=line
+				if (idiff == 1) {
+					if (!staging) {
+						idiff += 1
+						++complete
+					}
+					else if ((esync_rebase_index <= 8) && sub(text2regexp("return (mythread->state == TERMINATED);$"), "return (mythread->state == TERMINATED \\&\\& !mythread->exit_poll);", file_array[line])) {
+						++idiff
+						++complete
+					}
+					else if (sub(text2regexp("return (mythread->state == TERMINATED);$"), "return mythread->state == TERMINATED \\&\\& !mythread->exit_poll;", file_array[line])) {
+						++idiff
+						++complete
+					}
+				}
+				exit_end_line=line
+			}
+		}
+		else if (diff_file == "/server/trace.c") {
+			exit_start_line=exit_start_line ? exit_start_line : line
+			exit_diff_file=diff_file
+
+			if ((ihunk == 1) && (complete >= 2)) {
+				exit_hunk=ihunk
+				if (is_new_hunk(file_array[line])) exit_start_line=line
+				if (idiff == 1) {
+					if ((esync_rebase_index >= 9) || (staging && (esync_rebase_index != 7))) {
+						idiff += 1
+						++complete
+					}
+					else if (sub(text2regexp("(dump_func)dump_get_new_process_info_request,"), "(dump_func)dump_exec_process_request,", file_array[line])) {
+						++idiff
+						++complete
+					}
 				}
 				exit_end_line=line
 			}
@@ -1066,7 +1391,7 @@ function process_patch_file_0024(file_array,
 
 	if (!exit_end_line) exit_end_line=line
 
-	if (complete != 1) exit_code=idiff
+	if (complete != 3) exit_code=idiff
 }
 
 function process_staging_patch_file_0024(file_array,
@@ -1128,41 +1453,11 @@ function process_staging_patch_file_0024(file_array,
 				exit_end_line=line
 			}
 		}
-		else if (diff_file == "/server/thread.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_file=diff_file
-
-			if (ihunk == 1) {
-				exit_hunk=ihunk
-				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && is_new_hunk(file_array[line])) {
-					split("0 1 0 1", array_diff_lines)
-					change_array_entry_diff(file_array, line, array_diff_lines)
-					++idiff
-				}
-				else if ((idiff == 2) && (file_array[line] ~ text2regexp("^ static void dump_thread( struct object *obj, int verbose );$"))) {
-					line_text=" static struct object_type *thread_get_type( struct object *obj );"
-					insert_array_entry(file_array, ++line, line_text)
-					++idiff
-					++complete
-				}
-				exit_end_line=line
-			}
-			else if (ihunk == 2) {
-				exit_hunk=ihunk
-				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && sub(text2regexp("return (mythread->state == TERMINATED);$"), "return (mythread->state == TERMINATED \&\& !mythread->exit_poll);", file_array[line])) {
-					++idiff
-					++complete
-				}
-				exit_end_line=line
-			}
-		}
 	}
 
 	if (!exit_end_line) exit_end_line=line
 
-	if (complete != 4) exit_code=idiff
+	if (complete != 2) exit_code=idiff
 }
 
 function process_staging_patch_file_0025(file_array,
@@ -1577,10 +1872,10 @@ function process_staging_patch_file_0045(file_array,
 					idiff += 2
 					++complete
 				}
-				else if ((idiff == 2) && sub(text2regexp("pthread_attr_init( &attr );$"), "pthread_attr_init( \&pthread_attr );", file_array[line])) {
+				else if ((idiff == 2) && sub(text2regexp("pthread_attr_init( &attr );$"), "pthread_attr_init( \\&pthread_attr );", file_array[line])) {
 					++idiff
 				}
-				else if ((idiff == 3) && sub(text2regexp("pthread_attr_setstack( &attr, teb->DeallocationStack,$"), "pthread_attr_setstack( \&pthread_attr, teb->DeallocationStack,", file_array[line])) {
+				else if ((idiff == 3) && sub(text2regexp("pthread_attr_setstack( &attr, teb->DeallocationStack,$"), "pthread_attr_setstack( \\&pthread_attr, teb->DeallocationStack,", file_array[line])) {
 					++idiff
 					++complete
 				}
@@ -1694,43 +1989,82 @@ function process_patch_file_0064(file_array,
 			if (ihunk == 2) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && (is_new_hunk(file_array[line]))) {
-					split("0 1 0 1", array_diff_lines)
-					change_array_entry_diff(file_array, line, array_diff_lines)
-					++idiff
+				if (idiff == 1) {
+					if (esync_rebase_index >= 9) {
+						idiff += 2
+						++complete
+					}
+					else if (is_new_hunk(file_array[line])) {
+						split("0 1 0 1", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						++idiff
+					}
 				}
-				else if ((idiff == 2) && (file_array[line] ~ text2regexp("^ apc_param_t comp_key; /* completion key to set in completion events */$"))) {
-					line_text = (indent "unsigned int         comp_flags;  /* completion flags */")
-					insert_array_entry(file_array, ++line, line_text)
-					++idiff
-					++complete
+				else if (idiff == 2) {
+					if (file_array[line] ~ text2regexp("^ apc_param_t comp_key; /* completion key to set in completion events */$")) {
+						line_text = (indent "unsigned int         comp_flags;  /* completion flags */")
+						insert_array_entry(file_array, ++line, line_text)
+						++idiff
+						++complete
+					}
 				}
 			}
 			else if ((ihunk == 4) && (complete >= 1)) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && (file_array[line] ~ text2regexp("^ fd->fs_locks = 1;$"))) {
-					delete file_array[line]
-					++idiff
+				if (idiff == 1) {
+					if (esync_rebase_index >= 9) {
+						idiff += 2
+						++complete
+					}
+					else if (file_array[line] ~ text2regexp("^ fd->fs_locks = 1;$")) {
+						delete file_array[line]
+						++idiff
+					}
 				}
-				else if ((idiff == 2) && (file_array[line] ~ text2regexp("^ fd->completion = NULL;$"))) {
-					line_text = (indent "fd->comp_flags = 0;")
-					insert_array_entry(file_array, ++line, line_text)
-					++idiff
-					++complete
+				else if (idiff == 2) {
+					if (file_array[line] ~ text2regexp("^ fd->completion = NULL;$")) {
+						line_text = (indent "fd->comp_flags = 0;")
+						insert_array_entry(file_array, ++line, line_text)
+						++idiff
+						++complete
+					}
 				}
 				exit_end_line=line
 			}
 			else if ((ihunk == 5) && (complete >= 2)) {
 				exit_hunk=ihunk
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((idiff == 1) && (file_array[line] ~ text2regexp("^ fd->poll_index = -1;$"))) {
-					line_text = (indent "fd->completion = NULL;")
-					file_array[line] = line_text
-					line_text = (indent "fd->comp_flags = 0;")
-					file_array[++line] = line_text
-					++idiff
-					++complete
+				if (idiff == 1) {
+					if (esync_rebase_index >= 9) {
+						idiff += 1
+						++complete
+					}
+					else if (file_array[line] ~ text2regexp("^ fd->poll_index = -1;$")) {
+						line_text = (indent "fd->completion = NULL;")
+						file_array[line] = line_text
+						line_text = (indent "fd->comp_flags = 0;")
+						file_array[++line] = line_text
+						++idiff
+						++complete
+					}
+				}
+				exit_end_line=line
+			}
+			else if ((ihunk == 6) && (complete >= 3)) {
+				exit_hunk=ihunk
+				if (is_new_hunk(file_array[line])) exit_start_line=line
+				if (idiff == 1) {
+					if (esync_rebase_index <= 8) {
+						idiff += 1
+						++complete
+					}
+					else if (file_array[line] ~ text2regexp("fd->signaled = signaled;$")) {
+						line_text = (indent "if (fd->comp_flags & FILE_SKIP_SET_EVENT_ON_HANDLE) return;")
+						file_array[line-1] = line_text
+						++idiff
+						++complete
+					}
 				}
 				exit_end_line=line
 			}
@@ -1739,7 +2073,7 @@ function process_patch_file_0064(file_array,
 
 	if (!exit_end_line) exit_end_line=line
 
-	if (complete != 3) exit_code=idiff
+	if (complete != 4) exit_code=idiff
 }
 
 function process_patch_file_0074(file_array,
@@ -2022,6 +2356,15 @@ function process_patch_file(file_array)
 		else if (staging)
 			process_staging_patch_file_0006(file_array)
 	}
+	else if (patch_number == "0009") {
+		process_patch_file_0009(file_array)
+	}
+	else if (patch_number == "0010") {
+		process_patch_file_0010(file_array)
+	}
+	else if (patch_number == "0011") {
+		process_patch_file_0011(file_array)
+	}
 	else if (patch_number == "0013") {
 		process_patch_file_0013(file_array)
 	}
@@ -2037,8 +2380,8 @@ function process_patch_file(file_array)
 	else if (staging && (patch_number == "0017")) {
 		process_staging_patch_file_0017(file_array)
 	}
-	else if (staging && (patch_number == "0020")) {
-		process_staging_patch_file_0020(file_array)
+	else if (patch_number == "0020") {
+		process_patch_file_0020(file_array)
 	}
 	else if (staging && (patch_number == "0022")) {
 		process_staging_patch_file_0022(file_array)
@@ -2049,7 +2392,7 @@ function process_patch_file(file_array)
 		if (!exit_code && staging) process_staging_patch_file_0023(file_array)
 	}
 	else if (patch_number == "0024") {
-		if (esync_rebase_index == 7)
+		if ((esync_rebase_index == 7) || (esync_rebase_index >= 9) || staging)
 			process_patch_file_0024(file_array)
 		if (!exit_code && staging)
 			process_staging_patch_file_0024(file_array)
@@ -2096,7 +2439,7 @@ function process_patch_file(file_array)
 			process_patch_file_0048(file_array)
 	}
 	else if (patch_number == "0064") {
-		if ((staging && (esync_rebase_index <= 6)) || (esync_rebase_index == 7))
+		if ((staging && (esync_rebase_index <= 6)) || (esync_rebase_index == 7) || (esync_rebase_index >= 9))
 			process_patch_file_0064(file_array)
 	}
 	else if (patch_number == "0074") {
@@ -2126,8 +2469,8 @@ function process_patch_file(file_array)
 }
 
 BEGIN{
-	supported_patches="0002 0006 0013 0014 0015 0023 0024 0026 0032 0033 0040 0041 0042 0044 0045 0048 0064 0074 0077 0078 0079"
-	if (staging) supported_patches=(supported_patches " 0001 0003 0017 0020 0022 0025")
+	supported_patches="0002 0006 0009 0010 0011 0013 0014 0015 0020 0023 0024 0026 0032 0033 0040 0041 0042 0044 0045 0048 0064 0074 0077 0078 0079"
+	if (staging) supported_patches=(supported_patches " 0001 0003 0017 0022 0025")
 }
 {
 	if (FNR == 1) {
