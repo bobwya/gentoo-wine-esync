@@ -40,7 +40,7 @@ die()
 
 	if ((usage)); then
 		printf "Usage: %s WINE-GIT-TREE WINE-STAGING-GIT-TREE SOURCE-ROOT REBASE-PATCHSETS-ROOT DESTINATION-ROOT\\n\\n" "${SCRIPT_NAME}" >&2
-		printf "  WINE_GIT_TREE          : Wine git tree clone (root directory)\\n" >&2
+		printf "  WINE-GIT-TREE          : Wine git tree clone (root directory)\\n" >&2
 		printf "  WINE-STAGING-GIT-TREE  : Wine Staging git tree clone (root directory)\\n" >&2
 		printf "  SOURCE-ROOT            : Source wine-esync source(s) (root directory)\\n" >&2
 		printf "  REBASE-PATCHSETS-ROOT  : wine-esync rebasing patchsets (root directory)\\n" >&2
@@ -400,7 +400,7 @@ apply_esync_rebasing_patchset()
 		__patch_file="$( basename "${__patch}" )"
 		printf "Apply esync rebasing patch: '%s' ...\\n" "${__patch_file}"
 		if ! __patch_log="$(patch -p1 --verbose < "${__patch}" )"; then
-			echo "${__patch_log}"
+			printf "%s\\n" "${__patch_log}" >&2
 			die "patch -p1 failed, with esync rebasing patch '${__patch}"
 		fi
 	done
@@ -468,7 +468,7 @@ git_am_esync_patchset()
 
 	local 	__wine_git_tree="${1}" \
 			__source_directory="${2}"
-	local 	__git_error __i_patch __esync_patch
+	local 	__git_error __i_patch __esync_patch __patch_error
 
 	pushd "${__wine_git_tree}" >/dev/null || die "pushd failed"
 	printf "\\nApplying (using git am) esync patchset from directory: '%s' ...\\n" "${__source_directory}"
@@ -476,11 +476,14 @@ git_am_esync_patchset()
 		__esync_patch="$(find "${__source_directory}" -name "${__i_patch}*.patch" -printf '%f' 2>/dev/null)"
 		[[ -f "${__source_directory}/${__esync_patch}" ]] || die "patch: '${__esync_patch}' ; invalid"
 		printf "Applying esync patch: '%s' ...\\n" "${__esync_patch}"
-		__git_error="$(git am --ignore-whitespace "${__source_directory}/${__esync_patch}")" && continue
+		if __patch_error="$( patch -F1 -p1 --verbose --dry-run < "${__source_directory}/${__esync_patch}" )" \
+		&& __git_error="$( git am --ignore-whitespace "${__source_directory}/${__esync_patch}" )"; then
+			continue
+		fi
 
-		echo "${__git_error}" >&2
+		printf "%s\\n%s\\n" "${__patch_error}" "${__git_error}" >&2
 		git am --abort &>/dev/null
-		git clean -fd &>/dev/null
+		git clean -fxd &>/dev/null
 		# shellcheck disable=SC2164
 		popd &>/dev/null
 		die "git am failed"

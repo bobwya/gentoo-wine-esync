@@ -12,7 +12,10 @@ declare -a ARRAY_ESYNC_PATCH_COMMITS=(
 		"2f17e0112dc0af3f0b246cf377e2cb8fd7a6cf58" # (07)  wine:3.19
 		"2600ecd4edfdb71097105c74312f83845305a4f2" # (08)  wine:3.20
 		"d3660e5901914daab38c95f6b2a7a43dfe6d3eee" # (09) [wine:4.4]
-		"7ba361b47bc95df624eac83c170d6c1a4041d8f8" # (10)  wine:4.4
+		"7ba361b47bc95df624eac83c170d6c1a4041d8f8" # (10) [wine:4.4]
+		"817fb9755cbf48162fe1b7d37e77d7e25afa7520" # (11)  wine:4.4
+		"b2a546c92dabee8ab1c3d5b9fecc84d99caf0e76" # (12) [wine:4.5]
+		"0decadd62a76b968abf75c9943dd0869249ec716" # (13)  wine:4.5
 )
 declare ESYNC_ESYNCB4478B7_INDEX=0
 declare ESYNC_ESYNCCE79346_INDEX=8

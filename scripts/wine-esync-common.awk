@@ -134,6 +134,32 @@ function is_new_hunk(line_text)
 	return (line_text ~ "^@@[[:blank:]][-][[:digit:]][[:digit:]]*,[[:digit:]][[:digit:]]*[[:blank:]][+][[:digit:]][[:digit:]]*,[[:digit:]][[:digit:]]*[[:blank:]]@@( |$)")
 }
 
+# preprocess_patch_file_line(file_array, target_line, line_text)
+#
+# Parameters:
+#   1 >  line_text          :  (patch file) line text            (string)
+#   2<>  diff_array         :  array of (patch file) diff data   (string/integer array)
+#
+# Description
+#   Updates the diff data for the specified patch file line text.
+#   The diff data array stores:
+#     * "file"  : file name (diff'd file)
+#     * "ihunk" : current hunk sequence number
+#     * "idiff" : current diff (change within a hunk) sequence number
+function preprocess_patch_file_line(line_text, diff_array,
+	new_diff_file)
+{
+	if (new_diff_file = is_new_diff_file(line_text)) {
+		diff_array["file"] = new_diff_file
+		diff_array["idiff"]=1
+		diff_array["ihunk"]=0
+	}
+	else if (is_new_hunk(line_text)) {
+		++diff_array["ihunk"];
+		diff_array["idiff"]=1
+	}
+}
+
 # change_array_entry_diff(file_array, target_line, line_text)
 #
 # Parameters:
