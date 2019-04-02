@@ -1,5 +1,5 @@
 --- a/0041-server-Allocate-shared-memory-segments-for-semaphore.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0041-server-Allocate-shared-memory-segments-for-semaphore.patch	2019-03-14 14:26:00.571673125 +0000
++++ b/0041-server-Allocate-shared-memory-segments-for-semaphore.patch	2019-04-02 16:22:32.861644630 +0100
 @@ -3,19 +3,15 @@
  Date: Sun, 10 Jun 2018 23:12:16 -0500
  Subject: [PATCH 41/83] server: Allocate shared memory segments for semaphores
@@ -20,7 +20,7 @@
  Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
  ---
   include/wine/server_protocol.h |  6 +++-
-@@ -26,12 +22,13 @@
+@@ -26,12 +22,11 @@
   server/request.h               |  6 ++--
   server/trace.c                 |  2 ++
   7 files changed, 83 insertions(+), 3 deletions(-)
@@ -30,24 +30,20 @@
  --- a/include/wine/server_protocol.h
  +++ b/include/wine/server_protocol.h
 -@@ -5660,6 +5660,8 @@ struct create_esync_reply
-+@@ -5632,8 +5632,10 @@ struct create_esync_reply
-+ struct create_esync_reply
-+ {
++@@ -5632,6 +5632,8 @@ struct create_esync_reply
       struct reply_header __header;
       obj_handle_t handle;
       int          type;
-@@ -40,7 +37,9 @@
+@@ -40,7 +35,7 @@
   };
   
   
 -@@ -5678,6 +5680,8 @@ struct open_esync_reply
-+@@ -5650,8 +5652,10 @@ struct open_esync_reply
-+ struct open_esync_reply
-+ {
++@@ -5650,6 +5652,8 @@ struct open_esync_reply
       struct reply_header __header;
       obj_handle_t handle;
       int          type;
-@@ -49,14 +48,6 @@
+@@ -49,14 +44,6 @@
   };
   
   
@@ -62,7 +58,7 @@
  diff --git a/server/esync.c b/server/esync.c
  index 399011f..f1a46af 100644
  --- a/server/esync.c
-@@ -200,7 +191,7 @@
+@@ -200,7 +187,7 @@
   #include "wine/library.h"
   
   /* command-line options */
@@ -71,7 +67,7 @@
       sock_init();
       open_master_socket();
   
-@@ -208,6 +199,7 @@
+@@ -208,6 +195,7 @@
  +        esync_init();
  +
       if (debug_level) fprintf( stderr, "wineserver: starting (pid=%ld)\n", (long) getpid() );
@@ -79,7 +75,7 @@
       init_signals();
       init_directories();
  diff --git a/server/protocol.def b/server/protocol.def
-@@ -276,4 +268,3 @@
+@@ -276,4 +264,3 @@
   static void dump_get_esync_fd_request( const struct get_esync_fd_request *req )
  -- 
  2.7.4

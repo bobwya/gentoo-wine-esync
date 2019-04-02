@@ -1,0 +1,38 @@
+--- a/0040-server-Create-eventfd-descriptors-for-timers.patch	2018-11-01 17:19:43.000000000 +0000
++++ b/0040-server-Create-eventfd-descriptors-for-timers.patch	2019-04-02 16:22:31.021616121 +0100
+@@ -2,7 +2,6 @@
+ From: Zebediah Figura <z.figura12@gmail.com>
+ Date: Fri, 15 Jun 2018 11:01:44 -0500
+ Subject: [PATCH 40/83] server: Create eventfd descriptors for timers.
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  dlls/ntdll/esync.c             |  1 +
+@@ -10,7 +9,6 @@
+  server/protocol.def            |  1 +
+  server/timer.c                 | 18 +++++++++++++++++-
+  4 files changed, 21 insertions(+), 2 deletions(-)
+-
+ diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
+ index f63553a0c2..6409678e55 100644
+ --- a/dlls/ntdll/esync.c
+@@ -35,14 +33,6 @@
+      ESYNC_MANUAL_SERVER,
+      ESYNC_QUEUE,
+  };
+-@@ -6614,6 +6615,6 @@ union generic_reply
+-     struct get_esync_fd_reply get_esync_fd_reply;
+- };
+- 
+--#define SERVER_PROTOCOL_VERSION 570
+-+#define SERVER_PROTOCOL_VERSION 571
+- 
+- #endif /* __WINE_WINE_SERVER_PROTOCOL_H */
+ diff --git a/server/protocol.def b/server/protocol.def
+ index bce1fcc003..f22f8ce761 100644
+ --- a/server/protocol.def
+@@ -126,4 +116,3 @@
+      struct timer *timer = (struct timer *)obj;
+ -- 
+ 2.19.1
+-

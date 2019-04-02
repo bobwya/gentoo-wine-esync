@@ -1,5 +1,5 @@
 --- a/0022-server-Create-eventfd-file-descriptors-for-message-q.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0022-server-Create-eventfd-file-descriptors-for-message-q.patch	2019-03-14 14:25:57.408292170 +0000
++++ b/0022-server-Create-eventfd-file-descriptors-for-message-q.patch	2019-04-02 16:22:32.285635705 +0100
 @@ -3,15 +3,12 @@
  Date: Fri, 8 Jun 2018 23:41:54 -0500
  Subject: [PATCH 22/83] server: Create eventfd file descriptors for message
@@ -38,7 +38,7 @@
  +        queue->esync_fd        = -1;
           list_init( &queue->send_result );
           list_init( &queue->callback_result );
-@@ -65,17 +62,15 @@
+@@ -65,17 +62,16 @@
  +
           thread->queue = queue;
       }
@@ -46,7 +46,7 @@
 -@@ -450,6 +457,9 @@ static inline void clear_queue_bits( struct msg_queue *queue, unsigned int bits
 - {
 +     if (new_input)
-+@@ -500,4 +507,7 @@ static inline void clear_queue_bits( struct msg_queue *queue, unsigned int bits
++@@ -500,5 +507,8 @@ static inline void clear_queue_bits( struct msg_queue *queue, unsigned int bits
       queue->wake_bits &= ~bits;
       queue->changed_bits &= ~bits;
 +     update_shm_queue_bits( queue );
@@ -54,12 +54,12 @@
  +    if (do_esync() && !is_signaled( queue ))
  +        esync_clear( queue->esync_fd );
   }
-- 
+  
 - /* check whether msg is a keyboard message */
  @@ -954,6 +964,12 @@ static int msg_queue_signaled( struct object *obj, struct wait_queue_entry *entr
       return ret || is_signaled( queue );
   }
-@@ -111,4 +106,3 @@
+@@ -111,4 +107,3 @@
   }
  -- 
  2.7.4
