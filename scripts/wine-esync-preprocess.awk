@@ -222,10 +222,16 @@ function process_staging_patch_file_0002(file_array,
 			if (diff_array["ihunk"] == 1) {
 				exit_hunk=diff_array["ihunk"]
 				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((diff_array["idiff"] == 1) && is_new_hunk(file_array[line])) {
-					split("0 0 0 1", array_diff_lines)
-					change_array_entry_diff(file_array, line, array_diff_lines)
-					++diff_array["idiff"]
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index >= 12) {
+						diff_array["idiff"]+=2
+						++complete
+					}
+					else if (is_new_hunk(file_array[line])) {
+						split("0 0 0 1", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						++diff_array["idiff"]
+					}
 				}
 				else if ((diff_array["idiff"] == 2) && (file_array[line] ~ text2regexp("^+ no_open_file, /* open_file */$"))) {
 					line_text = ("+" substr(indent, 2) "no_alloc_handle,           /* alloc_handle */")
@@ -944,11 +950,7 @@ function process_staging_patch_file_0017(file_array,
 				exit_hunk=diff_array["ihunk"]
 				if (is_new_hunk(file_array[line])) exit_start_line=line
 				if (diff_array["idiff"] == 1) {
-					if (esync_rebase_index >= 12) {
-						diff_array["idiff"]+=2
-						++complete
-					}
-					else if (is_new_hunk(file_array[line])) {
+					if (is_new_hunk(file_array[line])) {
 						split("0 1 0 1", array_diff_lines)
 						change_array_entry_diff(file_array, line, array_diff_lines)
 						++diff_array["idiff"]
@@ -2387,7 +2389,8 @@ function process_patch_file(file_array)
 	}
 	else if (patch_number == "0017") {
 		process_patch_file_0017(file_array)
-		if (!exit_code && staging) process_staging_patch_file_0017(file_array)
+		if (!exit_code && staging && (esync_rebase_index <= 11))
+			process_staging_patch_file_0017(file_array)
 	}
 	else if (patch_number == "0020") {
 		process_patch_file_0020(file_array)
