@@ -1,5 +1,5 @@
 --- a/0045-server-ntdll-Implement-alertable-waits.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0045-server-ntdll-Implement-alertable-waits.patch	2019-04-02 23:19:14.944127166 +0100
++++ b/0045-server-ntdll-Implement-alertable-waits.patch	2019-04-06 10:25:40.177738257 +0100
 @@ -2,9 +2,7 @@
  From: Zebediah Figura <z.figura12@gmail.com>
  Date: Fri, 15 Jun 2018 14:12:22 -0500
@@ -39,7 +39,7 @@
       thread_data->wait_fd[1]  = -1;
       thread_data->start_stack = (char *)teb->Tib.StackBase;
       thread_data->esync_queue_fd = -1;
-@@ -269,17 +267,14 @@
+@@ -269,17 +267,13 @@
   };
   union generic_reply
   {
@@ -55,11 +55,10 @@
 -+#define SERVER_PROTOCOL_VERSION 574
 - 
 - #endif /* __WINE_WINE_SERVER_PROTOCOL_H */
-+diff --git a/server/esync.c b/server/esync.c
  diff --git a/server/esync.c b/server/esync.c
  index 6adf996..8bf6e44 100644
  --- a/server/esync.c
-@@ -390,9 +385,9 @@
+@@ -390,9 +384,9 @@
       thread->token           = NULL;
       thread->esync_fd        = -1;
  +    thread->esync_apc_fd    = -1;
@@ -72,7 +71,7 @@
  @@ -289,7 +290,10 @@ struct thread *create_thread( int fd, struct process *process, const struct secu
       }
   
-@@ -438,9 +433,9 @@
+@@ -438,9 +432,9 @@
       struct token          *token;         /* security token associated with this thread */
       int                    esync_fd;      /* esync file descriptor (signalled on exit) */
  +    int                    esync_apc_fd;  /* esync apc fd (signalled when APCs are present) */
@@ -85,7 +84,7 @@
  diff --git a/server/trace.c b/server/trace.c
  index 26a84ba..5b1c7e1 100644
  --- a/server/trace.c
-@@ -482,4 +477,3 @@
+@@ -482,4 +476,3 @@
   static const struct
  -- 
  2.7.4

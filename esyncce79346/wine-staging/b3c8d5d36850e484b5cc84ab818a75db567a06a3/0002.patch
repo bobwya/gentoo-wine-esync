@@ -1,0 +1,74 @@
+--- a/0002-server-Create-server-objects-for-eventfd-based-synch.patch	2018-11-01 17:19:43.000000000 +0000
++++ b/0002-server-Create-server-objects-for-eventfd-based-synch.patch	2019-04-06 10:25:45.085798133 +0100
+@@ -3,7 +3,6 @@
+ Date: Thu, 7 Jun 2018 20:09:59 -0500
+ Subject: [PATCH 02/83] server: Create server objects for eventfd-based
+  synchronization objects.
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  include/wine/server_protocol.h |  19 +++++
+@@ -14,7 +13,6 @@
+  server/trace.c                 |  16 ++++
+  6 files changed, 190 insertions(+)
+  create mode 100644 server/esync.c
+-
+ diff --git a/include/wine/server_protocol.h b/include/wine/server_protocol.h
+ index 0e85d1a082..98470eca3c 100644
+ --- a/include/wine/server_protocol.h
+@@ -58,14 +56,13 @@
+  };
+  union generic_reply
+  {
+-@@ -6544,6 +6562,7 @@ union generic_reply
++@@ -6544,5 +6562,6 @@ union generic_reply
+      struct set_job_limits_reply set_job_limits_reply;
+      struct set_job_completion_port_reply set_job_completion_port_reply;
+      struct terminate_job_reply terminate_job_reply;
+ +    struct create_esync_reply create_esync_reply;
+  };
+  
+- #define SERVER_PROTOCOL_VERSION 570
+ diff --git a/server/Makefile.in b/server/Makefile.in
+ index aaaa8d34d5..5d96d22774 100644
+ --- a/server/Makefile.in
+@@ -83,7 +80,7 @@
+ index 0000000000..66cae244f6
+ --- /dev/null
+ +++ b/server/esync.c
+-@@ -0,0 +1,136 @@
++@@ -0,0 +1,137 @@
+ +/*
+ + * eventfd-based synchronization objects
+ + *
+@@ -149,6 +146,7 @@
+ +    directory_link_name,       /* link_name */
+ +    default_unlink_name,       /* unlink_name */
+ +    no_open_file,              /* open_file */
+++    no_kernel_obj_list,        /* get_kernel_obj_list */
+ +    no_close_handle,           /* close_handle */
+ +    esync_destroy              /* destroy */
+ +};
+@@ -224,7 +222,7 @@
+ index 6e02fbc501..b743674ebd 100644
+ --- a/server/protocol.def
+ +++ b/server/protocol.def
+-@@ -3855,3 +3855,13 @@ struct handle_info
++@@ -3968,5 +3968,15 @@ struct handle_info
+      obj_handle_t handle;          /* handle to the job */
+      int          status;          /* process exit code */
+  @END
+@@ -238,6 +236,8 @@
+ +@REPLY
+ +    obj_handle_t handle;        /* handle to the object */
+ +@END
++ 
++ 
+ diff --git a/server/request.h b/server/request.h
+ index 4610ca6868..242143d2c3 100644
+ --- a/server/request.h
+@@ -321,4 +321,3 @@
+  static const struct
+ -- 
+ 2.19.1
+-

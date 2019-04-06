@@ -1,5 +1,5 @@
 --- a/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2018-10-07 03:47:12.000000000 +0100
-+++ b/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2019-04-02 23:19:08.176023818 +0100
++++ b/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2019-04-06 10:25:33.521657027 +0100
 @@ -6,16 +6,13 @@
  MIME-Version: 1.0
  Content-Type: text/plain; charset=UTF-8
