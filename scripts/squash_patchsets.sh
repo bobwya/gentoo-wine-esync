@@ -466,12 +466,12 @@ git_am_esync_patchset()
 {
 	(($# == 2)) || die "invalid parameter count: ${#} (2)"
 
-	local 	__wine_git_tree="${1}" \
-			__source_directory="${2}"
+	local 	__wine_git_tree="${1%/}" \
+			__source_directory="${2%/}"
 	local 	__git_error __i_patch __esync_patch __patch_error
 
 	pushd "${__wine_git_tree}" >/dev/null || die "pushd failed"
-	printf "\\nApplying (using git am) esync patchset from directory: '%s' ...\\n" "${__source_directory}"
+	printf "\\nApplying (using git am) esync patchset from directory: '%s' ...\\n" "${__source_directory}/"
 	for __i_patch in $(seq -w "${PATCHSET_START}" "${PATCHSET_END}"); do
 		__esync_patch="$(find "${__source_directory}" -name "${__i_patch}*.patch" -printf '%f' 2>/dev/null)"
 		[[ -f "${__source_directory}/${__esync_patch}" ]] || die "patch: '${__esync_patch}' ; invalid"
@@ -534,8 +534,10 @@ squash_esync_patchset()
 	printf "Applying esync rebasing patches to esync source directory: '%s'\\n" "${__esync_source_directory}"
 	apply_esync_rebasing_patchset "${__esync_source_directory}" "${__esync_rebasing_patches_directory}"
 	__base_wine_git_commit="${__wine_git_commit}"
+	git_garbage_collect "${__wine_git_tree}"
 	reset_git_tree "${__wine_git_tree}" "${__wine_git_commit}"	
 	if [[ "${__wine_staging_git_tree}" != "." ]]; then
+		git_garbage_collect "${__wine_staging_git_tree}"
 		convert_wine_to_wine_staging_commit "${__wine_git_tree}" "${__wine_staging_git_tree}" \
 											"__wine_git_commit" "__wine_staging_git_commit"
 		printf "Wine git commit: %s\\n" "${__wine_git_commit}"
@@ -609,8 +611,6 @@ main()
 	elif [[ ! -d "${__destination_root}" ]]; then
 		mkdir -p "${__destination_root}" || die "mkdir failed"
 	fi
-	git_garbage_collect "${__wine_git_tree}"
-	git_garbage_collect "${__wine_staging_git_tree}"
 	git_create_branch "${__wine_git_tree}" "wine-esync"
 	git_create_branch "${__wine_staging_git_tree}" "wine-staging-esync"
 	printf "__esync_rebase_patches_root=%s\\n" "${__esync_rebase_patches_root}"

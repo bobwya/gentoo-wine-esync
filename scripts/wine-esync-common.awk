@@ -1,14 +1,10 @@
 #!/usr/bin/env awk
 
-# text2regexp(text)
+# dump_error(text)
 #
 # Parameters:
-#   file_name       :  patch file being processed by awk           (string,  global)
-#   exit_code       :  exit code for this awk script               (integer, global)
-#   exit_diff_file  :  diff file being processed in patch          (string,  global)
-#   exit_hunk       :  hunk number being processed in diff file    (integer, global)
-#   exit_start_line :  start line, in patch file, for failed block (integer, global)
-#   exit_end_line   :  end line, in patch file, for failed block   (integer, global)
+#   >  file_name       :  patch file being processed by awk    (string,  global)
+#   >  diff_array      :  array of (patch file) diff data      (string/integer array)
 #
 # Description
 #   Dumps a fixed format error message to stderr. An error will occur:
@@ -17,11 +13,36 @@
 #   in the current patch file.
 function dump_error()
 {
-	if (exit_code == 255)
+	if (diff_array["exit code"] == 255)
 		return
 
 	printf("%s: file: '%s' hunk: %d [%d] (lines: %04d-%04d) failed\n",
-			file_name, exit_diff_file, exit_hunk, exit_code, exit_start_line, exit_end_line) >"/dev/stderr"
+			file_name,
+			diff_array["exit file"], diff_array["exit ihunk"], diff_array["exit code"],
+			diff_array["exit strart line"], diff_array["exit end line"]) >"/dev/stderr"
+}
+
+# squash_array(text)
+#
+# Parameters:
+#   1>  sparse_array          :  array of (numerical indicies)         (array)
+#
+# Description
+#   Compact a sparse array (with holes). Entry [0] should contain the total entries.
+#   This total is updated, posted the compaction process.
+function squash_array(sparse_array,
+		count, i, total)
+{
+	total = sparse_array[0]
+	for (i = 1 ; i <= total ; ++i) {
+		if (sparse_array[i])
+			sparse_array[++count] = sparse_array[i]
+	}
+	for (i = count+1 ; i <= total ; ++i) {
+		if (sparse_array[i])
+			delete sparse_array[i]
+	}
+	sparse_array[0] = count
 }
 
 # text2regexp(text)
@@ -39,7 +60,7 @@ function dump_error()
 #   Spaces ' ' are replaced with a variable width blank match.
 #   An asterisk '*' character will match a variable width block.
 function text2regexp(text,
-			    endmarker,regexp,startmarker)
+		endmarker,regexp,startmarker)
 {
 		regexp=text
 		startmarker=sub("^\\^", "", regexp)
@@ -134,7 +155,7 @@ function is_new_hunk(line_text)
 	return (line_text ~ "^@@[[:blank:]][-][[:digit:]][[:digit:]]*,[[:digit:]][[:digit:]]*[[:blank:]][+][[:digit:]][[:digit:]]*,[[:digit:]][[:digit:]]*[[:blank:]]@@( |$)")
 }
 
-# preprocess_patch_file_line(file_array, target_line, line_text)
+# preprocess_patch_file_line(line_text, diff_array)
 #
 # Parameters:
 #   1 >  line_text          :  (patch file) line text            (string)
@@ -158,6 +179,46 @@ function preprocess_patch_file_line(line_text, diff_array,
 		++diff_array["ihunk"];
 		diff_array["idiff"]=1
 	}
+}
+
+# preprocess_diff_file(line, diff_array)
+#
+# Parameters:
+#   1 >  line          :  (patch file) line number            (integer)
+#   2<>  diff_array    :  array of (patch file) diff data     (string/integer array)
+#
+# Description
+#   Updates the diff data for the specified patch file hunk (first line).
+#   The diff data array stores:
+#     * "exit start line" : current hunk start line (for error messages)
+#     * "exit file"       : currently processed diff file name (for error messages)
+#     * "file"            : currently processed diff file name
+function preprocess_diff_file(line, diff_array,
+	new_diff_file)
+{
+	diff_array["exit start line"]=diff_array["exit start line"] ? diff_array["exit start line"] : line
+	diff_array["exit file"]=diff_array["file"]
+}
+
+# preprocess_diff_file_hunk(line, file_array, diff_array)
+#
+# Parameters:
+#   1 >  line          :  (patch file) line number             (integer)
+#   2 >  file_array    :  array of (patch file) line text      (string array)
+#   3<>  diff_array    :  array of (patch file) diff data      (string/integer array)
+#
+# Description
+#   Updates the diff exit data for the specified patch file hunk (within the current diff file).
+#   The diff data array stores:
+#     * "exit start line" : current hunk start line (for error messages)
+#     * "exit ihunk"      : current hunk sequence number (for error messages)
+#     * "ihunk"           : current hunk sequence number
+function preprocess_diff_file_hunk(line, file_array, diff_array,
+	new_diff_file)
+{
+	diff_array["exit ihunk"]=diff_array["ihunk"]
+	if (is_new_hunk(file_array[line]))
+		diff_array["exit start line"]=line
 }
 
 # change_array_entry_diff(file_array, target_line, line_text)

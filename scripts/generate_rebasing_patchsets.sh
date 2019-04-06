@@ -16,6 +16,7 @@ declare -a ARRAY_ESYNC_PATCH_COMMITS=(
 		"817fb9755cbf48162fe1b7d37e77d7e25afa7520" # (11)  wine:4.4
 		"b2a546c92dabee8ab1c3d5b9fecc84d99caf0e76" # (12) [wine:4.5]
 		"0decadd62a76b968abf75c9943dd0869249ec716" # (13)  wine:4.5
+		"b3c8d5d36850e484b5cc84ab818a75db567a06a3" # (14)  wine:4.6
 )
 declare ESYNC_ESYNCB4478B7_INDEX=0
 declare ESYNC_ESYNCCE79346_INDEX=8

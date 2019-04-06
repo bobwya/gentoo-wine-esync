@@ -3,18 +3,16 @@
 function process_patch_file_0001(file_array,
 	array_diff_lines, complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/configure") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 2) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (file_array[line] ~ "poll \\\\$") {
 						line_text = (indent "pipe2 \\")
@@ -28,16 +26,14 @@ function process_patch_file_0001(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 		else if ((diff_array["file"] == "/configure.ac") && (complete >= 1)) {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 2) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (file_array[line] ~ "poll \\\\$") {
 						line_text = (indent "pipe2 \\")
@@ -51,122 +47,112 @@ function process_patch_file_0001(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 2) exit_code=diff_array["idiff"]
+	if (complete != 2) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_staging_patch_file_0001(file_array,
 	array_diff_lines, complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/configure") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && is_new_hunk(file_array[line])) {
 					split("-243 0 -243 0", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 			else if ((diff_array["ihunk"] == 2) && (complete >= 1)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && is_new_hunk(file_array[line])) {
 					split("-137 0 -137 0", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 			else if ((diff_array["ihunk"] == 3) && (complete >= 2)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && is_new_hunk(file_array[line])) {
 					split("-137 0 -137 0", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 		else if (diff_array["file"] == "/configure.ac") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if ((diff_array["ihunk"] == 1) && (complete >= 3)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && is_new_hunk(file_array[line])) {
 					split("-3 0 -3 0", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 			else if ((diff_array["ihunk"] == 2) && (complete >= 4)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && is_new_hunk(file_array[line])) {
 					split("47 0 47 0", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 			else if ((diff_array["ihunk"] == 3) && (complete >= 5)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && is_new_hunk(file_array[line])) {
 					split("47 0 47 0", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 6) exit_code=diff_array["idiff"]
+	if (complete != 6) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0002(file_array,
 	array_diff_lines, complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/include/wine/server_protocol.h") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 4) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && is_new_hunk(file_array[line])) {
 					split("0 -1 0 -1", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
@@ -177,16 +163,41 @@ function process_patch_file_0002(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
-		else if (diff_array["file"] == "/server/trace.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+		else if (diff_array["file"] == "/server/esync.c") {
+			preprocess_diff_file(line, diff_array)
+
+			if ((diff_array["ihunk"] == 1) && (complete >= 1)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 11) {
+						diff_array["idiff"]+=2
+						++complete
+					}
+					else if (is_new_hunk(file_array[line])) {
+						split("0 0 0 1", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^+ no_open_file, /* open_file */$")) {
+						line_text="+    no_kernel_obj_list,        /* get_kernel_obj_list */"
+						insert_array_entry(file_array, ++line, line_text)
+						++diff_array["idiff"]
+						++complete
+					}
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+		else if ((diff_array["file"] == "/server/trace.c") && (complete >= 2)) {
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index != 7) {
 						++diff_array["idiff"]
@@ -197,31 +208,29 @@ function process_patch_file_0002(file_array,
 						++complete
 					}
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 2) exit_code=diff_array["idiff"]
+	if (complete != 3) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_staging_patch_file_0002(file_array,
 	array_diff_lines, complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/server/esync.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index >= 12) {
 						diff_array["idiff"]+=2
@@ -239,16 +248,14 @@ function process_staging_patch_file_0002(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 		else if (diff_array["file"] == "/server/protocol.def") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if ((diff_array["ihunk"] == 1) && (complete >= 1)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && is_new_hunk(file_array[line])) {
 					split("113 2 113 2", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
@@ -261,62 +268,58 @@ function process_staging_patch_file_0002(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 2) exit_code=diff_array["idiff"]
+	if (complete != 2) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_staging_patch_file_0003(file_array,
 	array_diff_lines, complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/dlls/ntdll/server.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (file_array[line] ~ text2regexp("^ WINE_DEFAULT_DEBUG_CHANNEL(server);$"))) {
 					line_text = (" WINE_DECLARE_DEBUG_CHANNEL(winediag);")
 					file_array[++line] = line_text
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}			
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 1) exit_code=diff_array["idiff"]
+	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0006(file_array,
 	array_diff_lines, complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/dlls/ntdll/om.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (file_array[line] ~ "^ #include \"wine/server.h\"$")) {
 					line_text = " "
 					file_array[++line] = line_text
@@ -325,64 +328,60 @@ function process_patch_file_0006(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 			
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 1) exit_code=diff_array["idiff"]
+	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_staging_patch_file_0006(file_array,
 	array_diff_lines, complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/dlls/ntdll/om.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (file_array[line] ~ "^ #include \"wine/exception.h\"$")) {
 					line_text = (indent "#include \"wine/unicode.h\"")
 					file_array[++line] = line_text
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 			
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 1) exit_code=diff_array["idiff"]
+	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0009(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/dlls/ntdll/sync.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index == 9) {
 						++diff_array["idiff"]
@@ -393,7 +392,7 @@ function process_patch_file_0009(file_array,
 						change_array_entry_diff(file_array, line, array_diff_lines)
 						++diff_array["idiff"]
 					}
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 				else if (diff_array["idiff"] == 2) {
 					if ((esync_rebase_index == 9) && !staging) {
@@ -404,7 +403,7 @@ function process_patch_file_0009(file_array,
 						insert_array_entry(file_array, line, line_text)
 						++diff_array["idiff"]
 					}
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 				else if (diff_array["idiff"] == 3) {
 					if ((esync_rebase_index == 9) && !staging) {
@@ -438,26 +437,24 @@ function process_patch_file_0009(file_array,
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 1) exit_code=diff_array["idiff"]
+	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0010(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/dlls/ntdll/sync.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index <= 8) {
 						diff_array["idiff"] += 4
@@ -476,7 +473,7 @@ function process_patch_file_0010(file_array,
 						}
 						++diff_array["idiff"]
 					}
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 				else if (diff_array["idiff"] == 2) {
 					if ((esync_rebase_index <= 8) || ((esync_rebase_index == 9) && !staging)) {
@@ -486,7 +483,7 @@ function process_patch_file_0010(file_array,
 						delete file_array[++line]
 						++diff_array["idiff"]
 					}
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 				else if (diff_array["idiff"] == 3) {
 					if ((esync_rebase_index <= 8) || ((esync_rebase_index == 9) && !staging)) {
@@ -495,7 +492,7 @@ function process_patch_file_0010(file_array,
 					else if (sub(text2regexp("/* resetting an event can't release any thread... */$"), "SERVER_START_REQ( event_op )", file_array[line])) {
 						++diff_array["idiff"]
 					}
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 				else if (diff_array["idiff"] == 4) {
 					if (file_array[line] ~ text2regexp("if (NumberOfThreadsReleased) *NumberOfThreadsReleased = 0;$")) {
@@ -513,37 +510,35 @@ function process_patch_file_0010(file_array,
 						++diff_array["idiff"]
 						++complete
 					}
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 1) exit_code=diff_array["idiff"]
+	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0011(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/dlls/ntdll/sync.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (sub(text2regexp("NTSTATUS WINAPI NtPulseEvent( HANDLE handle, PULONG PulseCount )$"), "NTSTATUS WINAPI NtPulseEvent( HANDLE handle, LONG *prev_state )", file_array[line])) {
 						++diff_array["idiff"]
 					}
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 				else if (diff_array["idiff"] == 2) {
 					if (file_array[line] ~ text2regexp("^     if (PulseCount)")) {
@@ -556,32 +551,30 @@ function process_patch_file_0011(file_array,
 						++diff_array["idiff"]
 						++complete
 					}
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 1) exit_code=diff_array["idiff"]
+	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0013(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/server/named_pipe.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 4) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (1) {
 						++diff_array["idiff"]
@@ -591,32 +584,30 @@ function process_patch_file_0013(file_array,
 						++diff_array["idiff"]
 						++complete
 					}
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 1) exit_code=diff_array["idiff"]
+	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0014(file_array,
 	complete, diff_array, indent, line, line_count, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/include/wine/server_protocol.h") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 4) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && is_new_hunk(file_array[line])) {
 					saved_line=line
 					++diff_array["idiff"]
@@ -638,16 +629,14 @@ function process_patch_file_0014(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 		else if (diff_array["file"] == "/server/trace.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (complete >= 1)) {
 					if (esync_rebase_index != 7) {
 						++diff_array["idiff"]
@@ -657,32 +646,30 @@ function process_patch_file_0014(file_array,
 						++diff_array["idiff"]
 						++complete
 					}
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 2) exit_code=diff_array["idiff"]
+	if (complete != 2) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_staging_patch_file_0014(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/include/wine/server_protocol.h") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 4) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (1) {
 						diff_array["idiff"] += 3
@@ -701,16 +688,14 @@ function process_staging_patch_file_0014(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 		else if (diff_array["file"] == "/server/protocol.def") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if ((diff_array["ihunk"] == 1) && (complete >= 1)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && is_new_hunk(file_array[line])) {
 					split("113 2 113 2", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
@@ -723,31 +708,29 @@ function process_staging_patch_file_0014(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 2) exit_code=diff_array["idiff"]
+	if (complete != 2) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0015(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/server/process.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 5) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && !staging && (esync_rebase_index >= 6)) {
 					++diff_array["idiff"]
 					++complete
@@ -762,40 +745,37 @@ function process_patch_file_0015(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 1) exit_code=diff_array["idiff"]
+	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_staging_patch_file_0015(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/server/process.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 2) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && sub(text2regexp("^ static unsigned int process_map_access( struct object *obj, unsigned int access );$"), " static struct security_descriptor *process_get_sd( struct object *obj );", file_array[line])) {
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 			else if ((diff_array["ihunk"] == 5) && (complete >= 1)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (file_array[line] ~ text2regexp("^ if (!token_assign_label( process->token, security_high_label_sid ))$"))) {
 					line_text = (indent "}")
 					file_array[line] = line_text
@@ -804,31 +784,29 @@ function process_staging_patch_file_0015(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 2) exit_code=diff_array["idiff"]
+	if (complete != 2) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0017(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/server/event.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if ((esync_rebase_index <= 11) || (!staging && (esync_rebase_index == 12))) {
 						diff_array["idiff"]+=3
@@ -851,11 +829,10 @@ function process_patch_file_0017(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 			else if ((diff_array["ihunk"] == 3) && (complete >= 1)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index <= 11) {
 						++diff_array["idiff"]
@@ -879,11 +856,10 @@ function process_patch_file_0017(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 			else if ((diff_array["ihunk"] == 4) && (complete >= 2)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if ((esync_rebase_index <= 11) || (!staging && (esync_rebase_index == 12))) {
 						diff_array["idiff"]+=2
@@ -901,11 +877,10 @@ function process_patch_file_0017(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 			else if ((diff_array["ihunk"] == 7) && (complete >= 3)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if ((esync_rebase_index <= 11) || (!staging && (esync_rebase_index == 12))) {
 						diff_array["idiff"]+=2
@@ -924,31 +899,29 @@ function process_patch_file_0017(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 4) exit_code=diff_array["idiff"]
+	if (complete != 4) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_staging_patch_file_0017(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/server/event.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 3) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (is_new_hunk(file_array[line])) {
 						split("0 1 0 1", array_diff_lines)
@@ -962,31 +935,29 @@ function process_staging_patch_file_0017(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 1) exit_code=diff_array["idiff"]
+	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0020(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/server/thread.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (!staging && (esync_rebase_index <= 8)) {
 						diff_array["idiff"] += 2
@@ -1005,31 +976,29 @@ function process_patch_file_0020(file_array,
 						++complete
 					}
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 1) exit_code=diff_array["idiff"]
+	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_staging_patch_file_0020(file_array,
 	array_diff_lines, complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/server/thread.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 3) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (is_new_hunk(file_array[line])) {
 						split("0 -1 0 -1", array_diff_lines)
@@ -1048,11 +1017,10 @@ function process_staging_patch_file_0020(file_array,
 						++complete
 					}
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 			else if ((diff_array["ihunk"] == 5) && (complete >= 1)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (is_new_hunk(file_array[line])) {
 						split("0 1 0 1", array_diff_lines)
@@ -1069,11 +1037,10 @@ function process_staging_patch_file_0020(file_array,
 						++complete
 					}
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 			else if ((diff_array["ihunk"] == 6) && (complete >= 2)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if ((esync_rebase_index <= 8) && sub(text2regexp("return (mythread->state == TERMINATED);$"), "return (mythread->state == TERMINATED \\&\\& !mythread->exit_poll);", file_array[line])) {
 						++diff_array["idiff"]
@@ -1084,18 +1051,14 @@ function process_staging_patch_file_0020(file_array,
 						++complete
 					}
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 		else if (diff_array["file"] == "/server/thread.h") {
-			if (!exit_start_line)
-				exit_start_line=line
-			if (diff_array["file"])
-				exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if ((diff_array["ihunk"] == 1) && (complete >= 3)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (is_new_hunk(file_array[line])) {
 						split("0 -1 0 -1", array_diff_lines)
@@ -1114,83 +1077,79 @@ function process_staging_patch_file_0020(file_array,
 						++complete
 					}
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 4) exit_code=diff_array["idiff"]
+	if (complete != 4) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_staging_patch_file_0022(file_array,
 	array_diff_lines, complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/server/queue.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 2) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (file_array[line] ~ text2regexp("^ struct thread_input *input; /* thread input descriptor */$"))) {
 					delete file_array[line]
 					++diff_array["idiff"]
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 				else if ((diff_array["idiff"] == 2) && (file_array[line] ~ text2regexp("^ timeout_t              last_get_msg; /* time of last get message call */$"))) {
 					line_text = (indent "unsigned int           ignore_post_msg; /* ignore post messages newer than this unique id */")
 					insert_array_entry(file_array, ++line, line_text)
 					++diff_array["idiff"]
 					++complete
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 			}
 			else if ((diff_array["ihunk"] == 5) && (complete >= 1)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (file_array[line] ~ text2regexp("^ queue->input = (struct thread_input *)grab_object( input );$"))) {
 					delete file_array[line]
 					++diff_array["idiff"]
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 				else if ((diff_array["idiff"] == 2) && (file_array[line] ~ text2regexp("^ queue->last_get_msg = current_time;$"))) {
 					line_text = (indent "queue->ignore_post_msg = 0;")
 					insert_array_entry(file_array, ++line, line_text)
 					++diff_array["idiff"]
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 				else if ((diff_array["idiff"] == 3) && sub(text2regexp("if (new_input) release_object( new_input );$"), "if (new_input)", file_array[line])) {
 					++diff_array["idiff"]
 					++complete
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 			}
 			else if ((diff_array["ihunk"] == 6) && (complete >= 2)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && is_new_hunk(file_array[line])) {
 					split("50 -1 50 -1", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
 					++diff_array["idiff"]
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 				else if ((diff_array["idiff"] == 2) && (file_array[line] ~ text2regexp("^ queue->wake_bits &= ~bits;$"))) {
 					delete file_array[line-1]
 					++diff_array["idiff"]
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 				else if ((diff_array["idiff"] == 3) && (file_array[line] ~ text2regexp("^ queue->changed_bits &= ~bits;$"))) {
 					line_text = (indent "update_shm_queue_bits( queue );")
 					insert_array_entry(file_array, ++line, line_text)
 					++diff_array["idiff"]
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 				else if ((diff_array["idiff"] == 4) && (file_array[line] ~ text2regexp("^ /* check whether msg is a keyboard message */$"))) {
 					line_text = (indent "")
@@ -1198,85 +1157,111 @@ function process_staging_patch_file_0022(file_array,
 					delete file_array[line]
 					++diff_array["idiff"]
 					++complete
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 3) exit_code=diff_array["idiff"]
+	if (complete != 3) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0023(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/dlls/ntdll/ntdll.spec") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((diff_array["idiff"] == 1) && is_new_hunk(file_array[line])) {
-					if (staging)
-						split("15 1 15 1", array_diff_lines)
-					else
-						split("-13 1 -13 1", array_diff_lines)
-					change_array_entry_diff(file_array, line, array_diff_lines)
-					++diff_array["idiff"]
-					exit_end_line=line
-				}
-				else if ((diff_array["idiff"] == 2) && (file_array[line] ~ text2regexp("^+@ cdecl __wine_esync_set_queue_fd(long)$"))) {					
-					if (staging) {
-						if (esync_rebase_index == 0)
-							line_text=" @ cdecl __wine_user_shared_data()"
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index != 0) {
+						diff_array["idiff"] += 2
+						++complete
+					}
+					else if (is_new_hunk(file_array[line])) {
+						if (staging)
+							split("15 1 15 1", array_diff_lines)
 						else
-							line_text = " "
+							split("-13 1 -13 1", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						++diff_array["idiff"]
+						diff_array["exit end line"]=line
 					}
-					else {
+				}
+				else if ((diff_array["idiff"] == 2) && (file_array[line] ~ text2regexp("^+@ cdecl __wine_esync_set_queue_fd(long)$"))) {
+					if (staging)
+						line_text=" @ cdecl __wine_user_shared_data()"
+					else
 						line_text=" @ cdecl __wine_init_windows_dir(wstr wstr)"
-					}
 					insert_array_entry(file_array, ++line, line_text)
 					++diff_array["idiff"]
 					++complete
-					exit_end_line=line
-				}				
+					diff_array["exit end line"]=line
+				}
+			}
+		}
+		else if (diff_array["file"] == "/dlls/ntdll/thread.c") {
+			preprocess_diff_file(line, diff_array)
+
+			if ((diff_array["ihunk"] == 1) && (complete >= 1)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 13) {
+						diff_array["idiff"] += 2
+						++complete
+					}
+					else if (is_new_hunk(file_array[line])) {
+						indent="     "
+						line_text=(indent "thread_data->reply_fd   = -1;")
+						insert_array_entry(file_array, ++line, line_text)
+						++diff_array["idiff"]
+					}
+					diff_array["exit end line"]=line
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^ thread_data->debug_info = &debug_info;$")) {
+						delete file_array[line]
+						++line
+						++diff_array["idiff"]
+						++complete
+					}
+					diff_array["exit end line"]=line
+				}
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 1) exit_code=diff_array["idiff"]
+	if (complete != 2) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_staging_patch_file_0023(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/dlls/ntdll/ntdll.spec") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && is_new_hunk(file_array[line])) {
 					split("-4 2 -4 2", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
 					++diff_array["idiff"]
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 				else if ((diff_array["idiff"] == 2) && (file_array[line] ~ text2regexp("^+@ cdecl __wine_esync_set_queue_fd(long)$"))) {
 					line_text = " "
@@ -1285,21 +1270,19 @@ function process_staging_patch_file_0023(file_array,
 					insert_array_entry(file_array, ++line, line_text)
 					++diff_array["idiff"]
 					++complete
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 			}
 		}
 		else if (diff_array["file"] == "/dlls/ntdll/ntdll_misc.h") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if ((diff_array["ihunk"] == 1) && (complete >= 1)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (file_array[line] ~ text2regexp("^ int wait_fd[2]; /* fd for sleeping server requests */$"))) {
 					delete file_array[line]
 					++diff_array["idiff"]
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 				else if ((diff_array["idiff"] == 2) && (file_array[line] ~ text2regexp("^+ int esync_queue_fd;/* fd to wait on for driver events */"))) {
 					line_text = (indent "void              *pthread_stack; /* pthread stack */")
@@ -1307,25 +1290,25 @@ function process_staging_patch_file_0023(file_array,
 					++line
 					++diff_array["idiff"]
 					++complete
-					exit_end_line=line
+					diff_array["exit end line"]=line
 				}
 			}
 		}
 		else if (diff_array["file"] == "/dlls/ntdll/thread.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
-			if ((diff_array["ihunk"] == 2) && (complete >= 2)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
-				if ((diff_array["idiff"] == 1) && (esync_rebase_index <= 4)) {
-					diff_array["idiff"] += 3
-					++complete
-				}
-				else if ((diff_array["idiff"] == 1) && is_new_hunk(file_array[line])) {
-					split("171 0 171 0", array_diff_lines)
-					change_array_entry_diff(file_array, line, array_diff_lines)
-					++diff_array["idiff"]
+			if ((diff_array["ihunk"] == 2) && (complete >= 1)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 4) {
+						diff_array["idiff"] += 3
+						++complete
+					}
+					else if (is_new_hunk(file_array[line])) {
+						split("171 0 171 0", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						++diff_array["idiff"]
+					}
 				}
 				else if ((diff_array["idiff"] == 2) && sub(text2regexp("pthread_attr_init( &attr );$"), "pthread_attr_init( \\&pthread_attr );", file_array[line])) {
 					++diff_array["idiff"]
@@ -1338,26 +1321,24 @@ function process_staging_patch_file_0023(file_array,
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 3) exit_code=diff_array["idiff"]
+	if (complete != 3) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0024(file_array,
 	complete, diff_array, indent, line)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/server/thread.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (!staging && (esync_rebase_index <= 8)) {
 						diff_array["idiff"] += 2
@@ -1377,11 +1358,10 @@ function process_patch_file_0024(file_array,
 						++complete
 					}
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 			else if ((diff_array["ihunk"] == 2) && (complete >= 1)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (!staging) {
 						diff_array["idiff"] += 1
@@ -1396,16 +1376,14 @@ function process_patch_file_0024(file_array,
 						++complete
 					}
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 		else if (diff_array["file"] == "/server/trace.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if ((diff_array["ihunk"] == 1) && (complete >= 2)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if ((esync_rebase_index >= 9) || (staging && (esync_rebase_index != 7))) {
 						diff_array["idiff"] += 1
@@ -1416,31 +1394,29 @@ function process_patch_file_0024(file_array,
 						++complete
 					}
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 3) exit_code=diff_array["idiff"]
+	if (complete != 3) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_staging_patch_file_0024(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/server/process.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && is_new_hunk(file_array[line])) {
 					split("0 1 0 1", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
@@ -1452,16 +1428,14 @@ function process_staging_patch_file_0024(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 		else if (diff_array["file"] == "/server/protocol.def") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && is_new_hunk(file_array[line])) {
 					split("113 2 113 2", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
@@ -1474,31 +1448,29 @@ function process_staging_patch_file_0024(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 2) exit_code=diff_array["idiff"]
+	if (complete != 2) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0025(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/server/device.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 2) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index <= 11) {
 						diff_array["idiff"]+=4
@@ -1526,8 +1498,7 @@ function process_patch_file_0025(file_array,
 				}
 			}
 			else if ((diff_array["ihunk"] == 6) && (complete >= 1)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if ((esync_rebase_index <= 11) || (!staging && (esync_rebase_index == 12))) {
 						++diff_array["idiff"]
@@ -1542,8 +1513,7 @@ function process_patch_file_0025(file_array,
 				}
 			}
 			else if ((diff_array["ihunk"] == 7) && (complete >= 2)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index <= 11) {
 						diff_array["idiff"]+=2
@@ -1563,8 +1533,7 @@ function process_patch_file_0025(file_array,
 				}
 			}
 			else if ((diff_array["ihunk"] == 8) && (complete >= 3)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if ((esync_rebase_index <= 11) || (!staging && (esync_rebase_index == 12))) {
 						diff_array["idiff"]+=2
@@ -1583,28 +1552,26 @@ function process_patch_file_0025(file_array,
 					++complete
 				}
 			}
-			exit_end_line=line
+			diff_array["exit end line"]=line
 		}
 	}
 
-	if (complete != 4) exit_code=diff_array["idiff"]
+	if (complete != 4) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_staging_patch_file_0025(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/server/device.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 6) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && is_new_hunk(file_array[line])) {
 					split("8 0 8 0", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
@@ -1621,28 +1588,26 @@ function process_staging_patch_file_0025(file_array,
 					++complete
 				}
 			}
-			exit_end_line=line
+			diff_array["exit end line"]=line
 		}
 	}
 
-	if (complete != 1) exit_code=diff_array["idiff"]
+	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0033(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/include/wine/server_protocol.h") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 4) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (is_new_hunk(file_array[line]))) {
 					split("308 -3 308 -3", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
@@ -1655,17 +1620,17 @@ function process_patch_file_0033(file_array,
 					++complete
 				}
 			}
-			exit_end_line=line
+			diff_array["exit end line"]=line
 		}
 	}
 
-	if (complete != 1) exit_code=diff_array["idiff"]
+	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0041(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	if (esync_rebase_index <= 10)
 		diff_offset=staging ? -28 : -58
 	else
@@ -1676,55 +1641,49 @@ function process_patch_file_0041(file_array,
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/include/wine/server_protocol.h") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (is_new_hunk(file_array[line]))) {
 					split((diff_offset " 0 " diff_offset " 0"), array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 			else if ((diff_array["ihunk"] == 2) && (complete >= 1)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (is_new_hunk(file_array[line]))) {
 					split((diff_offset " 0 " diff_offset " 0"), array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 	
-	if (complete != 2) exit_code=diff_array["idiff"]
+	if (complete != 2) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_staging_patch_file_0041(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/server/main.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 2) {
-				
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && is_new_hunk(file_array[line])) {
 					split("1 1 1 1", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
@@ -1737,31 +1696,29 @@ function process_staging_patch_file_0041(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 	
-	if (complete != 1) exit_code=diff_array["idiff"]
+	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0042(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/dlls/ntdll/thread.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (esync_rebase_index >= 1)) {
 					++diff_array["idiff"]
 					++complete
@@ -1772,11 +1729,10 @@ function process_patch_file_0042(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 			if ((diff_array["ihunk"] == 2) && (complete >= 1)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (file_array[line] ~ text2regexp("^ NtCreateKeyedEvent( &keyed_event, GENERIC_READ | GENERIC_WRITE, NULL, 0 );$"))) {
 					line_text=" "
 					file_array[++line] = line_text
@@ -1787,31 +1743,29 @@ function process_patch_file_0042(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 	
-	if (complete != 2) exit_code=diff_array["idiff"]
+	if (complete != 2) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_staging_patch_file_0042(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/dlls/ntdll/thread.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 2) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && is_new_hunk(file_array[line])) {
 					split("163 0 163 0", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
@@ -1823,31 +1777,57 @@ function process_staging_patch_file_0042(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 	
-	if (complete != 1) exit_code=diff_array["idiff"]
+	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0045(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
-		if (diff_array["file"] == "/include/wine/server_protocol.h") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+		if (diff_array["file"] == "/dlls/ntdll/thread.c") {
+			preprocess_diff_file(line, diff_array)
 
-			if (diff_array["ihunk"] == 4) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+			if (diff_array["ihunk"] == 1) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 13) {
+						diff_array["idiff"] += 2
+						++complete
+					}
+					else if (is_new_hunk(file_array[line])) {
+						indent="     "
+						line_text=(indent "thread_data->wait_fd[0] = -1;")
+						insert_array_entry(file_array, ++line, line_text)
+						++diff_array["idiff"]
+					}
+					diff_array["exit end line"]=line
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^ thread_data->debug_info = &debug_info;$")) {
+						delete file_array[line]
+						++diff_array["idiff"]
+						++complete
+					}
+					diff_array["exit end line"]=line
+				}
+			}
+		}
+		else if (diff_array["file"] == "/include/wine/server_protocol.h") {
+			preprocess_diff_file(line, diff_array)
+
+			if ((diff_array["ihunk"] == 4) && (complete >= 1)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (is_new_hunk(file_array[line]))) {
 					split("283 -3 283 -3", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
@@ -1859,16 +1839,14 @@ function process_patch_file_0045(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 		else if (diff_array["file"] == "/server/trace.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
-			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+			if ((diff_array["ihunk"] == 1) && (complete >= 2)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (esync_rebase_index != 7)) {
 					++diff_array["idiff"]
 					++complete
@@ -1877,31 +1855,29 @@ function process_patch_file_0045(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 	
-	if (complete != 2) exit_code=diff_array["idiff"]
+	if (complete != 3) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_staging_patch_file_0045(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/dlls/ntdll/ntdll_misc.h") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (is_new_hunk(file_array[line]))) {
 					split("49 1 49 1", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
@@ -1914,16 +1890,14 @@ function process_staging_patch_file_0045(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 		else if (diff_array["file"] == "/dlls/ntdll/thread.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if ((diff_array["ihunk"] == 2) && (complete >= 1)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (is_new_hunk(file_array[line]))) {
 					split("171 0 171 0", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
@@ -1940,16 +1914,14 @@ function process_staging_patch_file_0045(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 		else if (diff_array["file"] == "/server/thread.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if ((diff_array["ihunk"] == 1) && (complete >= 2)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (file_array[line] ~ text2regexp("^+ thread->esync_apc_fd = -1;$"))) {
 					line_text="thread->exit_poll       = NULL;"
 					file_array[++line]=(indent line_text)
@@ -1960,16 +1932,14 @@ function process_staging_patch_file_0045(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 		else if (diff_array["file"] == "/server/thread.h") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if ((diff_array["ihunk"] == 1) && (complete >= 3)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (file_array[line] ~ text2regexp("^+ int esync_apc_fd; /* esync apc fd (signalled when APCs are present) */$"))) {
 					line_text="struct timeout_user   *exit_poll;     /* poll if the thread/process has exited already */"
 					file_array[++line]=(indent line_text)
@@ -1980,60 +1950,56 @@ function process_staging_patch_file_0045(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 4) exit_code=diff_array["idiff"]
+	if (complete != 4) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0048(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/dlls/kernel32/tests/sync.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 2) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && sub(text2regexp("ERROR_INVALID_PARAMETER"), "ERROR_FILE_NOT_FOUND", file_array[line])) {
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 	
-	if (complete != 1) exit_code=diff_array["idiff"]
+	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0064(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/server/fd.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 2) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index >= 9) {
 						diff_array["idiff"] += 2
@@ -2055,8 +2021,7 @@ function process_patch_file_0064(file_array,
 				}
 			}
 			else if ((diff_array["ihunk"] == 4) && (complete >= 1)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index >= 9) {
 						diff_array["idiff"] += 2
@@ -2075,11 +2040,10 @@ function process_patch_file_0064(file_array,
 						++complete
 					}
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 			else if ((diff_array["ihunk"] == 5) && (complete >= 2)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index >= 9) {
 						diff_array["idiff"] += 1
@@ -2094,11 +2058,10 @@ function process_patch_file_0064(file_array,
 						++complete
 					}
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 			else if ((diff_array["ihunk"] == 6) && (complete >= 3)) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index <= 8) {
 						diff_array["idiff"] += 1
@@ -2111,31 +2074,29 @@ function process_patch_file_0064(file_array,
 						++complete
 					}
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 4) exit_code=diff_array["idiff"]
+	if (complete != 4) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0074(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/dlls/ntdll/thread.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (file_array[line] ~ text2regexp("^ NtCreateKeyedEvent( &keyed_event, GENERIC_READ | GENERIC_WRITE, NULL, 0 );$"))) {
 					line_text = " "
 					if (esync_rebase_index == 6)
@@ -2145,62 +2106,58 @@ function process_patch_file_0074(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 	
-	if (complete != 1) exit_code=diff_array["idiff"]
+	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_staging_patch_file_0074(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/dlls/ntdll/thread.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (file_array[line] ~ text2regexp("^ fill_cpu_info();$"))) {
 					line_text = (indent "__wine_user_shared_data();")
 					file_array[line-1] = line_text
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 	
-	if (complete != 1) exit_code=diff_array["idiff"]
+	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_0079(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/include/wine/server_protocol.h") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 4) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (is_new_hunk(file_array[line]))) {
 					split("306 -3 306 -3", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
@@ -2212,16 +2169,14 @@ function process_patch_file_0079(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 		else if ((diff_array["file"] == "/server/trace.c") && (complete >= 1)) {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index != 7) {
 						++diff_array["idiff"]
@@ -2265,30 +2220,28 @@ function process_patch_file_0079(file_array,
 					}
 				}
 			}
-			exit_end_line=line
+			diff_array["exit end line"]=line
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 2) exit_code=diff_array["idiff"]
+	if (complete != 2) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_staging_patch_file_0079(file_array,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == "/server/queue.c") {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (is_new_hunk(file_array[line]))) {
 					split("6 1 6 1", array_diff_lines)
 					change_array_entry_diff(file_array, line, array_diff_lines)
@@ -2300,45 +2253,43 @@ function process_staging_patch_file_0079(file_array,
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 1) exit_code=diff_array["idiff"]
+	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file_delete_target_hunk(file_array, target_diff_file, target_hunk,
 	complete, diff_array, indent, line, line_text)
 {
-	exit_start_line=0
+	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
 		if (diff_array["file"] == target_diff_file) {
-			exit_start_line=exit_start_line ? exit_start_line : line
-			exit_diff_array["file"]=diff_array["file"]
+			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == target_hunk) {
-				exit_hunk=diff_array["ihunk"]
-				if (is_new_hunk(file_array[line])) exit_start_line=line
+				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if ((diff_array["idiff"] == 1) && (is_new_hunk(file_array[line]))) {
 					while(!is_new_diff_file(file_array[line]))
 						delete file_array[line++]
 					++diff_array["idiff"]
 					++complete
 				}
-				exit_end_line=line
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (!exit_end_line) exit_end_line=line
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
 
-	if (complete != 1) exit_code=diff_array["idiff"]
+	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
 }
 
 function process_patch_file(file_array)
@@ -2348,12 +2299,14 @@ function process_patch_file(file_array)
 	if (patch_number == "0001") {
 		if (esync_rebase_index >= 11)
 			process_patch_file_0001(file_array)
-		if (!exit_code && staging && (esync_rebase_index <= 2))
+		if (!diff_array["exit code"] && staging && (esync_rebase_index <= 2)) {
+			squash_array(file_array)
 			process_staging_patch_file_0001(file_array)
+		}
 	}
 	else if (patch_number == "0002") {
 		process_patch_file_0002(file_array)
-		if (!exit_code && staging) process_staging_patch_file_0002(file_array)
+		if (!diff_array["exit code"] && staging) process_staging_patch_file_0002(file_array)
 	}
 	else if (staging && (patch_number == "0003")) {
 		process_staging_patch_file_0003(file_array)
@@ -2380,41 +2333,59 @@ function process_patch_file(file_array)
 	}
 	else if (patch_number == "0014") {
 		process_patch_file_0014(file_array)
-		if (!exit_code && staging) process_staging_patch_file_0014(file_array)
+		if (!diff_array["exit code"] && staging) {
+			squash_array(file_array)
+			process_staging_patch_file_0014(file_array)
+		}
 	}
 	else if (patch_number == "0015") {
 		if (esync_rebase_index <= 5)
 			process_patch_file_0015(file_array)
-		if (!exit_code && staging) process_staging_patch_file_0015(file_array)
+		if (!diff_array["exit code"] && staging) {
+			squash_array(file_array)
+			process_staging_patch_file_0015(file_array)
+		}
 	}
 	else if (patch_number == "0017") {
 		process_patch_file_0017(file_array)
-		if (!exit_code && staging && (esync_rebase_index <= 11))
+		if (!diff_array["exit code"] && staging && (esync_rebase_index <= 11)) {
+			squash_array(file_array)
 			process_staging_patch_file_0017(file_array)
+		}
 	}
 	else if (patch_number == "0020") {
 		process_patch_file_0020(file_array)
-		if (!exit_code && staging) process_staging_patch_file_0020(file_array)
+		if (!diff_array["exit code"] && staging) {
+			squash_array(file_array)
+			process_staging_patch_file_0020(file_array)
+		}
 	}
 	else if (staging && (patch_number == "0022")) {
 		process_staging_patch_file_0022(file_array)
 	}
 	else if (patch_number == "0023") {
-		if (esync_rebase_index == 0)
+		if ((esync_rebase_index == 0) || (esync_rebase_index >= 14))
 			process_patch_file_0023(file_array)
-		if (!exit_code && staging) process_staging_patch_file_0023(file_array)
+		if (!diff_array["exit code"] && staging) {
+			squash_array(file_array)
+			process_staging_patch_file_0023(file_array)
+		}
 	}
 	else if (patch_number == "0024") {
 		if ((esync_rebase_index == 7) || (esync_rebase_index >= 9) || staging)
 			process_patch_file_0024(file_array)
-		if (!exit_code && staging)
+		if (!diff_array["exit code"] && staging) {
+			squash_array(file_array)
 			process_staging_patch_file_0024(file_array)
-		if (!exit_code && (esync_rebase_index <= 7))
+		}
+		if (!diff_array["exit code"] && (esync_rebase_index <= 7)) {
+			squash_array(file_array)
 			process_patch_file_delete_target_hunk(file_array, "/include/wine/server_protocol.h", 2)
+		}
 	}
 	else if (patch_number == "0025") {
 		process_patch_file_0025(file_array)
-		if (!exit_code && staging) process_staging_patch_file_0025(file_array)
+		if (!diff_array["exit code"] && staging) process_staging_patch_file_0025(file_array)
 	}
 	else if ((patch_number == "0026") && (esync_rebase_index <= 7)) {
 		process_patch_file_delete_target_hunk(file_array, "/include/wine/server_protocol.h", 2)
@@ -2430,23 +2401,30 @@ function process_patch_file(file_array)
 	}
 	else if (patch_number == "0041") {
 		process_patch_file_0041(file_array)
-		if (!exit_code && staging)
+		if (!diff_array["exit code"] && staging)
 			process_staging_patch_file_0041(file_array)
-		if (!exit_code)
+		if (!diff_array["exit code"]) {
+			squash_array(file_array)
 			process_patch_file_delete_target_hunk(file_array, "/include/wine/server_protocol.h", 3)
+		}
 	}
 	else if (patch_number == "0042") {
 		if (esync_rebase_index <= 6)
 			process_patch_file_0042(file_array)
-		if (!exit_code && staging)
+		if (!diff_array["exit code"] && staging) {
+			squash_array(file_array)
 			process_staging_patch_file_0042(file_array)
+		}
 	}
 	else if (patch_number == "0044") {
 		process_patch_file_delete_target_hunk(file_array, "/include/wine/server_protocol.h", 2)
 	}
 	else if (patch_number == "0045") {
 		process_patch_file_0045(file_array)
-		if (!exit_code && staging) process_staging_patch_file_0045(file_array)
+		if (!diff_array["exit code"] && staging) {
+			squash_array(file_array)
+			process_staging_patch_file_0045(file_array)
+		}
 	}
 	else if (patch_number == "0048") {
 		if ((esync_rebase_index <= 1) || (staging && (esync_rebase_index == 2)))
@@ -2457,9 +2435,11 @@ function process_patch_file(file_array)
 			process_patch_file_0064(file_array)
 	}
 	else if (patch_number == "0074") {
-		if (esync_rebase_index <= 6)
+		if (esync_rebase_index <= 6) {
 			process_patch_file_0074(file_array)
-		if (!exit_code && staging) process_staging_patch_file_0074(file_array)
+			squash_array(file_array)
+		}
+		if (!diff_array["exit code"] && staging) process_staging_patch_file_0074(file_array)
 	}
 	else if (patch_number == "0077") {
 		process_patch_file_delete_target_hunk(file_array, "/include/wine/server_protocol.h", 2)
@@ -2469,12 +2449,15 @@ function process_patch_file(file_array)
 	}
 	else if (patch_number == "0079") {
 		process_patch_file_0079(file_array)
-		if (!exit_code && staging) process_staging_patch_file_0079(file_array)
+		if (!diff_array["exit code"] && staging) {
+			squash_array(file_array)
+			process_staging_patch_file_0079(file_array)
+		}
 	}
 
-	if (exit_code) return exit_code
+	if (diff_array["exit code"]) return diff_array["exit code"]
 
-
+	squash_array(file_array)
 	if (target_esync_directory) {
 		print_file(file_array, (target_esync_directory "/" file_name))
 	}
@@ -2492,8 +2475,8 @@ BEGIN{
 		file_name = get_file_name(file_path)
 		patch_number = substr(file_name,1,4)
  		if (supported_patches !~ patch_number) {
-			exit_code=255
-			exit exit_code
+			diff_array["exit code"]=255
+			exit diff_array["exit code"]
 		}
 	}
 
@@ -2505,8 +2488,8 @@ END{
 		process_patch_file(file_array)
 	}
 
-	if (exit_code) {
+	if (diff_array["exit code"]) {
 		dump_error()
-		exit exit_code
+		exit diff_array["exit code"]
 	}
 }
