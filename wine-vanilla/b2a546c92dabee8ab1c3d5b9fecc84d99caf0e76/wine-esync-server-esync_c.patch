@@ -1,9 +1,9 @@
 diff --git a/server/esync.c b/server/esync.c
 new file mode 100644
-index 00000000000..c4141631204
+index 00000000000..7aa112feefe
 --- /dev/null
 +++ b/server/esync.c
-@@ -0,0 +1,549 @@
+@@ -0,0 +1,550 @@
 +/*
 + * eventfd-based synchronization objects
 + *
@@ -142,6 +142,7 @@ index 00000000000..c4141631204
 +    directory_link_name,       /* link_name */
 +    default_unlink_name,       /* unlink_name */
 +    no_open_file,              /* open_file */
++    no_kernel_obj_list,        /* get_kernel_obj_list */
 +    no_close_handle,           /* close_handle */
 +    esync_destroy              /* destroy */
 +};
