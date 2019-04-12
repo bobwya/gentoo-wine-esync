@@ -16,12 +16,15 @@ declare -a ARRAY_ESYNC_PATCH_COMMITS=(
 		"817fb9755cbf48162fe1b7d37e77d7e25afa7520" # (11)  wine:4.4
 		"b2a546c92dabee8ab1c3d5b9fecc84d99caf0e76" # (12) [wine:4.5]
 		"0decadd62a76b968abf75c9943dd0869249ec716" # (13)  wine:4.5
-		"b3c8d5d36850e484b5cc84ab818a75db567a06a3" # (14)  wine:4.6
+		"b3c8d5d36850e484b5cc84ab818a75db567a06a3" # (14) [wine:4.6]
+		"8268c47462544baf5bc7e5071c0a9f2d00c5c2cb" # (15) [wine:4.6]
+		"4c0e81728f6db575d9cbd8feb8a5374f1adec9bb" # (16)  wine:4.6
 )
 declare ESYNC_ESYNCB4478B7_INDEX=0
 declare ESYNC_ESYNCCE79346_INDEX=8
-declare ESYNC_STAGING_SUPPORT_INDEX=2
-declare ESYNC_VANILLA_SUPPORT_INDEX=$((ESYNC_ESYNCB4478B7_INDEX))
+declare ESYNC_STAGING_SUPPORT_INDEX_MIN=2
+declare ESYNC_STAGING_SUPPORT_INDEX_MAX=14
+declare ESYNC_VANILLA_SUPPORT_INDEX_MIN="$((ESYNC_ESYNCB4478B7_INDEX))"
 
 declare ESYNC_BASE_URL="https://github.com/zfigura/wine/releases/download"
 declare ESYNC_VERSION_ARRAY=(
@@ -155,13 +158,15 @@ function generate_rebased_esync_patchset()
 			_target_esync_version _target_esync_patch_file _target_patch
 
 	if ((_staging)); then
-		_min_esync_rebase_index=$((ESYNC_STAGING_SUPPORT_INDEX))
+		_min_esync_rebase_index=$((ESYNC_STAGING_SUPPORT_INDEX_MIN))
+		_max_esync_rebase_index=$((ESYNC_STAGING_SUPPORT_INDEX_MAX))
 		_target_esync_version="wine-staging"
 	else
-		_min_esync_rebase_index=$((ESYNC_VANILLA_SUPPORT_INDEX))
+		_min_esync_rebase_index=$((ESYNC_VANILLA_SUPPORT_INDEX_MIN))
+		_max_esync_rebase_index=$((_array_size-1))
 		_target_esync_version="wine-vanilla"
 	fi
-	if ((_esync_rebase_index < _min_esync_rebase_index)); then
+	if (( (_esync_rebase_index < _min_esync_rebase_index) || (_esync_rebase_index > _max_esync_rebase_index) )); then
 		printf " skipping unsupported index: %02d\\n" "$((_esync_rebase_index+1))"
 		return 0
 	fi
@@ -227,7 +232,8 @@ function generate_all_rebased_esync_patchsets()
 
 	local  _source_directory="${1%/}" _target_directory="${2%/}" \
 			_awk_scripts_directory="${3%/}" \
-			_array_size="${#ARRAY_ESYNC_PATCH_COMMITS[@]}" _esync_rebase_index _esync_version _i _staging
+			_array_size="${#ARRAY_ESYNC_PATCH_COMMITS[@]}" \
+			_esync_rebase_index _esync_version _i _staging
 
 	for _i in "${!ESYNC_VERSION_ARRAY[@]}"; do
 		_esync_version="${ESYNC_VERSION_ARRAY[_i]}"

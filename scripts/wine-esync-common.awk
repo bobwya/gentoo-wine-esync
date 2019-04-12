@@ -19,7 +19,7 @@ function dump_error()
 	printf("%s: file: '%s' hunk: %d [%d] (lines: %04d-%04d) failed\n",
 			file_name,
 			diff_array["exit file"], diff_array["exit ihunk"], diff_array["exit code"],
-			diff_array["exit strart line"], diff_array["exit end line"]) >"/dev/stderr"
+			diff_array["exit start line"], diff_array["exit end line"]) >"/dev/stderr"
 }
 
 # squash_array(text)
