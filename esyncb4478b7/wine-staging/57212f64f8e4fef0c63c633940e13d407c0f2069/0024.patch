@@ -1,5 +1,5 @@
 --- a/0024-server-ntdll-Also-wait-on-the-queue-fd-when-waiting-.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0024-server-ntdll-Also-wait-on-the-queue-fd-when-waiting-.patch	2019-04-12 18:38:09.213877312 +0100
++++ b/0024-server-ntdll-Also-wait-on-the-queue-fd-when-waiting-.patch	2019-04-13 21:57:47.910393551 +0100
 @@ -3,15 +3,12 @@
  Date: Sat, 9 Jun 2018 14:44:54 -0500
  Subject: [PATCH 24/83] server, ntdll: Also wait on the queue fd when waiting
@@ -24,6 +24,23 @@
  diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
  index c4faf69..cb206bc 100644
  --- a/dlls/ntdll/esync.c
+@@ -105,13 +101,13 @@
+          FIXME("Can't wait on esync and server objects at the same time!\n");
+ @@ -491,6 +496,9 @@ NTSTATUS esync_wait_objects( DWORD count, const HANDLE *handles, BOOLEAN wait_an
+          for (i = 0; i < count; i++)
+-             DPRINTF(" %p", handles[i]);
++             TRACE(" %p", handles[i]);
+  
+ +        if (msgwait)
+-+            DPRINTF(" or driver events (fd %d)", ntdll_get_thread_data()->esync_queue_fd);
+++            TRACE(" or driver events (fd %d)", ntdll_get_thread_data()->esync_queue_fd);
+ +
+          if (!timeout)
+-             DPRINTF(", timeout = INFINITE.\n");
++             TRACE(", timeout = INFINITE.\n");
+          else
+ @@ -508,10 +516,16 @@ NTSTATUS esync_wait_objects( DWORD count, const HANDLE *handles, BOOLEAN wait_an
+              fds[i].fd = objs[i] ? objs[i]->fd : -1;
 @@ -166,14 +162,6 @@
   };
   
