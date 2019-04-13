@@ -1,6 +1,6 @@
 diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
 new file mode 100644
-index 00000000000..a7fee036697
+index 00000000000..f5687d61d89
 --- /dev/null
 +++ b/dlls/ntdll/esync.c
 @@ -0,0 +1,1324 @@
@@ -909,19 +909,19 @@ index 00000000000..a7fee036697
 +    {
 +        TRACE("Waiting for %s of %d handles:", wait_any ? "any" : "all", count);
 +        for (i = 0; i < count; i++)
-+            DPRINTF(" %p", handles[i]);
++            TRACE(" %p", handles[i]);
 +
 +        if (msgwait)
-+            DPRINTF(" or driver events (fd %d)", ntdll_get_thread_data()->esync_queue_fd);
++            TRACE(" or driver events (fd %d)", ntdll_get_thread_data()->esync_queue_fd);
 +        if (alertable)
-+            DPRINTF(", alertable");
++            TRACE(", alertable");
 +
 +        if (!timeout)
-+            DPRINTF(", timeout = INFINITE.\n");
++            TRACE(", timeout = INFINITE.\n");
 +        else
 +        {
 +            timeleft = update_timeout( end );
-+            DPRINTF(", timeout = %ld.%07ld sec.\n",
++            TRACE(", timeout = %ld.%07ld sec.\n",
 +                (long) timeleft / TICKSPERSEC, (long) timeleft % TICKSPERSEC);
 +        }
 +    }
