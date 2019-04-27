@@ -1,5 +1,5 @@
 diff --git a/include/wine/server_protocol.h b/include/wine/server_protocol.h
-index 60b02f74ed8..375a7b4908a 100644
+index 3ab8813b5f9..8708119cef7 100644
 --- a/include/wine/server_protocol.h
 +++ b/include/wine/server_protocol.h
 @@ -5743,6 +5743,92 @@ struct terminate_job_reply
@@ -130,4 +130,4 @@ index 60b02f74ed8..375a7b4908a 100644
 +    struct esync_msgwait_reply esync_msgwait_reply;
  };
  
- #define SERVER_PROTOCOL_VERSION 577
+ 
