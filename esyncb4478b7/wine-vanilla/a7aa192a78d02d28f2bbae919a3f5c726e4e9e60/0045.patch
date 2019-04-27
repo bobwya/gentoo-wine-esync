@@ -1,5 +1,5 @@
 --- a/0045-server-ntdll-Implement-alertable-waits.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0045-server-ntdll-Implement-alertable-waits.patch	2019-04-13 21:57:39.590276900 +0100
++++ b/0045-server-ntdll-Implement-alertable-waits.patch	2019-04-27 22:44:13.562561879 +0100
 @@ -2,9 +2,7 @@
  From: Zebediah Figura <z.figura12@gmail.com>
  Date: Fri, 15 Jun 2018 14:12:22 -0500
@@ -34,12 +34,12 @@
  @@ -766,10 +792,17 @@ NTSTATUS esync_wait_objects( DWORD count, const HANDLE *handles, BOOLEAN wait_an
           }
           if (msgwait)
-@@ -269,17 +266,13 @@
+@@ -269,17 +266,14 @@
   };
   union generic_reply
   {
 -@@ -6602,8 +6615,9 @@ union generic_reply
-+@@ -6885,5 +6898,6 @@ union generic_reply
++@@ -6885,6 +6898,7 @@ union generic_reply
       struct create_esync_reply create_esync_reply;
       struct open_esync_reply open_esync_reply;
       struct get_esync_fd_reply get_esync_fd_reply;
@@ -48,12 +48,12 @@
   
 --#define SERVER_PROTOCOL_VERSION 573
 -+#define SERVER_PROTOCOL_VERSION 574
-- 
+  
 - #endif /* __WINE_WINE_SERVER_PROTOCOL_H */
  diff --git a/server/esync.c b/server/esync.c
  index 6adf996..8bf6e44 100644
  --- a/server/esync.c
-@@ -482,4 +475,3 @@
+@@ -482,4 +476,3 @@
   static const struct
  -- 
  2.7.4

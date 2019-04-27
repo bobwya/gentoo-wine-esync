@@ -1,5 +1,5 @@
 --- a/0002-server-Create-server-objects-for-eventfd-based-synch.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0002-server-Create-server-objects-for-eventfd-based-synch.patch	2019-04-13 21:57:38.850266525 +0100
++++ b/0002-server-Create-server-objects-for-eventfd-based-synch.patch	2019-04-27 22:44:12.714548847 +0100
 @@ -3,7 +3,6 @@
  Date: Thu, 7 Jun 2018 20:09:59 -0500
  Subject: [PATCH 02/83] server: Create server objects for eventfd-based
@@ -16,23 +16,16 @@
  diff --git a/include/wine/server_protocol.h b/include/wine/server_protocol.h
  index e8611ce..be6c71f 100644
  --- a/include/wine/server_protocol.h
-@@ -58,14 +56,13 @@
-  };
-  union generic_reply
-  {
--@@ -6529,6 +6547,7 @@ union generic_reply
-+@@ -6529,5 +6547,6 @@ union generic_reply
-      struct set_job_limits_reply set_job_limits_reply;
-      struct set_job_completion_port_reply set_job_completion_port_reply;
-      struct terminate_job_reply terminate_job_reply;
+@@ -65,7 +63,7 @@
  +    struct create_esync_reply create_esync_reply;
   };
   
 - #define SERVER_PROTOCOL_VERSION 565
++ 
  diff --git a/server/Makefile.in b/server/Makefile.in
  index aaaa8d3..5d96d22 100644
  --- a/server/Makefile.in
-@@ -321,4 +318,3 @@
+@@ -321,4 +319,3 @@
   static const struct
  -- 
  2.7.4

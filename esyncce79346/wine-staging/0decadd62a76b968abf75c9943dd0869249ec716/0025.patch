@@ -1,5 +1,5 @@
 --- a/0025-server-Create-eventfd-descriptors-for-device-manager.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0025-server-Create-eventfd-descriptors-for-device-manager.patch	2019-04-13 21:57:51.794448008 +0100
++++ b/0025-server-Create-eventfd-descriptors-for-device-manager.patch	2019-04-27 22:44:28.278788096 +0100
 @@ -3,19 +3,15 @@
  Date: Sat, 9 Jun 2018 15:39:37 -0500
  Subject: [PATCH 25/83] server: Create eventfd descriptors for device manager
@@ -20,7 +20,7 @@
  diff --git a/server/device.c b/server/device.c
  index 94309ba112..5c13a839ab 100644
  --- a/server/device.c
-@@ -28,11 +24,12 @@
+@@ -28,11 +24,11 @@
   
   /* IRP object */
   
@@ -29,8 +29,7 @@
 -     struct list            devices;       /* list of devices */
 -     struct list            requests;      /* list of pending irps across all devices */
 -+    int                    esync_fd;      /* esync file descriptor */
-+@@ -96,11 +97,13 @@ struct device_manager
-+     struct object          obj;            /* object header */
++@@ -96,10 +97,12 @@ struct device_manager
 +     struct list            devices;        /* list of devices */
 +     struct list            requests;       /* list of pending irps across all devices */
 +     struct wine_rb_tree    kernel_objects; /* map of objects that have client side pointer associated */
@@ -38,14 +37,14 @@
   };
   
   static void device_manager_dump( struct object *obj, int verbose );
-@@ -74,30 +71,32 @@
+@@ -74,30 +70,30 @@
   static void device_manager_destroy( struct object *obj )
   {
       struct device_manager *manager = (struct device_manager *)obj;
 -@@ -618,6 +631,9 @@ static void device_manager_destroy( struct object *obj )
 -     {
 -         struct device *device = LIST_ENTRY( ptr, struct device, entry );
-+@@ -626,6 +639,9 @@ static void device_manager_destroy( struct object *obj )
++@@ -687,6 +700,9 @@ static void device_manager_destroy( struct object *obj )
 +         grab_object( &device->obj );
           delete_device( device );
 +         release_object( &device->obj );
@@ -56,9 +55,9 @@
 - }
   
 -@@ -629,6 +645,9 @@ static struct device_manager *create_device_manager(void)
+-     {
 +     while ((ptr = list_head( &manager->requests )))
-+@@ -637,7 +653,10 @@ static struct device_manager *create_device_manager(void)
-      {
++@@ -637,6 +653,9 @@ static struct device_manager *create_device_manager(void)
           list_init( &manager->devices );
           list_init( &manager->requests );
 +         wine_rb_init( &manager->kernel_objects, compare_kernel_object );
@@ -69,15 +68,15 @@
       return manager;
   }
 -@@ -735,6 +754,9 @@ DECL_HANDLER(get_next_device_request)
-+@@ -743,7 +762,10 @@ DECL_HANDLER(get_next_device_request)
-              iosb->in_size = 0;
+-             iosb->in_size = 0;
++@@ -743,6 +762,9 @@ DECL_HANDLER(get_next_device_request)
               list_remove( &irp->mgr_entry );
               list_init( &irp->mgr_entry );
 +             if (!irp->file) release_object( irp ); /* no longer on manager queue */
  +
  +            if (do_esync() && list_empty( &manager->requests ))
  +                esync_clear( manager->esync_fd );
-@@ -106,4 +105,3 @@
+@@ -106,4 +102,3 @@
       else set_error( STATUS_PENDING );
  -- 
  2.19.1

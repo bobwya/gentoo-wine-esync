@@ -1,5 +1,5 @@
 --- a/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2018-10-07 03:47:12.000000000 +0100
-+++ b/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2019-04-13 21:57:46.750377287 +0100
++++ b/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2019-04-27 22:44:22.478698921 +0100
 @@ -6,16 +6,13 @@
  MIME-Version: 1.0
  Content-Type: text/plain; charset=UTF-8
@@ -25,12 +25,12 @@
  diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
  index f678ae8..0ca8896 100644
  --- a/dlls/ntdll/esync.c
-@@ -147,17 +143,13 @@
+@@ -147,17 +143,14 @@
   };
   union generic_reply
   {
 -@@ -6616,8 +6629,9 @@ union generic_reply
-+@@ -6922,5 +6935,6 @@ union generic_reply
++@@ -6922,6 +6935,7 @@ union generic_reply
       struct open_esync_reply open_esync_reply;
       struct get_esync_fd_reply get_esync_fd_reply;
       struct get_esync_apc_fd_reply get_esync_apc_fd_reply;
@@ -39,18 +39,18 @@
   
 --#define SERVER_PROTOCOL_VERSION 576
 -+#define SERVER_PROTOCOL_VERSION 577
-- 
+  
 - #endif /* __WINE_WINE_SERVER_PROTOCOL_H */
  diff --git a/server/protocol.def b/server/protocol.def
  index 1c7cf76..b3db323 100644
  --- a/server/protocol.def
-@@ -179,9 +171,10 @@
+@@ -179,9 +172,9 @@
  index 1ca556e..fb60e53 100644
  --- a/server/queue.c
  +++ b/server/queue.c
 -@@ -142,6 +142,7 @@ struct msg_queue
-+@@ -148,7 +148,8 @@ struct msg_queue
-      struct hook_table     *hooks;           /* hook table */
+-     struct hook_table     *hooks;           /* hook table */
++@@ -148,6 +148,7 @@ struct msg_queue
       timeout_t              last_get_msg;    /* time of last get message call */
 +     unsigned int           ignore_post_msg; /* ignore post messages newer than this unique id */
       int                    esync_fd;        /* esync file descriptor (signalled on message) */

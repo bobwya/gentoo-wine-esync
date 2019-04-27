@@ -1,5 +1,5 @@
 --- a/0023-ntdll-wineandroid.drv-winemac.drv-winex11.drv-Store-.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0023-ntdll-wineandroid.drv-winemac.drv-winex11.drv-Store-.patch	2019-04-13 21:57:49.342413629 +0100
++++ b/0023-ntdll-wineandroid.drv-winemac.drv-winex11.drv-Store-.patch	2019-04-27 22:44:25.458744736 +0100
 @@ -3,11 +3,8 @@
  Date: Tue, 12 Jun 2018 10:01:08 -0500
  Subject: [PATCH 23/83] ntdll, wineandroid.drv, winemac.drv, winex11.drv: Store
@@ -20,12 +20,12 @@
  diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
  index f77c84a18f..c4faf69a13 100644
  --- a/dlls/ntdll/esync.c
-@@ -40,20 +36,22 @@
+@@ -40,20 +36,23 @@
  index 87b5d7078f..2c2445a58a 100644
  --- a/dlls/ntdll/ntdll.spec
  +++ b/dlls/ntdll/ntdll.spec
 -@@ -1516,3 +1516,5 @@
-+@@ -1512,5 +1512,7 @@
++@@ -1516,6 +1516,8 @@
   # Filesystem
   @ cdecl wine_nt_to_unix_file_name(ptr ptr long long)
   @ cdecl wine_unix_to_nt_file_name(ptr ptr)
@@ -33,6 +33,7 @@
  +@ cdecl __wine_esync_set_queue_fd(long)
 + 
 + # User shared data
++ @ cdecl __wine_user_shared_data()
  diff --git a/dlls/ntdll/ntdll_misc.h b/dlls/ntdll/ntdll_misc.h
  index eea1387863..0ce1f32b70 100644
  --- a/dlls/ntdll/ntdll_misc.h
@@ -45,7 +46,7 @@
  +    int                esync_queue_fd;/* fd to wait on for driver events */
   };
   
-@@ -70,14 +68,14 @@
+@@ -70,14 +69,14 @@
   
       signal_init_thread( teb );
       virtual_init_threading();
@@ -63,7 +64,7 @@
  diff --git a/dlls/wineandroid.drv/window.c b/dlls/wineandroid.drv/window.c
  index aebe4c57b3..3bc3703eda 100644
  --- a/dlls/wineandroid.drv/window.c
-@@ -143,4 +141,3 @@
+@@ -143,4 +142,3 @@
           MESSAGE( "x11drv: Can't allocate handle for display fd\n" );
  -- 
  2.19.1

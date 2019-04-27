@@ -1,5 +1,5 @@
 --- a/0011-ntdll-Implement-NtPulseEvent.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0011-ntdll-Implement-NtPulseEvent.patch	2019-04-13 21:57:51.190439539 +0100
++++ b/0011-ntdll-Implement-NtPulseEvent.patch	2019-04-27 22:44:27.594777578 +0100
 @@ -2,14 +2,12 @@
  From: Zebediah Figura <z.figura12@gmail.com>
  Date: Fri, 8 Jun 2018 15:47:16 -0500
@@ -32,7 +32,7 @@
 - 
 +     SERVER_START_REQ( event_op )
 +     {
-+          req->handle = wine_server_obj_handle( handle );
++         req->handle = wine_server_obj_handle( handle );
  -- 
  2.19.1
 -

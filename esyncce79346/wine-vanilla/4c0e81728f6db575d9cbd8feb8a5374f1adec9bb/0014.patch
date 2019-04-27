@@ -1,5 +1,5 @@
 --- a/0014-server-Add-a-request-to-get-the-eventfd-file-descrip.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0014-server-Add-a-request-to-get-the-eventfd-file-descrip.patch	2019-04-13 21:57:45.902365398 +0100
++++ b/0014-server-Add-a-request-to-get-the-eventfd-file-descrip.patch	2019-04-27 22:44:20.918674940 +0100
 @@ -3,7 +3,6 @@
  Date: Fri, 8 Jun 2018 18:55:49 -0500
  Subject: [PATCH 14/83] server: Add a request to get the eventfd file
@@ -16,12 +16,12 @@
  diff --git a/include/wine/server_protocol.h b/include/wine/server_protocol.h
  index 98470eca3c..554fa10835 100644
  --- a/include/wine/server_protocol.h
-@@ -51,14 +49,13 @@
+@@ -51,14 +49,14 @@
   };
   union generic_reply
   {
 -@@ -6563,6 +6576,7 @@ union generic_reply
-+@@ -6934,5 +6947,6 @@ union generic_reply
++@@ -6934,6 +6947,7 @@ union generic_reply
       struct set_job_completion_port_reply set_job_completion_port_reply;
       struct terminate_job_reply terminate_job_reply;
       struct create_esync_reply create_esync_reply;
@@ -29,10 +29,11 @@
   };
   
 - #define SERVER_PROTOCOL_VERSION 570
++ 
  diff --git a/server/esync.c b/server/esync.c
  index e761475678..e775b3bd28 100644
  --- a/server/esync.c
-@@ -181,4 +178,3 @@
+@@ -181,4 +179,3 @@
   static const struct
  -- 
  2.19.1

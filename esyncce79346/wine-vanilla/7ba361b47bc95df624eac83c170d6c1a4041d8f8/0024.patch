@@ -1,5 +1,5 @@
 --- a/0024-server-ntdll-Also-wait-on-the-queue-fd-when-waiting-.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0024-server-ntdll-Also-wait-on-the-queue-fd-when-waiting-.patch	2019-04-13 21:57:43.162326981 +0100
++++ b/0024-server-ntdll-Also-wait-on-the-queue-fd-when-waiting-.patch	2019-04-27 22:44:17.802627043 +0100
 @@ -3,15 +3,12 @@
  Date: Sat, 9 Jun 2018 14:44:54 -0500
  Subject: [PATCH 24/83] server, ntdll: Also wait on the queue fd when waiting
@@ -41,19 +41,17 @@
           else
  @@ -508,10 +516,16 @@ NTSTATUS esync_wait_objects( DWORD count, const HANDLE *handles, BOOLEAN wait_an
               fds[i].fd = objs[i] ? objs[i]->fd : -1;
-@@ -327,9 +323,10 @@
- index 722c133847..56bef76c5f 100644
+@@ -328,8 +324,8 @@
  --- a/server/thread.c
  +++ b/server/thread.c
--@@ -131,7 +131,7 @@ static const struct object_ops thread_apc_ops =
-+@@ -131,8 +131,8 @@ static const struct object_ops thread_apc_ops =
-  
+ @@ -131,7 +131,7 @@ static const struct object_ops thread_apc_ops =
+- 
   static void dump_thread( struct object *obj, int verbose );
 + static struct object_type *thread_get_type( struct object *obj );
   static int thread_signaled( struct object *obj, struct wait_queue_entry *entry );
  -static int thread_get_esync_fd( struct object *obj );
  +static int thread_get_esync_fd( struct object *obj, enum esync_type *type );
-@@ -375,4 +372,3 @@
+@@ -375,4 +371,3 @@
   static const char * const req_names[REQ_NB_REQUESTS] = {
  -- 
  2.19.1

@@ -1,5 +1,5 @@
 --- a/0045-server-ntdll-Implement-alertable-waits.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0045-server-ntdll-Implement-alertable-waits.patch	2019-04-13 21:57:47.078381886 +0100
++++ b/0045-server-ntdll-Implement-alertable-waits.patch	2019-04-27 22:44:22.838704456 +0100
 @@ -2,9 +2,7 @@
  From: Zebediah Figura <z.figura12@gmail.com>
  Date: Fri, 15 Jun 2018 14:12:22 -0500
@@ -34,19 +34,17 @@
  @@ -766,10 +792,17 @@ NTSTATUS esync_wait_objects( DWORD count, const HANDLE *handles, BOOLEAN wait_an
           }
           if (msgwait)
-@@ -203,9 +200,10 @@
- index 7ee4f8c..12f10a6 100644
+@@ -204,8 +201,8 @@
  --- a/dlls/ntdll/ntdll_misc.h
  +++ b/dlls/ntdll/ntdll_misc.h
--@@ -235,6 +235,7 @@ struct ntdll_thread_data
-+@@ -284,7 +284,8 @@ struct ntdll_thread_data
-      BOOL               wow64_redir;   /* Wow64 filesystem redirection flag */
+ @@ -235,6 +235,7 @@ struct ntdll_thread_data
+-     BOOL               wow64_redir;   /* Wow64 filesystem redirection flag */
       pthread_t          pthread_id;    /* pthread thread id */
 +     void              *pthread_stack; /* pthread stack */
       int                esync_queue_fd;/* fd to wait on for driver events */
  +    int                esync_apc_fd;  /* fd to wait on for user APCs */
   };
-@@ -223,7 +221,7 @@
+@@ -223,7 +220,7 @@
   
       signal_init_thread( teb );
       virtual_init_threading();
@@ -55,12 +53,12 @@
       thread_data->wait_fd[1]  = -1;
       thread_data->start_stack = (char *)teb->Tib.StackBase;
       thread_data->esync_queue_fd = -1;
-@@ -269,17 +267,13 @@
+@@ -269,17 +266,14 @@
   };
   union generic_reply
   {
 -@@ -6602,8 +6615,9 @@ union generic_reply
-+@@ -6885,5 +6898,6 @@ union generic_reply
++@@ -6885,6 +6898,7 @@ union generic_reply
       struct create_esync_reply create_esync_reply;
       struct open_esync_reply open_esync_reply;
       struct get_esync_fd_reply get_esync_fd_reply;
@@ -69,7 +67,7 @@
   
 --#define SERVER_PROTOCOL_VERSION 573
 -+#define SERVER_PROTOCOL_VERSION 574
-- 
+  
 - #endif /* __WINE_WINE_SERVER_PROTOCOL_H */
  diff --git a/server/esync.c b/server/esync.c
  index 6adf996..8bf6e44 100644

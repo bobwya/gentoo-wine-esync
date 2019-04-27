@@ -1,5 +1,5 @@
 --- a/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2018-10-07 03:47:12.000000000 +0100
-+++ b/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2019-04-13 21:57:39.742279031 +0100
++++ b/0079-ntdll-server-Revert-to-old-implementation-of-hung-qu.patch	2019-04-27 22:44:13.750564767 +0100
 @@ -6,16 +6,13 @@
  MIME-Version: 1.0
  Content-Type: text/plain; charset=UTF-8
@@ -25,12 +25,12 @@
  diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
  index f678ae8..0ca8896 100644
  --- a/dlls/ntdll/esync.c
-@@ -147,17 +143,13 @@
+@@ -147,17 +143,14 @@
   };
   union generic_reply
   {
 -@@ -6616,8 +6629,9 @@ union generic_reply
-+@@ -6922,5 +6935,6 @@ union generic_reply
++@@ -6922,6 +6935,7 @@ union generic_reply
       struct open_esync_reply open_esync_reply;
       struct get_esync_fd_reply get_esync_fd_reply;
       struct get_esync_apc_fd_reply get_esync_apc_fd_reply;
@@ -39,12 +39,12 @@
   
 --#define SERVER_PROTOCOL_VERSION 576
 -+#define SERVER_PROTOCOL_VERSION 577
-- 
+  
 - #endif /* __WINE_WINE_SERVER_PROTOCOL_H */
  diff --git a/server/protocol.def b/server/protocol.def
  index 1c7cf76..b3db323 100644
  --- a/server/protocol.def
-@@ -316,6 +308,11 @@
+@@ -316,6 +309,11 @@
   };
   
   static const struct

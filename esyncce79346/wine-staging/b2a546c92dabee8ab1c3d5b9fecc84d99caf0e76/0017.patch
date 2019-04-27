@@ -1,5 +1,5 @@
 --- a/0017-server-Create-eventfd-file-descriptors-for-event-obj.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0017-server-Create-eventfd-file-descriptors-for-event-obj.patch	2019-04-13 21:57:51.230440101 +0100
++++ b/0017-server-Create-eventfd-file-descriptors-for-event-obj.patch	2019-04-27 22:44:27.646778378 +0100
 @@ -3,18 +3,14 @@
  Date: Fri, 8 Jun 2018 21:01:24 -0500
  Subject: [PATCH 17/83] server: Create eventfd file descriptors for event
@@ -44,7 +44,7 @@
  +static void event_destroy( struct object *obj );
   
   static const struct object_ops event_ops =
-@@ -81,17 +79,17 @@
+@@ -81,9 +79,8 @@
       event_satisfied,           /* satisfied */
       event_signal,              /* signal */
       no_get_fd,                 /* get_fd */
@@ -56,17 +56,16 @@
       no_close_handle,           /* close_handle */
  -    no_destroy                 /* destroy */
  +    event_destroy              /* destroy */
-  };
+@@ -91,7 +88,7 @@
   
   
--@@ -121,6 +125,9 @@ struct event *create_event( struct object *root, const struct unicode_str *name,
-+@@ -121,7 +125,10 @@ struct event *create_event( struct object *root, const struct unicode_str *name,
-              /* initialize it if it didn't already exist */
+ @@ -121,6 +125,9 @@ struct event *create_event( struct object *root, const struct unicode_str *name,
+-             /* initialize it if it didn't already exist */
 +             list_init( &event->kernel_object );
               event->manual_reset = manual_reset;
               event->signaled     = initial_state;
  +
-@@ -135,9 +133,8 @@
+@@ -135,9 +132,8 @@
  +        close( event->esync_fd );
  +}
  +
