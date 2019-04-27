@@ -1,5 +1,46 @@
 #!/usr/bin/env awk
 
+# initialise_tty_mode_codes(tty_mode_codes_array)
+#
+# Parameters:
+#   1<  tty_mode_codes_array  :  array of common terminal code sequences    (string array)
+#
+# Description
+#   Returns an array containing the (generated) shell code sequences for various terminal
+#   modesetting operations (colour change, reverse mode, reseting). These array entries
+#   can be passed directly to print/printf to change the terminal mode for terminal output.
+function initialise_tty_mode_codes(tty_mode_codes_array,
+		command_tty)
+{
+	command_tty="tput rev"
+	command_tty | getline tty_mode_codes_array["reverse"]
+	close(command_tty)
+	command_tty="tput setaf 1"
+	command_tty | getline tty_mode_codes_array["red"]
+	close(command_tty)
+	command_tty="tput setaf 2"
+	command_tty | getline tty_mode_codes_array["green"]
+	close(command_tty)
+	command_tty="tput setaf 3"
+	command_tty | getline tty_mode_codes_array["yellow"]
+	close(command_tty)
+	command_tty="tput setaf 4"
+	command_tty | getline tty_mode_codes_array["blue"]
+	close(command_tty)
+	command_tty="tput setaf 5"
+	command_tty | getline tty_mode_codes_array["magenta"]
+	close(command_tty)
+	command_tty="tput setaf 6"
+	command_tty | getline tty_mode_codes_array["cyan"]
+	close(command_tty)
+	command_tty="tput setaf 7"
+	command_tty | getline tty_mode_codes_array["white"]
+	close(command_tty)
+	command_tty="tput sgr0"
+	command_tty | getline tty_mode_codes_array["reset"]
+	close(command_tty)
+}
+
 # dump_error(text)
 #
 # Parameters:

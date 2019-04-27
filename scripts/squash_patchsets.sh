@@ -5,9 +5,11 @@ export TOP_PID=$$
 
 declare -r SHA1_REGEXP="[[:xdigit:]]{40}" VARIABLE_NAME_REGEXP="^[_[:alpha:]][_[:alnum:]]+$"
 
-declare SCRIPT_NAME
+declare SCRIPT_DIRECTORY SCRIPT_NAME
 SCRIPT_NAME="$(readlink -f "${0}")"
+SCRIPT_DIRECTORY="$(dirname "${SCRIPT_NAME}")"
 SCRIPT_NAME="$(basename "${SCRIPT_NAME}")"
+AWK="$(command -v "mawk" || command -v "awk")"
 
 declare PATCHSET_START="0001"
 declare PATCHSET_END="0083"
@@ -249,6 +251,38 @@ git_get_tag()
 	[[ -z "${git_tag}" ]] && git_tag="origin/master"
 }
 
+# dump_failing_diffs()
+#
+# Parameters:
+#   1 >   patch-file        :  patch file     (string)
+#   2<>   patch-error       :  patch error    (string, reference)
+#
+# Description:
+#   Processes the patch error message (patch-error). The function dumps
+#   any and all failing diff hunks from the supplied patch file (patch-file).
+#
+dump_failing_diffs()
+{
+	(($# == 2)) || die "invalid parameter count: ${#} (2)"
+
+	local __patch_file="${1}" __patch_error_reference="${2}"
+	if [[ ! -f "${__patch_file}" ]]; then
+		die "file does not exist, parameter (1): '${__patch_file}'"
+	fi
+	if [[ ! "${__patch_error_reference}" =~ ${VARIABLE_NAME_REGEXP} ]]; then
+		die "invalid parameter reference name (2): '${__patch_error_reference}' (${VARIABLE_NAME_REGEXP})"
+	else
+		declare -n 	__patch_error="${__patch_error_reference}"
+	fi
+
+	__patch_error="$(
+		"${AWK}" -vpatch_error="${__patch_error}" \
+			-f "${SCRIPT_DIRECTORY}/wine-esync-common.awk" \
+			-f "${SCRIPT_DIRECTORY}/wine-esync-process-patch-errors.awk" \
+			"${__patch_file}"
+	)"
+}
+
 # convert_wine_to_wine_staging_commit()
 #
 # Parameters:
@@ -285,7 +319,7 @@ convert_wine_to_wine_staging_commit()
 	else
 		declare -n 	wine_staging_git_commit="${__wine_staging_git_commit_reference}"
 	fi
-	
+
 	local __current_git_tag __i __next_git_tag __staging_previous_git_tag __staging_next_git_tag __staging_git_commit \
 		__match=0 __upstream_git_commit __patch_install_script="${__wine_staging_git_tree}/patches/patchinstall.sh"
 	local -a __staging_git_commit_array
@@ -395,7 +429,7 @@ apply_esync_rebasing_patchset()
 			__rebasing_patches="${2}"
 	local 	__patch __patch_file __patch_log
 
-	pushd "${__source_directory}" >/dev/null || die "pushd failed"	
+	pushd "${__source_directory}" >/dev/null || die "pushd failed"
 	for __patch in "${__rebasing_patches}"/*.patch; do
 		__patch_file="$( basename "${__patch}" )"
 		printf "Apply esync rebasing patch: '%s' ...\\n" "${__patch_file}"
@@ -425,7 +459,7 @@ apply_esync_rebasing_patchset()
 git_am_wine_staging_patchset()
 {
 	(($# == 4)) || die "invalid parameter count: ${#} (4)"
-	
+
 	local 	__wine_git_tree="${1}" \
 			__wine_staging_git_tree="${2}" \
 			__wine_git_commit="${3}" \
@@ -458,7 +492,7 @@ git_am_wine_staging_patchset()
 #   2>   source-directory :  Pre-rebased wine-esync patchset directory (string)
 #
 # Description:
-#   Apply esync patches in numerical sequence to the Wine source, in the Wine Git tree 
+#   Apply esync patches in numerical sequence to the Wine source, in the Wine Git tree
 #   directory (wine-git-tree). Use 'git am' to apply these patches. Clean up the Wine
 #   Git tree, if any patch fails to apply.
 #
@@ -468,20 +502,33 @@ git_am_esync_patchset()
 
 	local 	__wine_git_tree="${1%/}" \
 			__source_directory="${2%/}"
-	local 	__git_error __i_patch __esync_patch __patch_error
+	local 	__git_error __i_patch __esync_patch patch_error
 
 	pushd "${__wine_git_tree}" >/dev/null || die "pushd failed"
+	# Exclude SERVER_PROTOCOL_VERSION from the hunk spread (+/-3) of esync patchsets.
+	# This variable updates every Wine release - so is too hard to track.
+	# shellcheck disable=SC1003
+	sed -i -e '/^#define SERVER_PROTOCOL_VERSION /i\\' "include/wine/server_protocol.h" \
+		|| die "sed failed"
+	git add "include/wine/server_protocol.h" \
+		|| die "git add failed"
+	git commit --no-edit --quiet -m "include/wine/server_protocol.h: add single blank line, before SERVER_PROTOCOL_VERSION definition" \
+		|| die "git commit failed"
+
 	printf "\\nApplying (using git am) esync patchset from directory: '%s' ...\\n" "${__source_directory}/"
 	for __i_patch in $(seq -w "${PATCHSET_START}" "${PATCHSET_END}"); do
 		__esync_patch="$(find "${__source_directory}" -name "${__i_patch}*.patch" -printf '%f' 2>/dev/null)"
 		[[ -f "${__source_directory}/${__esync_patch}" ]] || die "patch: '${__esync_patch}' ; invalid"
 		printf "Applying esync patch: '%s' ...\\n" "${__esync_patch}"
-		if __patch_error="$( patch -F1 -p1 --verbose --dry-run < "${__source_directory}/${__esync_patch}" )" \
+		if patch_error="$( patch -F0 -p1 --verbose --dry-run < "${__source_directory}/${__esync_patch}" )" \
 		&& __git_error="$( git am --ignore-whitespace "${__source_directory}/${__esync_patch}" )"; then
 			continue
 		fi
 
-		printf "%s\\n%s\\n" "${__patch_error}" "${__git_error}" >&2
+		[[ -n "${patch_error}" ]] && dump_failing_diffs "${__source_directory}/${__esync_patch}" "patch_error"
+
+		printf "\\nFailed to apply esync patch: '%s' ...\\n\\n%s\\n%s\\n" \
+				"${__source_directory}/${__esync_patch}" "${patch_error}" "${__git_error}" >&2
 		git am --abort &>/dev/null
 		git clean -fxd &>/dev/null
 		# shellcheck disable=SC2164
@@ -535,7 +582,7 @@ squash_esync_patchset()
 	apply_esync_rebasing_patchset "${__esync_source_directory}" "${__esync_rebasing_patches_directory}"
 	__base_wine_git_commit="${__wine_git_commit}"
 	git_garbage_collect "${__wine_git_tree}"
-	reset_git_tree "${__wine_git_tree}" "${__wine_git_commit}"	
+	reset_git_tree "${__wine_git_tree}" "${__wine_git_commit}"
 	if [[ "${__wine_staging_git_tree}" != "." ]]; then
 		git_garbage_collect "${__wine_staging_git_tree}"
 		convert_wine_to_wine_staging_commit "${__wine_git_tree}" "${__wine_staging_git_tree}" \
@@ -613,6 +660,12 @@ main()
 	fi
 	git_create_branch "${__wine_git_tree}" "wine-esync"
 	git_create_branch "${__wine_staging_git_tree}" "wine-staging-esync"
+
+	git_garbage_collect "${__wine_git_tree}"
+	if [[ "${__wine_staging_git_tree}" != "." ]]; then
+		git_garbage_collect "${__wine_staging_git_tree}"
+	fi
+
 	printf "__esync_rebase_patches_root=%s\\n" "${__esync_rebase_patches_root}"
 	__patchset_total="$(find "${__esync_rebase_patches_root}" -mindepth 3 -type d -regextype posix-awk -regex ".*/${SHA1_REGEXP}" | wc  -l)"
 	find "${__esync_rebase_patches_root}" -mindepth 3 -type d -regextype posix-awk -regex ".*/${SHA1_REGEXP}" -print0 | \

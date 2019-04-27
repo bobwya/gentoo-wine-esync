@@ -19,6 +19,7 @@ declare -a ARRAY_ESYNC_PATCH_COMMITS=(
 		"b3c8d5d36850e484b5cc84ab818a75db567a06a3" # (14) [wine:4.6]
 		"8268c47462544baf5bc7e5071c0a9f2d00c5c2cb" # (15) [wine:4.6]
 		"4c0e81728f6db575d9cbd8feb8a5374f1adec9bb" # (16)  wine:4.6
+		"19bf03ed4b48b398236c8a998394089c93b50891" # (17)  wine:4.7
 )
 declare ESYNC_ESYNCB4478B7_INDEX=0
 declare ESYNC_ESYNCCE79346_INDEX=8
@@ -179,7 +180,7 @@ function generate_rebased_esync_patchset()
 	_source_esync_directory="${_source_directory}/${_esync_version}/esync"
 	_target_esync_directory="${_target_directory}/${_esync_version}/${_target_esync_version}/${ARRAY_ESYNC_PATCH_COMMITS[_esync_rebase_index]}"
 	mkdir -p "${_target_esync_directory}" || die "mkdir -p failed"
-		
+
 	printf "\\nRebasing esync patchset, for app-emulation/${_target_esync_version}, against Wine Git commit: %s\\n" "${ARRAY_ESYNC_PATCH_COMMITS[_esync_rebase_index]}"
 	for _patch_file_path in "${_source_esync_directory}/"{0001..0083}*.patch; do
 		if "${AWK}" -vstaging="${_staging}" \
