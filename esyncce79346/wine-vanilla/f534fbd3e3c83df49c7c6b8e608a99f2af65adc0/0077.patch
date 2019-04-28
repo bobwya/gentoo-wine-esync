@@ -1,0 +1,50 @@
+--- a/0077-ntdll-server-Specify-EFD_SEMAPHORE-on-the-server-sid.patch	2018-11-01 17:19:44.000000000 +0000
++++ b/0077-ntdll-server-Specify-EFD_SEMAPHORE-on-the-server-sid.patch	2019-04-28 17:53:45.801420987 +0100
+@@ -3,10 +3,8 @@
+ Date: Sun, 29 Jul 2018 16:53:58 -0500
+ Subject: [PATCH 77/83] ntdll, server: Specify EFD_SEMAPHORE on the server
+  side.
+-
+ This just makes things cleaner; since we already pass the type to the server
+ there's no reason to pass this as well.
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  dlls/ntdll/esync.c             | 21 +++++++--------------
+@@ -16,7 +14,6 @@
+  server/request.h               |  5 ++---
+  server/trace.c                 |  1 -
+  6 files changed, 18 insertions(+), 25 deletions(-)
+-
+ diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
+ index 0bced88235..e3434e78f2 100644
+ --- a/dlls/ntdll/esync.c
+@@ -122,14 +119,6 @@
+  };
+  struct create_esync_reply
+  {
+-@@ -6633,6 +6631,6 @@ union generic_reply
+-     struct get_esync_apc_fd_reply get_esync_apc_fd_reply;
+- };
+- 
+--#define SERVER_PROTOCOL_VERSION 574
+-+#define SERVER_PROTOCOL_VERSION 575
+- 
+- #endif /* __WINE_WINE_SERVER_PROTOCOL_H */
+ diff --git a/server/esync.c b/server/esync.c
+ index 10001a243b..3e78387e88 100644
+ --- a/server/esync.c
+@@ -184,7 +173,7 @@
+ --- a/server/request.h
+ +++ b/server/request.h
+ @@ -2416,9 +2416,8 @@ C_ASSERT( FIELD_OFFSET(struct terminate_job_request, status) == 16 );
+- C_ASSERT( sizeof(struct terminate_job_request) == 24 );
++ C_ASSERT( sizeof(struct resume_process_request) == 16 );
+  C_ASSERT( FIELD_OFFSET(struct create_esync_request, access) == 12 );
+  C_ASSERT( FIELD_OFFSET(struct create_esync_request, initval) == 16 );
+ -C_ASSERT( FIELD_OFFSET(struct create_esync_request, flags) == 20 );
+@@ -209,4 +198,3 @@
+  }
+ -- 
+ 2.19.1
+-

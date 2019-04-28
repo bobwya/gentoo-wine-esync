@@ -1,5 +1,5 @@
 --- a/0006-ntdll-Close-esync-objects.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0006-ntdll-Close-esync-objects.patch	2019-04-27 22:44:26.986768230 +0100
++++ b/0006-ntdll-Close-esync-objects.patch	2019-04-28 17:53:52.801531117 +0100
 @@ -2,14 +2,12 @@
  From: Zebediah Figura <z.figura12@gmail.com>
  Date: Thu, 7 Jun 2018 21:07:51 -0500

@@ -1,5 +1,5 @@
 --- a/0074-ntdll-server-Abort-if-esync-is-enabled-for-the-serve.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0074-ntdll-server-Abort-if-esync-is-enabled-for-the-serve.patch	2019-04-27 22:44:22.982706669 +0100
++++ b/0074-ntdll-server-Abort-if-esync-is-enabled-for-the-serve.patch	2019-04-28 17:53:48.013455790 +0100
 @@ -3,14 +3,12 @@
  Date: Sat, 4 Aug 2018 15:15:12 -0500
  Subject: [PATCH 74/83] ntdll, server: Abort if esync is enabled for the server
