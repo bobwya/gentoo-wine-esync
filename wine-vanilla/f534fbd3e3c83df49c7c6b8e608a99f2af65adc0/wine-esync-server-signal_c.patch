@@ -1,0 +1,12 @@
+diff --git a/server/signal.c b/server/signal.c
+index c81f6b8e989..ca200394f7e 100644
+--- a/server/signal.c
++++ b/server/signal.c
+@@ -67,6 +67,7 @@ static const struct object_ops handler_ops =
+     no_add_queue,             /* add_queue */
+     NULL,                     /* remove_queue */
+     NULL,                     /* signaled */
++    NULL,                     /* get_esync_fd */
+     NULL,                     /* satisfied */
+     no_signal,                /* signal */
+     no_get_fd,                /* get_fd */

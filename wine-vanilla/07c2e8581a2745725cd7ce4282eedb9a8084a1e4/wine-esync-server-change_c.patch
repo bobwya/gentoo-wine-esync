@@ -1,0 +1,12 @@
+diff --git a/server/change.c b/server/change.c
+index 6091d21f7f2..2be6a8360dd 100644
+--- a/server/change.c
++++ b/server/change.c
+@@ -115,6 +115,7 @@ static const struct object_ops dir_ops =
+     add_queue,                /* add_queue */
+     remove_queue,             /* remove_queue */
+     default_fd_signaled,      /* signaled */
++    NULL,                     /* get_esync_fd */
+     no_satisfied,             /* satisfied */
+     no_signal,                /* signal */
+     dir_get_fd,               /* get_fd */
