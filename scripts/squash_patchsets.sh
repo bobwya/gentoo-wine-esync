@@ -12,7 +12,7 @@ SCRIPT_NAME="$(basename "${SCRIPT_NAME}")"
 AWK="$(command -v "mawk" || command -v "awk")"
 
 declare PATCHSET_START="0001"
-declare PATCHSET_END="0083"
+declare PATCHSET_END="0084"
 declare PATCHSET_TOTAL="$((10#${PATCHSET_END}-10#${PATCHSET_START}+1))"
 declare PATCHFILE_PREFIX="wine-esync"
 declare ESYNC_BASE_URL="https://github.com/zfigura/wine/releases/download"

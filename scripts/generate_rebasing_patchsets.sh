@@ -41,6 +41,8 @@ declare ESYNC_SHA256_ARRAY=(
 )
 declare TARBALL_EXT="tgz"
 declare SCRIPT_DIRECTORY SCRIPT_NAME
+declare ESYNC_PATCH_0084="0084-server-Use-default_fd_get_esync_fd-for-directory-cha.patch"
+
 SCRIPT_NAME="$(readlink -f "${0}")"
 SCRIPT_DIRECTORY="$(dirname "${SCRIPT_NAME}")"
 SCRIPT_NAME="$(basename "${SCRIPT_NAME}")"
@@ -158,7 +160,8 @@ function generate_rebased_esync_patchset()
 			_awk_scripts_directory="${3%/}" _esync_rebase_index="${4}" \
 			_staging="${5}" _array_size="${#ARRAY_ESYNC_PATCH_COMMITS[@]}" \
 			_esync_tarball _esync_version _i=0 _min_esync_rebase_index \
-			_patch_file _patch_file_path _source_esync_directory _target_esync_directory \
+			_patch_file _patch_file_path _patch_number \
+			_source_esync_directory _target_esync_directory \
 			_target_esync_version _target_esync_patch_file _target_patch
 
 	if ((_staging)); then
@@ -185,10 +188,19 @@ function generate_rebased_esync_patchset()
 	mkdir -p "${_target_esync_directory}" || die "mkdir -p failed"
 
 	printf "\\nRebasing esync patchset, for app-emulation/${_target_esync_version}, against Wine Git commit: %s\\n" "${ARRAY_ESYNC_PATCH_COMMITS[_esync_rebase_index]}"
-	for _patch_file_path in "${_source_esync_directory}/"{0001..0083}*.patch; do
+
+	touch "${_source_esync_directory}/${ESYNC_PATCH_0084}"
+	for _patch_file_path in "${_source_esync_directory}/"{0001..0084}*.patch; do
+		_patch_file="$(basename "${_patch_file_path}")"
+		_patch_number="${_patch_file:0:4}"
+		_target_patch="${_patch_number}.patch"
+
 		if "${AWK}" -vstaging="${_staging}" \
 			-vesync_rebase_index="${_esync_rebase_index}" \
 			-vtarget_esync_directory="${_target_esync_directory}" \
+			-vfile_path="${_patch_file_path}" \
+			-vfile_name="${_patch_file}" \
+			-vpatch_number="${_patch_number}" \
 			-f "${_awk_scripts_directory}/wine-esync-common.awk" \
 			-f "${_awk_scripts_directory}/wine-esync-preprocess.awk" \
 			"${_patch_file_path}"
@@ -200,12 +212,11 @@ function generate_rebased_esync_patchset()
 			die "preprocessing patch failed: '${_patch_file_path}'"
 		fi
 
-		_patch_file="$(basename "${_patch_file_path}")"
 		_target_esync_patch_file="${_target_esync_directory}/${_patch_file}"
 		if [[ ! -f "${_target_esync_patch_file}" ]]; then
 			die "patch file path invalid: '${_target_esync_patch_file}'"
 		fi
-		_target_patch="${_patch_file:0:4}.patch"
+		[[ "${_patch_number}" == "0084" ]] && _patch_file_path="null"
 		diff -Nau "${_patch_file_path}" "${_target_esync_patch_file}" > "${_target_esync_directory}/${_target_patch}"
 		[[ -f "${_target_esync_directory}/${_target_patch}" ]] || die "diff failed"
 		rm -f "${_target_esync_patch_file}" || die "rm failed"

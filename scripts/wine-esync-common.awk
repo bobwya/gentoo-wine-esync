@@ -326,7 +326,7 @@ function print_file(file_array, file_path,
 		line)
 {
 	for (line = 1 ; line <= file_array[0] ; ++line) {
-		if ((line in file_array) && (file_array[line] != ""))
+		if (line in file_array)
 			print file_array[line] >file_path
 	}
 }

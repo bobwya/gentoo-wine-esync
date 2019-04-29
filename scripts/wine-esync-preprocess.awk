@@ -3380,6 +3380,96 @@ function process_staging_patch_file_0079(file_array, diff_array,
 	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
 }
 
+function generate_patch_file_0084(file_array, diff_array,
+	complete, line, line_text)
+{
+	diff_array["exit start line"]=0
+	diff_array["idiff"]=0
+
+	line_text = "From 770e803adbc13c78ee52c7e8435d651da854fcf1 Mon Sep 17 00:00:00 2001"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "From: Zebediah Figura <z.figura12@gmail.com>"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "Date: Wed, 24 Apr 2019 23:21:25 -0500"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "Subject: [PATCH] server: Create esync file descriptors for true file objects"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " and use them for directory change notifications."
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = ""
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "---"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " server/change.c | 2 +-"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " server/fd.c     | 3 +++"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " 2 files changed, 4 insertions(+), 1 deletion(-)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = ""
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "diff --git a/server/change.c b/server/change.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "index 2be6a8360..9f07be705 100644"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "--- a/server/change.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+++ b/server/change.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "@@ -115,7 +115,7 @@ static const struct object_ops dir_ops ="
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     add_queue,                /* add_queue */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     remove_queue,             /* remove_queue */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     default_fd_signaled,      /* signaled */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    NULL,                     /* get_esync_fd */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    default_fd_get_esync_fd,  /* get_esync_fd */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     no_satisfied,             /* satisfied */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     no_signal,                /* signal */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     dir_get_fd,               /* get_fd */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "diff --git a/server/fd.c b/server/fd.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "index 95f289718..9f51d065e 100644"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "--- a/server/fd.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+++ b/server/fd.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "@@ -1625,6 +1625,9 @@ static struct fd *alloc_fd_object(void)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     list_init( &fd->inode_entry );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     list_init( &fd->locks );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    if (do_esync())"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        fd->esync_fd = esync_create_fd( 1, 0 );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     if ((fd->poll_index = add_poll_user( fd )) == -1)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "         release_object( fd );"
+	insert_array_entry(file_array, ++line, line_text)
+
+	complete = ++diff_array["idiff"]
+
+	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
+
+	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+}
+
 function process_patch_file_delete_target_hunk(file_array, diff_array, target_diff_file, target_hunk,
 	complete, indent, line, line_text)
 {
@@ -3585,6 +3675,9 @@ function process_patch_file(file_array, diff_array)
 			process_staging_patch_file_0079(file_array, diff_array)
 		}
 	}
+	else if (patch_number == "0084") {
+		generate_patch_file_0084(file_array, diff_array)
+	}
 
 	if (diff_array["exit code"]) return diff_array["exit code"]
 
@@ -3597,27 +3690,20 @@ function process_patch_file(file_array, diff_array)
 }
 
 BEGIN{
-	supported_patches="0001 0002 0006 0007 0009 0010 0011 0013 0014 0015 0017 0020 0023 0024 0025 0026 0032 0033 0040 0041 0042 0044 0045 0048 0059 0064 0074 0077 0078 0079"
+	supported_patches="0001 0002 0006 0007 0009 0010 0011 0013 0014 0015 0017 0020 0023 0024 0025 0026 0032 0033 0040 0041 0042 0044 0045 0048 0059 0064 0074 0077 0078 0079 0084"
 	if (staging) supported_patches=(supported_patches " 0003 0022 ")
+
+	if (supported_patches !~ patch_number) {
+		diff_array["exit code"]=255
+		exit diff_array["exit code"]
+	}
 }
 {
-	if (FNR == 1) {
-		file_path = FILENAME
-		file_name = get_file_name(file_path)
-		patch_number = substr(file_name,1,4)
- 		if (supported_patches !~ patch_number) {
-			diff_array["exit code"]=255
-			exit diff_array["exit code"]
-		}
-	}
-
 	file_array[++line] = $0
 }
 END{
-	if (line) {
-		file_array[0]=line
-		process_patch_file(file_array, diff_array)
-	}
+	file_array[0]=line
+	process_patch_file(file_array, diff_array)
 
 	if (diff_array["exit code"]) {
 		dump_error()
