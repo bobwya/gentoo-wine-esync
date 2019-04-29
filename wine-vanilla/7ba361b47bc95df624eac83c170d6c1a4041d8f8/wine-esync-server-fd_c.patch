@@ -1,5 +1,5 @@
 diff --git a/server/fd.c b/server/fd.c
-index f2d83b4d583..9dac2ffa296 100644
+index f2d83b4d583..a0c6a55a252 100644
 --- a/server/fd.c
 +++ b/server/fd.c
 @@ -101,6 +101,7 @@
@@ -60,7 +60,7 @@ index f2d83b4d583..9dac2ffa296 100644
  }
  
  /* check if the desired access is possible without violating */
-@@ -1606,6 +1615,7 @@ static struct fd *alloc_fd_object(void)
+@@ -1606,12 +1615,16 @@ static struct fd *alloc_fd_object(void)
      fd->poll_index = -1;
      fd->completion = NULL;
      fd->comp_flags = 0;
@@ -68,7 +68,16 @@ index f2d83b4d583..9dac2ffa296 100644
      init_async_queue( &fd->read_q );
      init_async_queue( &fd->write_q );
      init_async_queue( &fd->wait_q );
-@@ -1643,11 +1653,15 @@ struct fd *alloc_pseudo_fd( const struct fd_ops *fd_user_ops, struct object *use
+     list_init( &fd->inode_entry );
+     list_init( &fd->locks );
+ 
++    if (do_esync())
++        fd->esync_fd = esync_create_fd( 1, 0 );
++
+     if ((fd->poll_index = add_poll_user( fd )) == -1)
+     {
+         release_object( fd );
+@@ -1643,11 +1656,15 @@ struct fd *alloc_pseudo_fd( const struct fd_ops *fd_user_ops, struct object *use
      fd->completion = NULL;
      fd->comp_flags = 0;
      fd->no_fd_status = STATUS_BAD_DEVICE_TYPE;
@@ -84,7 +93,7 @@ index f2d83b4d583..9dac2ffa296 100644
      return fd;
  }
  
-@@ -1967,6 +1981,9 @@ void set_fd_signaled( struct fd *fd, int signaled )
+@@ -1967,6 +1984,9 @@ void set_fd_signaled( struct fd *fd, int signaled )
      if (fd->comp_flags & FILE_SKIP_SET_EVENT_ON_HANDLE) return;
      fd->signaled = signaled;
      if (signaled) wake_up( fd->user, 0 );
@@ -94,7 +103,7 @@ index f2d83b4d583..9dac2ffa296 100644
  }
  
  /* check if fd is signaled */
-@@ -2004,6 +2021,15 @@ int default_fd_signaled( struct object *obj, struct wait_queue_entry *entry )
+@@ -2004,6 +2024,15 @@ int default_fd_signaled( struct object *obj, struct wait_queue_entry *entry )
      return ret;
  }
  
