@@ -90,9 +90,7 @@ function process_patch_file_0001(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 4) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 4) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0001(file_array, diff_array,
@@ -185,9 +183,7 @@ function process_staging_patch_file_0001(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 6) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 6) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0002(file_array, diff_array,
@@ -545,9 +541,7 @@ function process_patch_file_0002(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 11) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 11) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0002(file_array, diff_array,
@@ -587,9 +581,7 @@ function process_staging_patch_file_0002(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0003(file_array, diff_array,
@@ -616,9 +608,7 @@ function process_staging_patch_file_0003(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0006(file_array, diff_array,
@@ -647,9 +637,7 @@ function process_patch_file_0006(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0006(file_array, diff_array,
@@ -676,9 +664,7 @@ function process_staging_patch_file_0006(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0007(file_array, diff_array,
@@ -708,9 +694,7 @@ function process_patch_file_0007(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0009(file_array, diff_array,
@@ -782,9 +766,7 @@ function process_patch_file_0009(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0010(file_array, diff_array,
@@ -862,9 +844,7 @@ function process_patch_file_0010(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0011(file_array, diff_array,
@@ -906,9 +886,7 @@ function process_patch_file_0011(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0013(file_array, diff_array,
@@ -939,9 +917,7 @@ function process_patch_file_0013(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0014(file_array, diff_array,
@@ -1184,9 +1160,7 @@ function process_patch_file_0014(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 9) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 9) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0014(file_array, diff_array,
@@ -1233,9 +1207,7 @@ function process_staging_patch_file_0014(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0015(file_array, diff_array,
@@ -1342,9 +1314,7 @@ function process_patch_file_0015(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 4) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 4) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0015(file_array, diff_array,
@@ -1387,9 +1357,7 @@ function process_staging_patch_file_0015(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 2) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 2) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0017(file_array, diff_array,
@@ -1504,9 +1472,7 @@ function process_patch_file_0017(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 4) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 4) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0017(file_array, diff_array,
@@ -1541,9 +1507,7 @@ function process_staging_patch_file_0017(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0020(file_array, diff_array,
@@ -1626,9 +1590,7 @@ function process_patch_file_0020(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 2) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 2) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0020(file_array, diff_array,
@@ -1716,9 +1678,7 @@ function process_staging_patch_file_0020(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 4) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 4) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0022(file_array, diff_array,
@@ -1800,9 +1760,7 @@ function process_staging_patch_file_0022(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 3) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 3) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0023(file_array, diff_array,
@@ -1876,9 +1834,7 @@ function process_patch_file_0023(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 2) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 2) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0023(file_array, diff_array,
@@ -1975,9 +1931,7 @@ function process_staging_patch_file_0023(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 3) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 3) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0024(file_array, diff_array,
@@ -2160,9 +2114,7 @@ function process_patch_file_0024(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 6) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 6) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0024(file_array, diff_array,
@@ -2191,15 +2143,14 @@ function process_staging_patch_file_0024(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0025(file_array, diff_array,
 	complete, indent, line, line_text)
 {
-	diff_array["exit start line"]=0
+	diff_array["exit start line"] = diff_array["exit end line"] = 0
+	
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
@@ -2211,8 +2162,7 @@ function process_patch_file_0025(file_array, diff_array,
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index <= 11) {
-						diff_array["idiff"]+=4
-						++complete
+						diff_array["idiff"] += 4
 					}
 					else if (is_new_hunk(file_array[line])) {
 						split("8 0 8 0", array_diff_lines)
@@ -2223,6 +2173,10 @@ function process_patch_file_0025(file_array, diff_array,
 				else if (diff_array["idiff"] == 2) {
 					if (file_array[line] ~ text2regexp("^ struct object obj; /* object header */$")) {
 						delete file_array[line]
+						if (esync_rebase_index >= 21) {
+							delete file_array[++line]
+							++diff_array["idiff"]
+						}
 						++diff_array["idiff"]
 					}
 				}
@@ -2233,13 +2187,18 @@ function process_patch_file_0025(file_array, diff_array,
 				}
 				else if (diff_array["idiff"] == 4) {
 					if (sub(text2regexp("struct list requests;"), "& ", file_array[line])) {
+						if (esync_rebase_index >= 21) {
+							line_text=(indent "struct irp_call       *current_call;   /* call currently executed on client side */")
+							insert_array_entry(file_array, ++line, line_text)
+						}
 						line_text=(indent "struct wine_rb_tree    kernel_objects; /* map of objects that have client side pointer associated */")
 						insert_array_entry(file_array, ++line, line_text)
-						if (sub(text2regexp("int esync_fd;"), "& ", file_array[++line])) {
-							++diff_array["idiff"]
-							++complete
-						}
+						if (sub(text2regexp("int esync_fd;"), "& ", file_array[++line])) ++diff_array["idiff"]
 					}
+				}
+				else if (diff_array["idiff"] == 5) {
+					++diff_array["idiff"]
+					++complete
 				}
 			}
 			else if ((diff_array["ihunk"] == 6) && (complete >= 1)) {
@@ -2282,32 +2241,81 @@ function process_patch_file_0025(file_array, diff_array,
 			}
 			else if ((diff_array["ihunk"] == 8) && (complete >= 3)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (esync_rebase_index >= 22) indent=(indent "    ")
 				if (diff_array["idiff"] == 1) {
 					if ((esync_rebase_index <= 11) || (!staging && (esync_rebase_index == 12))) {
-						diff_array["idiff"]+=2
-						++complete
+						diff_array["idiff"] += 4
 					}
 					else if (is_new_hunk(file_array[line])) {
-						split("8 0 8 0", array_diff_lines)
+						if (esync_rebase_index == 22)
+							split("176 0 176 0", array_diff_lines)
+						else if (esync_rebase_index == 21)
+							split("155 0 155 0", array_diff_lines)
+						else
+							split("8 0 8 0", array_diff_lines)
 						change_array_entry_diff(file_array, line, array_diff_lines)
 						delete file_array[++line]
+						if (esync_rebase_index >= 21) delete file_array[++line]
 						++diff_array["idiff"]
 					}
 				}
 				else if (diff_array["idiff"] == 2) {
 					if (file_array[line] ~ text2regexp("list_init( &irp->mgr_entry );$")) {
-						line_text = (indent "if (!irp->file) release_object( irp ); /* no longer on manager queue */")
-						insert_array_entry(file_array, ++line, line_text)
+						if (esync_rebase_index >= 22) {
+							line_text = (indent "/* we already own the object if it's only on manager queue */")
+							file_array[line] = line_text
+							line_text = (indent "if (irp->file) grab_object( irp );")
+							insert_array_entry(file_array, ++line, line_text)
+						}
+						else if (esync_rebase_index == 21) {
+							line_text = (indent "if (irp->file) grab_object( irp ); /* we already own the object if it's only on manager queue */")
+							insert_array_entry(file_array, ++line, line_text)
+						}
+						else {
+							line_text = (indent "if (!irp->file) release_object( irp ); /* no longer on manager queue */")
+							insert_array_entry(file_array, ++line, line_text)
+						}
+						if (esync_rebase_index >= 21) {
+							line_text = (indent "manager->current_call = irp;")
+							insert_array_entry(file_array, ++line, line_text)
+						}
+						if (esync_rebase_index >= 22) {
+							sub("^[+]", "&    ", file_array[line+2])
+							sub("^[+]", "&    ", file_array[line+3])
+						}
 						++diff_array["idiff"]
-						++complete
 					}
 				}
+				else if (diff_array["idiff"] == 3) {
+					if (esync_rebase_index <= 21) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("}$")) {
+						sub("^", "    ", file_array[line])
+						line_text = (indent "else close_handle( current->process, reply->next );")
+						insert_array_entry(file_array, ++line, line_text)
+						sub("^", "    ", file_array[++line])
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 4) {
+					if (esync_rebase_index <= 21) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("else set_error( STATUS_PENDING );$")) {
+						delete file_array[line]
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 5) {
+						++diff_array["idiff"]
+						++complete					
+				}
 			}
-			diff_array["exit end line"]=line
 		}
 	}
 
-	if (complete != 4) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 4) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0025(file_array, diff_array,
@@ -2347,7 +2355,7 @@ function process_staging_patch_file_0025(file_array, diff_array,
 		}
 	}
 
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0033(file_array, diff_array,
@@ -2532,7 +2540,7 @@ function process_patch_file_0033(file_array, diff_array,
 		}
 	}
 
-	if (complete != 7) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 7) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0041(file_array, diff_array,
@@ -2578,9 +2586,7 @@ function process_patch_file_0041(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 2) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 2) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0041(file_array, diff_array,
@@ -2617,9 +2623,7 @@ function process_staging_patch_file_0041(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0042(file_array, diff_array,
@@ -2668,9 +2672,7 @@ function process_patch_file_0042(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 2) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 2) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0042(file_array, diff_array,
@@ -2706,9 +2708,7 @@ function process_staging_patch_file_0042(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0045(file_array, diff_array,
@@ -2848,9 +2848,7 @@ function process_patch_file_0045(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 5) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 5) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0045(file_array, diff_array,
@@ -2961,9 +2959,7 @@ function process_staging_patch_file_0045(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 4) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 4) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0048(file_array, diff_array,
@@ -2990,9 +2986,7 @@ function process_patch_file_0048(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0059(file_array, diff_array,
@@ -3047,9 +3041,7 @@ function process_patch_file_0059(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 2) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 2) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0064(file_array, diff_array,
@@ -3143,9 +3135,7 @@ function process_patch_file_0064(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 4) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 4) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0074(file_array, diff_array,
@@ -3177,9 +3167,7 @@ function process_patch_file_0074(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0074(file_array, diff_array,
@@ -3208,9 +3196,7 @@ function process_staging_patch_file_0074(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0077(file_array, diff_array,
@@ -3244,9 +3230,7 @@ function process_patch_file_0077(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0079(file_array, diff_array,
@@ -3336,9 +3320,7 @@ function process_patch_file_0079(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 2) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 2) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0079(file_array, diff_array,
@@ -3375,9 +3357,7 @@ function process_staging_patch_file_0079(file_array, diff_array,
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function generate_patch_file_0084(file_array, diff_array,
@@ -3465,9 +3445,7 @@ function generate_patch_file_0084(file_array, diff_array,
 
 	complete = ++diff_array["idiff"]
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file_delete_target_hunk(file_array, diff_array, target_diff_file, target_hunk,
@@ -3496,9 +3474,7 @@ function process_patch_file_delete_target_hunk(file_array, diff_array, target_di
 		}
 	}
 
-	if (!diff_array["exit end line"]) diff_array["exit end line"]=line
-
-	if (complete != 1) diff_array["exit code"]=diff_array["idiff"]
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file(file_array, diff_array)
@@ -3704,7 +3680,6 @@ BEGIN{
 END{
 	file_array[0]=line
 	process_patch_file(file_array, diff_array)
-
 	if (diff_array["exit code"]) {
 		dump_error()
 		exit diff_array["exit code"]

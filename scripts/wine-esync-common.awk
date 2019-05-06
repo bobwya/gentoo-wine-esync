@@ -237,8 +237,9 @@ function preprocess_patch_file_line(line_text, diff_array,
 function preprocess_diff_file(line, diff_array,
 	new_diff_file)
 {
-	diff_array["exit start line"]=diff_array["exit start line"] ? diff_array["exit start line"] : line
-	diff_array["exit file"]=diff_array["file"]
+	diff_array["exit start line"] = diff_array["exit start line"] ? diff_array["exit start line"] : line
+	if (diff_array["idiff"] > 1) diff_array["exit end line"] = line
+	diff_array["exit file"] = diff_array["file"]
 }
 
 # preprocess_diff_file_hunk(line, file_array, diff_array)
@@ -260,6 +261,7 @@ function preprocess_diff_file_hunk(line, file_array, diff_array,
 	diff_array["exit ihunk"]=diff_array["ihunk"]
 	if (is_new_hunk(file_array[line]))
 		diff_array["exit start line"]=line
+	diff_array["exit code"] = diff_array["idiff"]
 }
 
 # change_array_entry_diff(file_array, target_line, line_text)
