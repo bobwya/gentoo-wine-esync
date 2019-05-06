@@ -1,0 +1,12 @@
+diff --git a/server/symlink.c b/server/symlink.c
+index bc75ee9a7eb..6b66b23dd1e 100644
+--- a/server/symlink.c
++++ b/server/symlink.c
+@@ -60,6 +60,7 @@ static const struct object_ops symlink_ops =
+     no_add_queue,                 /* add_queue */
+     NULL,                         /* remove_queue */
+     NULL,                         /* signaled */
++    NULL,                         /* get_esync_fd */
+     NULL,                         /* satisfied */
+     no_signal,                    /* signal */
+     no_get_fd,                    /* get_fd */
