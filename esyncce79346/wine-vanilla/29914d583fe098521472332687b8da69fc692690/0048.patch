@@ -1,0 +1,20 @@
+--- a/0048-kernel32-tests-Add-some-semaphore-tests.patch	2018-11-01 17:19:44.000000000 +0000
++++ b/0048-kernel32-tests-Add-some-semaphore-tests.patch	2019-05-06 18:48:24.469074927 +0100
+@@ -2,12 +2,10 @@
+ From: Zebediah Figura <z.figura12@gmail.com>
+ Date: Wed, 13 Jun 2018 22:40:47 -0500
+ Subject: [PATCH 48/83] kernel32/tests: Add some semaphore tests.
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  dlls/kernel32/tests/sync.c | 98 +++++++++++++++++++++++++++++++++++++-
+  1 file changed, 97 insertions(+), 1 deletion(-)
+-
+ diff --git a/dlls/kernel32/tests/sync.c b/dlls/kernel32/tests/sync.c
+ index aebb25d659..354ccb89ad 100644
+ --- a/dlls/kernel32/tests/sync.c
+@@ -126,4 +124,3 @@
+  static void test_waitable_timer(void)
+ -- 
+ 2.19.1
+-
