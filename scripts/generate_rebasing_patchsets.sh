@@ -24,7 +24,13 @@ declare -a ARRAY_ESYNC_PATCH_COMMITS=(
 		"07c2e8581a2745725cd7ce4282eedb9a8084a1e4" # (19) [wine:4.7]
 		"bf174815ba8529bfbbda8697503d3c2539f82359" # (20)  wine:4.7
 		"781dd9a145d0ef8e4465f78b8916ea0861b5e161" # (21) [wine:4.8]
-		"29914d583fe098521472332687b8da69fc692690" # (22) [wine:4.8]
+		"29914d583fe098521472332687b8da69fc692690" # (22)  wine:4.8
+		"5ddcfa019d027d9d690c98151c708eb4e7d5f72b" # (23)  wine:4.9
+		"e2411ebecb13b1005c4d0a528056c9b8a1719049" # (24)  wine:4.11
+		"d1a7b681ead5fdf10bc2001d9841b7ad9b09423b" # (25)  wine:4.14
+		"461b5e56f95eb095d97e4af1cb1c5fd64bb2862a" # (26) [wine:4.20]
+		"608d086f1b1bb7168e9322c65224c23f34e75f29" # (27)  wine:4.20
+
 )
 declare ESYNC_ESYNCB4478B7_INDEX=0
 declare ESYNC_ESYNCCE79346_INDEX=8
@@ -43,7 +49,13 @@ declare ESYNC_SHA256_ARRAY=(
 )
 declare TARBALL_EXT="tgz"
 declare SCRIPT_DIRECTORY SCRIPT_NAME
-declare ESYNC_PATCH_0084="0084-server-Use-default_fd_get_esync_fd-for-directory-cha.patch"
+
+declare -a ESYNC_PATCH
+ESYNC_PATCH[84]="0084-server-Use-default_fd_get_esync_fd-for-directory-cha.patch"
+ESYNC_PATCH[85]="0085-server-Only-signal-the-APC-fd-for-user-APCs.patch"
+ESYNC_PATCH[86]="0086-ntdll-Check-the-APC-fd-first.patch"
+ESYNC_PATCH[87]="0087-ntdll-esync-Lock-accessing-the-shm_addrs-array.patch"
+ESYNC_PATCH[88]="0088-ntdll-Get-rid-of-the-per-event-spinlock-for-auto-res.patch"
 
 SCRIPT_NAME="$(readlink -f "${0}")"
 SCRIPT_DIRECTORY="$(dirname "${SCRIPT_NAME}")"
@@ -191,8 +203,10 @@ function generate_rebased_esync_patchset()
 
 	printf "\\nRebasing esync patchset, for app-emulation/${_target_esync_version}, against Wine Git commit: %s\\n" "${ARRAY_ESYNC_PATCH_COMMITS[_esync_rebase_index]}"
 
-	touch "${_source_esync_directory}/${ESYNC_PATCH_0084}"
-	for _patch_file_path in "${_source_esync_directory}/"{0001..0084}*.patch; do
+	for _patch_number in {84..88}; do
+		touch "${_source_esync_directory}/${ESYNC_PATCH[_patch_number]}"
+	done
+	for _patch_file_path in "${_source_esync_directory}/"{0001..0088}*.patch; do
 		_patch_file="$(basename "${_patch_file_path}")"
 		_patch_number="${_patch_file:0:4}"
 		_target_patch="${_patch_number}.patch"
@@ -218,7 +232,7 @@ function generate_rebased_esync_patchset()
 		if [[ ! -f "${_target_esync_patch_file}" ]]; then
 			die "patch file path invalid: '${_target_esync_patch_file}'"
 		fi
-		[[ "${_patch_number}" == "0084" ]] && _patch_file_path="null"
+		[[ "${_patch_number}" =~ 008[4-8] ]] && _patch_file_path="null"
 		diff -Nau "${_patch_file_path}" "${_target_esync_patch_file}" > "${_target_esync_directory}/${_target_patch}"
 		[[ -f "${_target_esync_directory}/${_target_patch}" ]] || die "diff failed"
 		rm -f "${_target_esync_patch_file}" || die "rm failed"

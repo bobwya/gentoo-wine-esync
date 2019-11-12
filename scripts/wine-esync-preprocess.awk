@@ -47,8 +47,50 @@ function process_patch_file_0001(file_array, diff_array,
 				}
 				diff_array["exit end line"]=line
 			}
+			else if (diff_array["ihunk"] == 3) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				indent = " "
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 22) {
+						diff_array["idiff"] += 3
+					}
+					else if (is_new_hunk(file_array[line])) {
+						split("724 0 724 0", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("LIBS=$ac_save_LIBS$")) {
+						line_text = (indent "fi")
+						file_array[line-1] = line_text
+						line_text = (indent "")
+						file_array[line] = line_text
+						line_text = (indent "    LIBS=$ac_save_LIBS")
+						file_array[++line] = line_text
+						++line
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 3) {
+					if (file_array[line] ~ text2regexp("if test \"x$with_ldap\" != \"xno\"")) {
+						line_text=(indent "    ;;")
+						file_array[line] = line_text
+						line_text=(indent "esac")
+						file_array[++line] = line_text
+						line_text=(indent "")
+ 						file_array[++line] = line_text
+ 						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 4) {
+					++diff_array["idiff"]
+					++complete
+					printf("(4) complete=%d\n", complete)
+				}
+			}
 		}
-		else if ((diff_array["file"] == "/configure.ac") && (complete >= 2)) {
+		else if ((diff_array["file"] == "/configure.ac") && (complete >= 3)) {
 			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
@@ -87,10 +129,53 @@ function process_patch_file_0001(file_array, diff_array,
 				}
 				diff_array["exit end line"]=line
 			}
+			else if (diff_array["ihunk"] == 3) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				indent = " "
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 22) {
+						diff_array["idiff"] += 4
+					}
+					else if (is_new_hunk(file_array[line])) {
+						split("-87 0 -87 0", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("test \"$ac_res\" = \"none required\" || AC_SUBST(RT_LIBS,\"$ac_res\")])")) {
+						line_text = (indent "            [AC_DEFINE(HAVE_CLOCK_GETTIME, 1, [Define to 1 if you have the `clock_gettime' function.])")
+						insert_array_entry(file_array, line, line_text)
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 3) {
+					if (file_array[line] ~ text2regexp("LIBS=$ac_save_LIBS$")) {
+						sub("^", "    ", file_array[line])
+						delete file_array[++line]
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 4) {
+					if (file_array[line] ~ text2regexp("dnl **** Check for OpenLDAP ***")) {
+						line_text=(indent "    ;;")
+						file_array[line] = line_text
+						line_text=(indent "esac")
+						file_array[++line] = line_text
+						line_text=(indent "")
+ 						file_array[++line] = line_text
+ 						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 5) {
+					++diff_array["idiff"]
+					++complete
+				}
+			}
 		}
 	}
 
-	if (complete == 4) diff_array["exit code"] = 0
+	if (complete == 6) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0001(file_array, diff_array,
@@ -572,6 +657,35 @@ function process_staging_patch_file_0002(file_array, diff_array,
 					if (file_array[line] ~ text2regexp("^+ no_open_file, /* open_file */$")) {
 						line_text = ("+" substr(indent, 2) "no_alloc_handle,		   /* alloc_handle */")
 						insert_array_entry(file_array, ++line, line_text)
+						++diff_array["idiff"]
+						++complete
+					}
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+	}
+
+	if (complete == 1) diff_array["exit code"] = 0
+}
+
+function process_patch_file_0003(file_array, diff_array,
+	array_diff_lines, complete, indent, line, line_text)
+{
+	diff_array["exit start line"]=0
+	for (line = 1 ; line <= file_array[0] ; ++line) {
+		indent = get_indent(file_array[line])
+		preprocess_patch_file_line(file_array[line], diff_array)
+
+		if (diff_array["file"] == "/dlls/ntdll/sync.c") {
+			preprocess_diff_file(line, diff_array)
+
+			if (diff_array["ihunk"] == 1) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (file_array[line] ~ text2regexp("^ WINE_DEFAULT_DEBUG_CHANNEL(ntdll);$")) {
+						sub("ntdll","sync",file_array[line])
+						++line
 						++diff_array["idiff"]
 						++complete
 					}
@@ -2653,7 +2767,7 @@ function process_patch_file_0042(file_array, diff_array,
 				}
 				diff_array["exit end line"]=line
 			}
-			if ((diff_array["ihunk"] == 2) && (complete >= 1)) {
+			else if ((diff_array["ihunk"] == 2) && (complete >= 1)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (file_array[line] ~ text2regexp("^ NtCreateKeyedEvent( &keyed_event, GENERIC_READ | GENERIC_WRITE, NULL, 0 );$")) {
@@ -2673,6 +2787,81 @@ function process_patch_file_0042(file_array, diff_array,
 	}
 
 	if (complete == 2) diff_array["exit code"] = 0
+}
+
+function regenerate_patch_file_0042(file_array, diff_array,
+	complete, indent, line, line_text)
+{
+	diff_array["exit start line"]=0
+	for (line = 1 ; line <= file_array[0] ; ++line) {
+		indent = get_indent(file_array[line])
+		preprocess_patch_file_line(file_array[line], diff_array)
+
+		if (file_array[line] ~ text2regexp("^From ")) {
+			sub("56864692e4ed8f588a5dcee931e70fe6da0a1920",
+				"74673086285abb335d58cecf4327bf08034210a6",
+				file_array[line])
+			++complete
+		}
+		else if (file_array[line] ~ text2regexp("^Subject: ")) {
+			line_text = "Subject: [PATCH] ntdll: Use shared memory segments to store semaphore and"
+			file_array[line] = line_text
+			line_text = " mutex state."
+			file_array[++line] = line_text
+			++complete
+		}
+		else if (file_array[line] ~ text2regexp("^ dlls/ntdll/thread.c | 4 +")) {
+			line_text = " dlls/ntdll/loader.c |   4 +"
+			file_array[line] = line_text
+			++complete
+		}
+		else if (file_array[line] ~ text2regexp("^diff --git a/dlls/ntdll/thread.c b/dlls/ntdll/thread.c")) {
+			line_text = "diff --git a/dlls/ntdll/loader.c b/dlls/ntdll/loader.c"
+			file_array[line] = line_text
+			line_text = "index 9972d680e..f9c529357 100644"
+			file_array[++line] = line_text
+			line_text = "--- a/dlls/ntdll/loader.c"
+			file_array[++line] = line_text
+			line_text = "+++ b/dlls/ntdll/loader.c"
+			file_array[++line] = line_text
+			line_text = "@@ -44,6 +44,7 @@"
+			file_array[++line] = line_text
+			line_text = " #include \"wine/server.h\""
+			insert_array_entry(file_array, ++line, line_text)
+			++complete
+		}
+		else if (file_array[line] ~ text2regexp("^ #include \"wine/exception.h\"")) {
+			delete file_array[line]
+			++complete
+		}
+		else if (file_array[line] ~ text2regexp("^ WINE_DEFAULT_DEBUG_CHANNEL(thread);")) {
+			line_text = " WINE_DEFAULT_DEBUG_CHANNEL(module);"
+			file_array[line] = line_text
+			line_text = " WINE_DECLARE_DEBUG_CHANNEL(relay);"
+			file_array[++line] = line_text
+			line_text = "@@ -4246,6 +4247,9 @@ void __wine_process_init(void)"
+			file_array[++line] = line_text
+			line_text = "     peb->ProcessHeap = RtlCreateHeap( HEAP_GROWABLE, NULL, 0, 0, NULL, NULL );"
+			file_array[++line] = line_text
+			line_text = "     peb->LoaderLock = &loader_section;"
+			file_array[++line] = line_text
+			++complete
+		}
+		else if (file_array[line] ~ text2regexp("^ NtCreateKeyedEvent( &keyed_event, GENERIC_READ | GENERIC_WRITE, NULL, 0 );$")) {
+			line_text = "     init_directories();"
+			file_array[line] = line_text
+			line_text = "     init_user_process_params( info_size );"
+			file_array[++line] = line_text
+			++complete
+		}
+		else if (file_array[line] ~ text2regexp("2.19.1")) {
+			line_text = "2.23.0"
+			file_array[line] = line_text
+			++complete
+		}
+	}
+
+	if (complete == 8) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0042(file_array, diff_array,
@@ -2989,6 +3178,34 @@ function process_patch_file_0048(file_array, diff_array,
 	if (complete == 1) diff_array["exit code"] = 0
 }
 
+function process_patch_file_0051(file_array, diff_array,
+	complete, indent, line, line_text)
+{
+	diff_array["exit start line"]=0
+	for (line = 1 ; line <= file_array[0] ; ++line) {
+		indent = get_indent(file_array[line])
+		preprocess_patch_file_line(file_array[line], diff_array)
+
+		if (diff_array["file"] == "/dlls/kernel32/tests/sync.c") {
+			preprocess_diff_file(line, diff_array)
+
+			if (diff_array["ihunk"] == 1) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (file_array[line] ~ text2regexp("static NTSTATUS (WINAPI *pNtAllocateVirtualMemory)(HANDLE, PVOID *, ULONG, SIZE_T *, ULONG, ULONG);")) {
+						sub(text2regexp("(HANDLE, PVOID *, ULONG, SIZE_T *, ULONG, ULONG)"),"(HANDLE, PVOID *, ULONG_PTR, SIZE_T *, ULONG, ULONG)", file_array[line])
+						++diff_array["idiff"]
+						++complete
+					}
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+	}
+
+	if (complete == 1) diff_array["exit code"] = 0
+}
+
 function process_patch_file_0059(file_array, diff_array,
 	complete, indent, line, line_text)
 {
@@ -3156,7 +3373,7 @@ function process_patch_file_0074(file_array, diff_array,
 						line_text = " "
 						if (esync_rebase_index == 6)
 							file_array[++line] = line_text
-						else
+						else if (esync_rebase_index <= 5)
 							insert_array_entry(file_array, ++line, line_text)
 						++diff_array["idiff"]
 						++complete
@@ -3168,6 +3385,71 @@ function process_patch_file_0074(file_array, diff_array,
 	}
 
 	if (complete == 1) diff_array["exit code"] = 0
+}
+
+function regenerate_patch_file_0074(file_array, diff_array,
+	complete, indent, line, line_text)
+{
+	diff_array["exit start line"]=0
+	for (line = 1 ; line <= file_array[0] ; ++line) {
+		indent = get_indent(file_array[line])
+		preprocess_patch_file_line(file_array[line], diff_array)
+
+		if (file_array[line] ~ text2regexp("^From ")) {
+			sub("7b617b003abd29e7869178cb8ca108802691159f",
+				"4293d1e7797b999611ecc410b24052a1566715b6",
+				file_array[line])
+			++complete
+		}
+		else if (file_array[line] ~ text2regexp("^Subject: ")) {
+			line_text = "Subject: [PATCH] ntdll, server: Abort if esync is enabled for the server but"
+			file_array[line] = line_text
+			line_text = " not the client, and vice versa."
+			file_array[++line] = line_text
+			++complete
+		}
+		else if (file_array[line] ~ text2regexp("^ dlls/ntdll/thread.c |  3 +--$")) {
+			line_text = " dlls/ntdll/loader.c |  3 +--"
+			file_array[line] = line_text
+			++complete
+		}
+		else if (file_array[line] ~ text2regexp("^index 3ab069da9..1dd96c8e6 100644$")) {
+			line_text = "index 8255810a9..fb1953fb9 100644"
+			file_array[line] = line_text
+			++complete
+		}
+		else if (file_array[line] ~ text2regexp("^diff --git a/dlls/ntdll/thread.c b/dlls/ntdll/thread.c")) {
+			line_text = "diff --git a/dlls/ntdll/loader.c b/dlls/ntdll/loader.c"
+			file_array[line] = line_text
+			line_text = "index f9c529357..80f1304a3 100644"
+			file_array[++line] = line_text
+			line_text = "--- a/dlls/ntdll/loader.c"
+			file_array[++line] = line_text
+			line_text = "+++ b/dlls/ntdll/loader.c"
+			file_array[++line] = line_text
+			line_text = "@@ -4405,8 +4405,7 @@ void __wine_process_init(void)"
+			file_array[++line] = line_text
+			line_text = "     peb->ProcessHeap = RtlCreateHeap( HEAP_GROWABLE, NULL, 0, 0, NULL, NULL );"
+			file_array[++line] = line_text
+			line_text = "     peb->LoaderLock = &loader_section;"
+			file_array[++line] = line_text
+			++complete
+		}
+		else if (file_array[line] ~ text2regexp("^ NtCreateKeyedEvent( &keyed_event, GENERIC_READ | GENERIC_WRITE, NULL, 0 );$")) {
+			line_text = "     init_directories();"
+			file_array[line] = line_text
+			line_text = "     init_user_process_params( info_size );"
+			file_array[++line] = line_text
+			++complete
+		}
+		else if (file_array[line] ~ text2regexp("2.19.1")) {
+			line_text = "2.23.0"
+			file_array[line] = line_text
+			++complete
+		}
+	}
+
+	if (complete == 7) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0074(file_array, diff_array,
@@ -3448,6 +3730,700 @@ function generate_patch_file_0084(file_array, diff_array,
 	if (complete == 1) diff_array["exit code"] = 0
 }
 
+function generate_patch_file_0085(file_array, diff_array,
+	complete, line, line_text)
+{
+	diff_array["exit start line"]=0
+	diff_array["idiff"]=0
+
+	line_text = "From 9e4df70f7282b04849153b3fa2edf15dc24eaf4f Mon Sep 17 00:00:00 2001"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "From: Zebediah Figura <zfigura@codeweavers.com>"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "Date: Tue, 23 Jul 2019 18:39:06 -0500"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "Subject: [PATCH] server: Only signal the APC fd for user APCs."
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = ""
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "Otherwise we might incorrectly return WAIT_IO_COMPLETION to the user when a system APC runs."
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "---"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " server/thread.c | 2 +-"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " 1 file changed, 1 insertion(+), 1 deletion(-)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = ""
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "diff --git a/server/thread.c b/server/thread.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "index fc751c2cb..2e77e5ff2 100644"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "--- a/server/thread.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+++ b/server/thread.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "@@ -1057,7 +1057,7 @@ static int queue_apc( struct process *process, struct thread *thread, struct thr"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "         wake_thread( thread );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-        if (do_esync())"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        if (do_esync() && queue == &thread->user_apc)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "             esync_wake_fd( thread->esync_apc_fd );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-- "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "2.23.0"
+	insert_array_entry(file_array, ++line, line_text)
+
+	complete = ++diff_array["idiff"]
+
+	if (complete == 1) diff_array["exit code"] = 0
+}
+
+function generate_patch_file_0086(file_array, diff_array,
+	complete, line, line_text)
+{
+	diff_array["exit start line"]=0
+	diff_array["idiff"]=0
+
+	line_text = "From 836f1b6b0560bd178efb8d52900b4b136f87ae30 Mon Sep 17 00:00:00 2001"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "From: Zebediah Figura <zfigura@codeweavers.com>"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "Date: Tue, 23 Jul 2019 17:22:20 -0500"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "Subject: [PATCH] ntdll: Check the APC fd first."
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = ""
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "---"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " dlls/ntdll/esync.c | 13 ++++++++-----"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " 1 file changed, 8 insertions(+), 5 deletions(-)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = ""
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "index fc621ccfb..0adb4ad77 100644"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "--- a/dlls/ntdll/esync.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+++ b/dlls/ntdll/esync.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "@@ -1046,6 +1046,14 @@ static NTSTATUS __esync_wait_objects( DWORD count, const HANDLE *handles,"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "             ret = do_poll( fds, pollcount, timeout ? &end : NULL );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "             if (ret > 0)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "             {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+                /* We must check this first! The server may set an event that"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+                 * we're waiting on, but we need to return STATUS_USER_APC. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+                if (alertable)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+                {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+                    if (fds[pollcount - 1].revents & POLLIN)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+                        goto userapc;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+                }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "                 /* Find out which object triggered the wait. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "                 for (i = 0; i < count; i++)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "                 {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "@@ -1089,11 +1097,6 @@ static NTSTATUS __esync_wait_objects( DWORD count, const HANDLE *handles,"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "                         return count - 1;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "                     }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "                 }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-                if (alertable)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-                {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-                    if (fds[i++].revents & POLLIN)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-                        goto userapc;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-                }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "                 /* If we got here, someone else stole (or reset, etc.) whatever"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "                  * we were waiting for. So keep waiting. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-- "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "2.23.0"
+	insert_array_entry(file_array, ++line, line_text)
+
+	complete = ++diff_array["idiff"]
+
+	if (complete == 1) diff_array["exit code"] = 0
+}
+
+function generate_patch_file_0087(file_array, diff_array,
+	complete, line, line_text)
+{
+	diff_array["exit start line"]=0
+	diff_array["idiff"]=0
+
+	line_text = "From c1804983dc8e9509c088c35914212cda1bd5a48a Mon Sep 17 00:00:00 2001"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "From: Zebediah Figura <zfigura@codeweavers.com>"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "Date: Wed, 7 Aug 2019 17:14:54 -0500"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "Subject: [PATCH] ntdll/esync: Lock accessing the shm_addrs array."
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = ""
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "---"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " dlls/ntdll/esync.c | 18 +++++++++++++++++-"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " 1 file changed, 17 insertions(+), 1 deletion(-)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = ""
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "index 0adb4ad77..2f030c141 100644"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "--- a/dlls/ntdll/esync.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+++ b/dlls/ntdll/esync.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "@@ -155,10 +155,22 @@ void esync_init(void)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     shm_addrs_size = 128;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+static RTL_CRITICAL_SECTION shm_addrs_section;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+static RTL_CRITICAL_SECTION_DEBUG shm_addrs_debug ="
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+{"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    0, 0, &shm_addrs_section,"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    { &shm_addrs_debug.ProcessLocksList, &shm_addrs_debug.ProcessLocksList },"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+      0, 0, { (DWORD_PTR)(__FILE__ \": shm_addrs_section\") }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+};"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+static RTL_CRITICAL_SECTION shm_addrs_section = { &shm_addrs_debug, -1, 0, 0, 0, 0 };"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " static void *get_shm( unsigned int idx )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     int entry  = (idx * 8) / pagesize;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     int offset = (idx * 8) % pagesize;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    void *ret;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    RtlEnterCriticalSection(&shm_addrs_section);"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     if (entry >= shm_addrs_size)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "@@ -180,7 +192,11 @@ static void *get_shm( unsigned int idx )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "             munmap( addr, pagesize ); /* someone beat us to it */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    return (void *)((unsigned long)shm_addrs[entry] + offset);"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    ret = (void *)((unsigned long)shm_addrs[entry] + offset);"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    RtlLeaveCriticalSection(&shm_addrs_section);"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    return ret;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " /* We'd like lookup to be fast. To that end, we use a static list indexed by handle."
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-- "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "2.23.0"
+	insert_array_entry(file_array, ++line, line_text)
+
+	complete = ++diff_array["idiff"]
+
+	if (complete == 1) diff_array["exit code"] = 0
+}
+
+function generate_patch_file_0088(file_array, diff_array,
+	complete, line, line_text)
+{
+	diff_array["exit start line"]=0
+	diff_array["idiff"]=0
+
+	line_text = "From c41dc5b8c422be3914cd31c239ec586a091b8a3b Mon Sep 17 00:00:00 2001"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "From: Zebediah Figura <zfigura@codeweavers.com>"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "Date: Mon, 10 Jun 2019 11:25:34 -0400"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "Subject: [PATCH] ntdll: Get rid of the per-event spinlock for auto-reset"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " events."
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = ""
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "It's not necessary. Much like semaphores, the shm state is just a hint."
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "---"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " dlls/ntdll/esync.c | 74 +++++++++++++++++++++++++++++++++++-----------"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " server/esync.c     | 32 +++++++++++++-------"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " 2 files changed, 78 insertions(+), 28 deletions(-)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = ""
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "index 2f030c141..87f303403 100644"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "--- a/dlls/ntdll/esync.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+++ b/dlls/ntdll/esync.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "@@ -570,6 +570,14 @@ static inline void small_pause(void)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "  * problem at all."
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "  */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+/* Removing this spinlock is harder than it looks. esync_wait_objects() can"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+ * deal with inconsistent state well enough, and a race between SetEvent() and"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+ * ResetEvent() gives us license to yield either result as long as we act"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+ * consistently, but that's not enough. Notably, esync_wait_objects() should"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+ * probably act like a fence, so that the second half of esync_set_event() does"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+ * not seep past a subsequent reset. That's one problem, but no guarantee there"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+ * aren't others. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " NTSTATUS esync_set_event( HANDLE handle, LONG *prev )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     static const uint64_t value = 1;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "@@ -583,21 +591,36 @@ NTSTATUS esync_set_event( HANDLE handle, LONG *prev )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     if ((ret = get_object( handle, &obj ))) return ret;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     event = obj->shm;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    /* Acquire the spinlock. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    while (interlocked_cmpxchg( &event->locked, 1, 0 ))"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-        small_pause();"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    if (obj->type == ESYNC_MANUAL_EVENT)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        /* Acquire the spinlock. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        while (interlocked_cmpxchg( &event->locked, 1, 0 ))"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+            small_pause();"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    /* For manual-reset events, as long as we're in a lock, we can take the"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+     * optimization of only calling write() if the event wasn't already"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+     * signaled."
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+     *"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+     * For auto-reset events, esync_wait_objects() must grab the kernel object."
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+     * Thus if we got into a race so that the shm state is signaled but the"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+     * eventfd is unsignaled (i.e. reset shm, set shm, set fd, reset fd), we"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+     * *must* signal the fd now, or any waiting threads will never wake up. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     /* Only bother signaling the fd if we weren't already signaled. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    if (!(current = interlocked_xchg( &event->signaled, 1 )))"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    if (!(current = interlocked_xchg( &event->signaled, 1 )) || obj->type == ESYNC_AUTO_EVENT)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "         if (write( obj->fd, &value, sizeof(value) ) == -1)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-            return FILE_GetNtStatus();"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+            ERR(\"write: %s\n\", strerror(errno));"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     if (prev) *prev = current;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    /* Release the spinlock. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    event->locked = 0;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    if (obj->type == ESYNC_MANUAL_EVENT)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        /* Release the spinlock. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        event->locked = 0;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     return STATUS_SUCCESS;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "@@ -615,21 +638,34 @@ NTSTATUS esync_reset_event( HANDLE handle, LONG *prev )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     if ((ret = get_object( handle, &obj ))) return ret;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     event = obj->shm;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    /* Acquire the spinlock. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    while (interlocked_cmpxchg( &event->locked, 1, 0 ))"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-        small_pause();"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    if (obj->type == ESYNC_MANUAL_EVENT)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        /* Acquire the spinlock. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        while (interlocked_cmpxchg( &event->locked, 1, 0 ))"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+            small_pause();"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    /* Only bother signaling the fd if we weren't already signaled. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    if ((current = interlocked_xchg( &event->signaled, 0 )))"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    /* For manual-reset events, as long as we're in a lock, we can take the"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+     * optimization of only calling read() if the event was already signaled."
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+     *"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+     * For auto-reset events, we have no guarantee that the previous \"signaled\""
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+     * state is actually correct. We need to leave both states unsignaled after"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+     * leaving this function, so we always have to read(). */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    if ((current = interlocked_xchg( &event->signaled, 0 )) || obj->type == ESYNC_AUTO_EVENT)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-        /* we don't care about the return value */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-        read( obj->fd, &value, sizeof(value) );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        if (read( obj->fd, &value, sizeof(value) ) == -1 && errno != EWOULDBLOCK && errno != EAGAIN)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+            ERR(\"read: %s\n\", strerror(errno));"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     if (prev) *prev = current;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    /* Release the spinlock. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    event->locked = 0;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    if (obj->type == ESYNC_MANUAL_EVENT)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        /* Release the spinlock. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        event->locked = 0;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     return STATUS_SUCCESS;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "@@ -844,8 +880,9 @@ static void update_grabbed_object( struct esync *obj )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     else if (obj->type == ESYNC_AUTO_EVENT)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "         struct event *event = obj->shm;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-        /* We don't have to worry about a race between this and read(), for"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-         * reasons described near esync_set_event(). */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        /* We don't have to worry about a race between this and read(), since"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+         * this is just a hint, and the real state is in the kernel object."
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+         * This might already be 0, but that's okay! */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "         event->signaled = 0;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "@@ -1094,6 +1131,7 @@ static NTSTATUS __esync_wait_objects( DWORD count, const HANDLE *handles,"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "                         }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "                         else"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "                         {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+                            /* FIXME: Could we check the poll or shm state first? Should we? */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "                             if ((size = read( fds[i].fd, &value, sizeof(value) )) == sizeof(value))"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "                             {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "                                 /* We found our object. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "diff --git a/server/esync.c b/server/esync.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "index 4521993d4..84d0951cb 100644"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "--- a/server/esync.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+++ b/server/esync.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "@@ -396,9 +396,12 @@ void esync_set_event( struct esync *esync )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     if (debug_level)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "         fprintf( stderr, \"esync_set_event() fd=%d\n\", esync->fd );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    /* Acquire the spinlock. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    while (interlocked_cmpxchg( &event->locked, 1, 0 ))"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-        small_pause();"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    if (esync->type == ESYNC_MANUAL_EVENT)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        /* Acquire the spinlock. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        while (interlocked_cmpxchg( &event->locked, 1, 0 ))"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+            small_pause();"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     if (!interlocked_xchg( &event->signaled, 1 ))"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "@@ -406,8 +409,11 @@ void esync_set_event( struct esync *esync )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "             perror( \"esync: write\" );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    /* Release the spinlock. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    event->locked = 0;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    if (esync->type == ESYNC_MANUAL_EVENT)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        /* Release the spinlock. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        event->locked = 0;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " void esync_reset_event( struct esync *esync )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "@@ -421,9 +427,12 @@ void esync_reset_event( struct esync *esync )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     if (debug_level)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "         fprintf( stderr, \"esync_reset_event() fd=%d\n\", esync->fd );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    /* Acquire the spinlock. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    while (interlocked_cmpxchg( &event->locked, 1, 0 ))"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-        small_pause();"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    if (esync->type == ESYNC_MANUAL_EVENT)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        /* Acquire the spinlock. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        while (interlocked_cmpxchg( &event->locked, 1, 0 ))"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+            small_pause();"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     /* Only bother signaling the fd if we weren't already signaled. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     if (interlocked_xchg( &event->signaled, 0 ))"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "@@ -432,8 +441,11 @@ void esync_reset_event( struct esync *esync )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "         read( esync->fd, &value, sizeof(value) );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "     }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    /* Release the spinlock. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-    event->locked = 0;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    if (esync->type == ESYNC_MANUAL_EVENT)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        /* Release the spinlock. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+        event->locked = 0;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "+    }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = " DECL_HANDLER(create_esync)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "-- "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text = "2.23.0"
+	insert_array_entry(file_array, ++line, line_text)
+
+	complete = ++diff_array["idiff"]
+
+	if (complete == 1) diff_array["exit code"] = 0
+}
+
 function process_patch_file_delete_target_hunk(file_array, diff_array, target_diff_file, target_hunk,
 	complete, indent, line, line_text)
 {
@@ -3493,8 +4469,10 @@ function process_patch_file(file_array, diff_array)
 		process_patch_file_0002(file_array, diff_array)
 		if (!diff_array["exit code"] && staging) process_staging_patch_file_0002(file_array, diff_array)
 	}
-	else if (staging && (patch_number == "0003")) {
-		process_staging_patch_file_0003(file_array, diff_array)
+	else if (patch_number == "0003") {
+		if (esync_rebase_index >= 24)
+			process_patch_file_0003(file_array, diff_array)
+		if (staging) process_staging_patch_file_0003(file_array, diff_array)
 	}
 	else if (patch_number == "0006") {
 		if (!staging && (esync_rebase_index <= 2))
@@ -3602,6 +4580,8 @@ function process_patch_file(file_array, diff_array)
 	else if (patch_number == "0042") {
 		if (esync_rebase_index <= 6)
 			process_patch_file_0042(file_array, diff_array)
+		if (esync_rebase_index >= 27)
+			regenerate_patch_file_0042(file_array, diff_array)
 		if (!diff_array["exit code"] && staging) {
 			squash_array(file_array)
 			process_staging_patch_file_0042(file_array, diff_array)
@@ -3621,6 +4601,10 @@ function process_patch_file(file_array, diff_array)
 		if ((esync_rebase_index <= 1) || (staging && (esync_rebase_index == 2)))
 			process_patch_file_0048(file_array, diff_array)
 	}
+	else if (patch_number == "0051") {
+		if (esync_rebase_index >= 25)
+			process_patch_file_0051(file_array, diff_array)
+	}
 	else if (patch_number == "0059") {
 		if (esync_rebase_index >= 20)
 			process_patch_file_0059(file_array, diff_array)
@@ -3630,7 +4614,10 @@ function process_patch_file(file_array, diff_array)
 			process_patch_file_0064(file_array, diff_array)
 	}
 	else if (patch_number == "0074") {
-		if (esync_rebase_index <= 6) process_patch_file_0074(file_array, diff_array)
+		if (esync_rebase_index <= 6)
+			process_patch_file_0074(file_array, diff_array)
+		if (esync_rebase_index >= 27)
+			regenerate_patch_file_0074(file_array, diff_array)
 		if (!diff_array["exit code"] && staging) {
 			squash_array(file_array)
 			process_staging_patch_file_0074(file_array, diff_array)
@@ -3654,6 +4641,18 @@ function process_patch_file(file_array, diff_array)
 	else if (patch_number == "0084") {
 		generate_patch_file_0084(file_array, diff_array)
 	}
+	else if (patch_number == "0085") {
+		generate_patch_file_0085(file_array, diff_array)
+	}
+	else if (patch_number == "0086") {
+		generate_patch_file_0086(file_array, diff_array)
+	}
+	else if (patch_number == "0087") {
+		generate_patch_file_0087(file_array, diff_array)
+	}
+	else if (patch_number == "0088") {
+		generate_patch_file_0088(file_array, diff_array)
+	}
 
 	if (diff_array["exit code"]) return diff_array["exit code"]
 
@@ -3661,13 +4660,14 @@ function process_patch_file(file_array, diff_array)
 	if (target_esync_directory) {
 		print_file(file_array, (target_esync_directory "/" file_name))
 	}
-	else
+	else {
 		print_file(file_array, (file_path ".new"))
+	}
 }
 
 BEGIN{
-	supported_patches="0001 0002 0006 0007 0009 0010 0011 0013 0014 0015 0017 0020 0023 0024 0025 0026 0032 0033 0040 0041 0042 0044 0045 0048 0059 0064 0074 0077 0078 0079 0084"
-	if (staging) supported_patches=(supported_patches " 0003 0022 ")
+	supported_patches="0001 0002 0003 0006 0007 0009 0010 0011 0013 0014 0015 0017 0020 0023 0024 0025 0026 0032 0033 0040 0041 0042 0044 0045 0048 0051 0059 0064 0074 0077 0078 0079 0084 0085 0086 0087 0088"
+	if (staging) supported_patches=(supported_patches " 0022 ")
 
 	if (supported_patches !~ patch_number) {
 		diff_array["exit code"]=255
