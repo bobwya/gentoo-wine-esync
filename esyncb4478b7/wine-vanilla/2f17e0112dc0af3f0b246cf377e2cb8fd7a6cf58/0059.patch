@@ -1,5 +1,5 @@
 --- a/0059-kernel32-tests-Zigzag-test.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0059-kernel32-tests-Zigzag-test.patch	2019-05-06 18:48:17.608975177 +0100
++++ b/0059-kernel32-tests-Zigzag-test.patch	2019-11-12 22:02:31.108619950 +0000
 @@ -2,14 +2,11 @@
  From: Zebediah Figura <z.figura12@gmail.com>
  Date: Tue, 26 Jun 2018 18:44:44 -0500

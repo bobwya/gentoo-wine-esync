@@ -1,5 +1,5 @@
 --- a/0078-ntdll-server-Initialize-the-shared-memory-portion-on.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0078-ntdll-server-Initialize-the-shared-memory-portion-on.patch	2019-05-06 18:48:15.404943130 +0100
++++ b/0078-ntdll-server-Initialize-the-shared-memory-portion-on.patch	2019-11-12 22:02:27.992583297 +0000
 @@ -3,9 +3,7 @@
  Date: Sun, 29 Jul 2018 16:50:08 -0500
  Subject: [PATCH 78/83] ntdll, server: Initialize the shared memory portion on
