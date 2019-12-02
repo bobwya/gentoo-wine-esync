@@ -655,7 +655,7 @@ function process_staging_patch_file_0002(file_array, diff_array,
 				}
 				else if (diff_array["idiff"] == 2) {
 					if (file_array[line] ~ text2regexp("^+ no_open_file, /* open_file */$")) {
-						line_text = ("+" substr(indent, 2) "no_alloc_handle,		   /* alloc_handle */")
+						line_text = ("+" substr(indent, 2) "no_alloc_handle,           /* alloc_handle */")
 						insert_array_entry(file_array, ++line, line_text)
 						++diff_array["idiff"]
 						++complete
@@ -829,7 +829,9 @@ function process_patch_file_0009(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (is_new_hunk(file_array[line])) {
-						sub(text2regexp("NTSTATUS WINAPI NtSetEvent( HANDLE handle, PULONG NumberOfThreadsReleased )$"), "NTSTATUS WINAPI NtOpenEvent( HANDLE *handle, ACCESS_MASK access, const OBJECT_ATT", file_array[line])
+						sub(text2regexp("NTSTATUS WINAPI NtSetEvent( HANDLE handle, PULONG NumberOfThreadsReleased )$"),
+							"NTSTATUS WINAPI NtOpenEvent( HANDLE *handle, ACCESS_MASK access, const OBJECT_ATT",
+							file_array[line])
 						split("+57 0 +57 0", array_diff_lines)
 						change_array_entry_diff(file_array, line, array_diff_lines)
 						++diff_array["idiff"]
@@ -903,9 +905,13 @@ function process_patch_file_0010(file_array, diff_array,
 					}
 					else if (is_new_hunk(file_array[line])) {
 						if ((esync_rebase_index >= 10) || ((esync_rebase_index == 9) && staging))
-							sub(text2regexp("NTSTATUS WINAPI NtResetEvent( HANDLE handle, PULONG NumberOfThreadsReleased )$"), "NTSTATUS WINAPI NtSetEvent( HANDLE handle, LONG *prev_state )", file_array[line])
+							sub(text2regexp("NTSTATUS WINAPI NtResetEvent( HANDLE handle, PULONG NumberOfThreadsReleased )$"),
+								"NTSTATUS WINAPI NtSetEvent( HANDLE handle, LONG *prev_state )",
+								file_array[line])
 						else
-							sub(text2regexp("NTSTATUS WINAPI NtResetEvent( HANDLE handle, PULONG NumberOfThreadsReleased )$"), "NTSTATUS WINAPI NtResetEvent( HANDLE handle, LONG *prev_state )", file_array[line])
+							sub(text2regexp("NTSTATUS WINAPI NtResetEvent( HANDLE handle, PULONG NumberOfThreadsReleased )$"),
+								"NTSTATUS WINAPI NtResetEvent( HANDLE handle, LONG *prev_state )",
+								file_array[line])
 						split("+55 0 +55 0", array_diff_lines)
 						change_array_entry_diff(file_array, line, array_diff_lines)
 						if ((esync_rebase_index >= 10) || ((esync_rebase_index == 9) && staging)) {
@@ -1021,7 +1027,7 @@ function process_patch_file_0013(file_array, diff_array,
 						++diff_array["idiff"]
 						++complete
 					}
-					else if (sub(text2regexp("named_pipe_device_get_fd, /* get_fd */"), "no_get_fd,						/* get_fd */", file_array[line])) {
+					else if (sub(text2regexp("named_pipe_device_get_fd, /* get_fd */"), "no_get_fd,                        /* get_fd */", file_array[line])) {
 						++diff_array["idiff"]
 						++complete
 					}
@@ -1662,7 +1668,9 @@ function process_patch_file_0020(file_array, diff_array,
 				}
 				else if (diff_array["idiff"] == 3) {
 					if (esync_rebase_index >= 16) {
-						if (sub(text2regexp("static void destroy_thread( struct object *obj );$"), "static struct list *thread_get_kernel_obj_list( struct object *obj );", file_array[line]))
+						if (sub(text2regexp("static void destroy_thread( struct object *obj );$"),
+							"static struct list *thread_get_kernel_obj_list( struct object *obj );",
+								file_array[line]))
 							++diff_array["idiff"]
 					}
 					else {
@@ -1675,16 +1683,38 @@ function process_patch_file_0020(file_array, diff_array,
 				}
 				diff_array["exit end line"]=line
 			}
+			else if (diff_array["ihunk"] == 3) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 28) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("^ thread->suspend = 0;$")) {
+						indent = "     "
+						line_text = (indent "thread->token           = NULL;")
+						file_array[line] = line_text
+						line_text = (indent "thread->desc            = NULL;")
+						file_array[++line] = line_text
+						line_text = (indent "thread->desc_len        = 0;")
+						file_array[++line] = line_text
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
 		}
 		else if (diff_array["file"] == "/server/thread.h") {
 			preprocess_diff_file(line, diff_array)
 
-			if ((diff_array["ihunk"] == 1) && (complete >= 1)) {
+			if ((diff_array["ihunk"] == 1) && (complete >= 2)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index <= 15) {
 						diff_array["idiff"]+=2
-						++complete
 					}
 					else if (file_array[line] ~ text2regexp("^ timeout_t creation_time; /* Thread creation time */$")) {
 						delete file_array[line]
@@ -1692,19 +1722,32 @@ function process_patch_file_0020(file_array, diff_array,
 					}
 				}
 				else if (diff_array["idiff"] == 2) {
-					if (file_array[line] ~ text2regexp("^ struct token *token; /* security token associated with this thread */$")) {
+					if ((esync_rebase_index <= 28) && (file_array[line] ~ text2regexp("^ struct token *token; /* security token associated with this thread */$"))) {
 						line_text = (indent "struct list            kernel_object; /* list of kernel object pointers */")
 						insert_array_entry(file_array, ++line, line_text)
 						++diff_array["idiff"]
-						++complete
 					}
+					else if ((esync_rebase_index >= 29) && (file_array[line] ~ text2regexp("^ timeout_t exit_time; /* Thread exit time */$"))) {
+						indent="     "
+						line_text = "struct list            kernel_object; /* list of kernel object pointers */"
+						file_array[line] = (indent line_text)
+						line_text = "data_size_t            desc_len;      /* thread description length in bytes */"
+						file_array[++line] = (indent line_text)
+						line_text = "WCHAR                 *desc;          /* thread description string */"
+						insert_array_entry(file_array, ++line, (indent line_text))
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 3) {
+					++diff_array["idiff"]
+					++complete
 				}
 				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (complete == 2) diff_array["exit code"] = 0
+	if (complete == 3) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0020(file_array, diff_array,
@@ -1756,7 +1799,9 @@ function process_staging_patch_file_0020(file_array, diff_array,
 			else if ((diff_array["ihunk"] == 6) && (complete >= 2)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
-					if ((esync_rebase_index <= 8) && sub(text2regexp("return (mythread->state == TERMINATED);$"), "return (mythread->state == TERMINATED \\&\\& !mythread->exit_poll);", file_array[line])) {
+					if ((esync_rebase_index <= 8) && sub(text2regexp("return (mythread->state == TERMINATED);$"),
+														 "return (mythread->state == TERMINATED \\&\\& !mythread->exit_poll);",
+														 file_array[line])) {
 						++diff_array["idiff"]
 						++complete
 					}
@@ -2423,7 +2468,7 @@ function process_patch_file_0025(file_array, diff_array,
 				}
 				else if (diff_array["idiff"] == 5) {
 						++diff_array["idiff"]
-						++complete					
+						++complete
 				}
 			}
 		}
@@ -2848,10 +2893,20 @@ function regenerate_patch_file_0042(file_array, diff_array,
 			++complete
 		}
 		else if (file_array[line] ~ text2regexp("^ NtCreateKeyedEvent( &keyed_event, GENERIC_READ | GENERIC_WRITE, NULL, 0 );$")) {
-			line_text = "     init_directories();"
-			file_array[line] = line_text
-			line_text = "     init_user_process_params( info_size );"
-			file_array[++line] = line_text
+			if (esync_rebase_index <= 27) {
+				line_text = "     init_directories();"
+				file_array[line] = line_text
+				line_text = "     init_user_process_params( info_size );"
+				file_array[++line] = line_text
+			}
+			else {
+				line_text = "     init_unix_codepage();"
+				file_array[line] = line_text
+				line_text = "     init_directories();"
+				file_array[++line] = line_text
+				line_text = "     init_user_process_params( info_size );"
+				file_array[++line] = line_text
+			}
 			++complete
 		}
 		else if (file_array[line] ~ text2regexp("2.19.1")) {
@@ -2978,10 +3033,35 @@ function process_patch_file_0045(file_array, diff_array,
 				diff_array["exit end line"]=line
 			}
 		}
-		else if (diff_array["file"] == "/server/thread.h") {
+		else if (diff_array["file"] == "/server/thread.c") {
 			preprocess_diff_file(line, diff_array)
 
 			if ((diff_array["ihunk"] == 1) && (complete >= 3)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 28) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("^ thread->desktop_users = 0;$")) {
+						indent = "     "
+						line_text = (indent "thread->desc            = NULL;")
+						file_array[line] = line_text
+						line_text = (indent "thread->desc_len        = 0;")
+						file_array[++line] = line_text
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 2) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+		else if (diff_array["file"] == "/server/thread.h") {
+			preprocess_diff_file(line, diff_array)
+
+			if ((diff_array["ihunk"] == 1) && (complete >= 4)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index >= 16) {
@@ -2997,8 +3077,16 @@ function process_patch_file_0045(file_array, diff_array,
 				else if (diff_array["idiff"] == 2) {
 					if (esync_rebase_index >= 16) {
 						if (file_array[line] ~ text2regexp("^ struct token *token; /* security token associated with this thread */$")) {
-							line_text = (indent "struct list            kernel_object; /* list of kernel object pointers */")
-							insert_array_entry(file_array, ++line, line_text)
+							if (esync_rebase_index <= 28) {
+								line_text = (indent "struct list            kernel_object; /* list of kernel object pointers */")
+								insert_array_entry(file_array, ++line, line_text)
+							}
+							else {
+								line_text = (indent "data_size_t            desc_len;      /* thread description length in bytes */")
+								file_array[line] = line_text
+								line_text = (indent "WCHAR                 *desc;          /* thread description string */")
+								insert_array_entry(file_array, ++line, line_text)
+							}
 							++diff_array["idiff"]
 						}
 					}
@@ -3016,7 +3104,7 @@ function process_patch_file_0045(file_array, diff_array,
 		else if (diff_array["file"] == "/server/trace.c") {
 			preprocess_diff_file(line, diff_array)
 
-			if ((diff_array["ihunk"] == 1) && (complete >= 4)) {
+			if ((diff_array["ihunk"] == 1) && (complete >= 5)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index != 7) {
@@ -3037,7 +3125,7 @@ function process_patch_file_0045(file_array, diff_array,
 		}
 	}
 
-	if (complete == 5) diff_array["exit code"] = 0
+	if (complete == 6) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0045(file_array, diff_array,
@@ -3111,6 +3199,8 @@ function process_staging_patch_file_0045(file_array, diff_array,
 
 			if ((diff_array["ihunk"] == 1) && (complete >= 2)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
+				printf("(1) complete=%d\n", complete) >"/dev/stderr"
+
 				if (diff_array["idiff"] == 1) {
 					if (file_array[line] ~ text2regexp("^+ thread->esync_apc_fd = -1;$")) {
 						line_text="thread->exit_poll       = NULL;"
@@ -3129,6 +3219,7 @@ function process_staging_patch_file_0045(file_array, diff_array,
 		else if (diff_array["file"] == "/server/thread.h") {
 			preprocess_diff_file(line, diff_array)
 
+			printf("(3) complete=%d\n", complete) >"/dev/stderr"
 			if ((diff_array["ihunk"] == 1) && (complete >= 3)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
@@ -3436,10 +3527,20 @@ function regenerate_patch_file_0074(file_array, diff_array,
 			++complete
 		}
 		else if (file_array[line] ~ text2regexp("^ NtCreateKeyedEvent( &keyed_event, GENERIC_READ | GENERIC_WRITE, NULL, 0 );$")) {
-			line_text = "     init_directories();"
-			file_array[line] = line_text
-			line_text = "     init_user_process_params( info_size );"
-			file_array[++line] = line_text
+			if (esync_rebase_index <= 27) {
+				line_text = "     init_directories();"
+				file_array[line] = line_text
+				line_text = "     init_user_process_params( info_size );"
+				file_array[++line] = line_text
+			}
+			else {
+				line_text = "     init_unix_codepage();"
+				file_array[line] = line_text
+				line_text = "     init_directories();"
+				file_array[++line] = line_text
+				line_text = "     init_user_process_params( info_size );"
+				file_array[++line] = line_text
+			}
 			++complete
 		}
 		else if (file_array[line] ~ text2regexp("2.19.1")) {
