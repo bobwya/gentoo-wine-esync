@@ -1,6 +1,6 @@
 diff --git a/server/esync.c b/server/esync.c
 new file mode 100644
-index 00000000000..a5ac91228e6
+index 00000000000..b72952fae9b
 --- /dev/null
 +++ b/server/esync.c
 @@ -0,0 +1,550 @@
@@ -142,7 +142,7 @@ index 00000000000..a5ac91228e6
 +    directory_link_name,       /* link_name */
 +    default_unlink_name,       /* unlink_name */
 +    no_open_file,              /* open_file */
-+    no_alloc_handle,		   /* alloc_handle */
++    no_alloc_handle,           /* alloc_handle */
 +    no_close_handle,           /* close_handle */
 +    esync_destroy              /* destroy */
 +};
