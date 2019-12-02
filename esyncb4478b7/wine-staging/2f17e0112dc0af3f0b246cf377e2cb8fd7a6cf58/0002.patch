@@ -1,5 +1,5 @@
 --- a/0002-server-Create-server-objects-for-eventfd-based-synch.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0002-server-Create-server-objects-for-eventfd-based-synch.patch	2019-11-12 22:02:48.176820608 +0000
++++ b/0002-server-Create-server-objects-for-eventfd-based-synch.patch	2019-12-02 20:36:04.415159473 +0000
 @@ -3,7 +3,6 @@
  Date: Thu, 7 Jun 2018 20:09:59 -0500
  Subject: [PATCH 02/83] server: Create server objects for eventfd-based
@@ -38,7 +38,7 @@
  +    directory_link_name,       /* link_name */
  +    default_unlink_name,       /* unlink_name */
  +    no_open_file,              /* open_file */
-++    no_alloc_handle,		   /* alloc_handle */
+++    no_alloc_handle,           /* alloc_handle */
  +    no_close_handle,           /* close_handle */
  +    esync_destroy              /* destroy */
  +};
