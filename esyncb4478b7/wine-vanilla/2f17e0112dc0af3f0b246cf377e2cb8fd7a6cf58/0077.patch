@@ -1,5 +1,5 @@
 --- a/0077-ntdll-server-Specify-EFD_SEMAPHORE-on-the-server-sid.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0077-ntdll-server-Specify-EFD_SEMAPHORE-on-the-server-sid.patch	2019-12-02 20:35:45.947474449 +0000
++++ b/0077-ntdll-server-Specify-EFD_SEMAPHORE-on-the-server-sid.patch	2019-12-19 12:30:10.359995816 +0000
 @@ -3,10 +3,8 @@
  Date: Sun, 29 Jul 2018 16:53:58 -0500
  Subject: [PATCH 77/83] ntdll, server: Specify EFD_SEMAPHORE on the server
