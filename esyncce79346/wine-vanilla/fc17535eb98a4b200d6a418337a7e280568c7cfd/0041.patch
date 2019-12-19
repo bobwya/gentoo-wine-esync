@@ -1,0 +1,86 @@
+--- a/0041-server-Allocate-shared-memory-segments-for-semaphore.patch	2018-11-01 17:19:43.000000000 +0000
++++ b/0041-server-Allocate-shared-memory-segments-for-semaphore.patch	2019-12-19 12:30:45.696565059 +0000
+@@ -3,19 +3,15 @@
+ Date: Sun, 10 Jun 2018 23:12:16 -0500
+ Subject: [PATCH 41/83] server: Allocate shared memory segments for semaphores
+  and mutexes.
+-
+ As has been described in the README, these two objects have state that can't
+ be expressed (or read from) the eventfd descriptor. Namely, for semaphores
+ we need to know the current lock count, and for mutexes we need to know the
+  owner tid and the recursion count. To make these work across processes, we
+ store them in a global shared memory section.
+-
+ This patch has no effect by itself; it's for separation.
+-
+ We use the WINEPREFIX dir to discriminate shm sections for simultaneously
+ running servers; this is based off of code in libwine (specifically
+ init_server_dir()).
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  include/wine/server_protocol.h |  6 +++-
+@@ -26,7 +22,6 @@
+  server/request.h               |  6 ++--
+  server/trace.c                 |  2 ++
+  7 files changed, 83 insertions(+), 3 deletions(-)
+-
+ diff --git a/include/wine/server_protocol.h b/include/wine/server_protocol.h
+ index 31619b9a48..1ead5f7ad1 100644
+ --- a/include/wine/server_protocol.h
+@@ -49,19 +44,11 @@
+  };
+  
+  
+-@@ -6615,6 +6619,6 @@ union generic_reply
+-     struct get_esync_fd_reply get_esync_fd_reply;
+- };
+- 
+--#define SERVER_PROTOCOL_VERSION 571
+-+#define SERVER_PROTOCOL_VERSION 572
+- 
+- #endif /* __WINE_WINE_SERVER_PROTOCOL_H */
+ diff --git a/server/esync.c b/server/esync.c
+ index 399011ff0b..f1a46afc23 100644
+ --- a/server/esync.c
+ +++ b/server/esync.c
+-@@ -21,16 +21,25 @@
++@@ -21,15 +21,24 @@
+  #include "config.h"
+  #include "wine/port.h"
+  
+@@ -81,7 +68,6 @@
+  
+  #include "ntstatus.h"
+  #define WIN32_NO_STATUS
+- #include "windef.h"
+  #include "winternl.h"
+ +#include "wine/library.h"
+  
+@@ -106,8 +92,8 @@
+ +{
+ +    struct stat st;
+ +
+-+    if (stat( wine_get_config_dir(), &st ) == -1)
+-+        fatal_error( "cannot stat %s\n", wine_get_config_dir() );
+++    if (fstat( config_dir_fd, &st ) == -1)
+++        fatal_error( "cannot stat config dir\n" );
+ +
+ +    if (st.st_ino != (unsigned long)st.st_ino)
+ +        sprintf( shm_name, "/wine-%lx%08lx-esync", (unsigned long)((unsigned long long)st.st_ino >> 32), (unsigned long)st.st_ino );
+@@ -197,9 +183,9 @@
+  #include "thread.h"
+  #include "request.h"
+ +#include "esync.h"
+- #include "wine/library.h"
+  
+  /* command-line options */
++ int debug_level = 0;
+ @@ -141,6 +142,9 @@ int main( int argc, char *argv[] )
+      sock_init();
+      open_master_socket();
+@@ -276,4 +262,3 @@
+  static void dump_get_esync_fd_request( const struct get_esync_fd_request *req )
+ -- 
+ 2.19.1
+-
