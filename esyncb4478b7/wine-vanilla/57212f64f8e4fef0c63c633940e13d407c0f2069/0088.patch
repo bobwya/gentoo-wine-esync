@@ -1,5 +1,5 @@
 --- null	1970-01-01 01:00:00.000000000 +0100
-+++ b/0088-ntdll-Get-rid-of-the-per-event-spinlock-for-auto-res.patch	2019-12-19 12:30:07.439948692 +0000
++++ b/0088-ntdll-Get-rid-of-the-per-event-spinlock-for-auto-res.patch	2019-12-19 22:34:57.299696239 +0000
 @@ -0,0 +1,207 @@
 +From c41dc5b8c422be3914cd31c239ec586a091b8a3b Mon Sep 17 00:00:00 2001
 +From: Zebediah Figura <zfigura@codeweavers.com>

@@ -1,5 +1,5 @@
 --- a/0025-server-Create-eventfd-descriptors-for-device-manager.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0025-server-Create-eventfd-descriptors-for-device-manager.patch	2019-12-19 12:30:09.543982648 +0000
++++ b/0025-server-Create-eventfd-descriptors-for-device-manager.patch	2019-12-19 22:34:59.423725686 +0000
 @@ -3,19 +3,15 @@
  Date: Sat, 9 Jun 2018 15:39:37 -0500
  Subject: [PATCH 25/83] server: Create eventfd descriptors for device manager
