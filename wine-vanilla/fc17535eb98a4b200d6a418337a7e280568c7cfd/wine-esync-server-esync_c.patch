@@ -1,9 +1,9 @@
 diff --git a/server/esync.c b/server/esync.c
 new file mode 100644
-index 00000000000..22e88cc59fb
+index 00000000000..71f4d1a13c9
 --- /dev/null
 +++ b/server/esync.c
-@@ -0,0 +1,549 @@
+@@ -0,0 +1,550 @@
 +/*
 + * eventfd-based synchronization objects
 + *
@@ -43,6 +43,7 @@ index 00000000000..22e88cc59fb
 +
 +#include "ntstatus.h"
 +#define WIN32_NO_STATUS
++#include "windef.h"
 +#include "winternl.h"
 +#include "wine/library.h"
 +
