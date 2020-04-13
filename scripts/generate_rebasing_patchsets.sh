@@ -33,6 +33,12 @@ declare -a ARRAY_ESYNC_PATCH_COMMITS=(
 		"4538a137e089240f1981f0d6f82fb8d63a65f4f6" # (28) [wine:4.21]
 		"b934f6626ed7cb8a6cc18b261550d363a0068141" # (29)  wine:4.21
 		"fc17535eb98a4b200d6a418337a7e280568c7cfd" # (30)  wine:5.0_rc1
+		"f181d5ce82470639459555cd59a076963861a61d" # (31) [wine:5.5]
+		"d637640f9af4ccfb6639361fc548d4bbeaafeb6f" # (32)  wine:5.5
+		"b664ae8e60e08224cdc3025c28a37cb22356aaa4" # (33) [wine:5.6]
+		"9bfbb4866231f9c2e6e22e23037c54c5702dd634" # (34) [wine:5.6]
+		"6d2d3595c0ea08d915df5fef506fe3679ffa8051" # (35) [wine:5.6]
+		"321d26cbb4404ee63df439759cbc5a546434dde6" # (36)  wine:5.6
 )
 declare ESYNC_ESYNCB4478B7_INDEX=0
 declare ESYNC_ESYNCCE79346_INDEX=8

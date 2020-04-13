@@ -17,12 +17,37 @@ function process_patch_file_0001(file_array, diff_array,
 					if (esync_rebase_index <= 18) {
 						++diff_array["idiff"]
 					}
-					else if (file_array[line] ~ "sys/inotify.h \\\\$") {
-						sub(text2regexp("sys/inotify.h"), "sys/ioctl.h", file_array[line])
-						++diff_array["idiff"]
+					else if ((esync_rebase_index >= 19) && (esync_rebase_index <= 32)) {
+						if (file_array[line] ~ text2regexp("sys/inotify.h \\$")) {
+							sub(text2regexp("sys/inotify.h"), "sys/ioctl.h", file_array[line])
+							++diff_array["idiff"]
+						}
+					}
+					else {
+						if (file_array[line] ~ text2regexp("^ sys/elf32.h \\$")) {
+							line_text = (indent "sys/cdio.h \\")
+							file_array[line] = line_text
+							++diff_array["idiff"]
+						}
 					}
 				}
 				if (diff_array["idiff"] == 2) {
+					if (esync_rebase_index <= 32) {
+						++diff_array["idiff"]
+					}
+					else {
+						if (file_array[line] ~ text2regexp("^ sys/exec_elf.h \\$")) {
+							line_text = (indent "sys/filio.h \\")
+							file_array[line] = line_text
+							line_text = (indent "sys/ioctl.h \\")
+							file_array[++line] = line_text
+							line_text = (indent "sys/ipc.h \\")
+							file_array[++line] = line_text
+							++diff_array["idiff"]
+						}
+					}
+				}
+				if (diff_array["idiff"] == 3) {
 					++diff_array["idiff"]
 					++complete
 				}
@@ -74,11 +99,11 @@ function process_patch_file_0001(file_array, diff_array,
 				}
 				else if (diff_array["idiff"] == 3) {
 					if (file_array[line] ~ text2regexp("if test \"x$with_ldap\" != \"xno\"")) {
-						line_text=(indent "    ;;")
+						line_text = (indent "    ;;")
 						file_array[line] = line_text
-						line_text=(indent "esac")
+						line_text = (indent "esac")
 						file_array[++line] = line_text
-						line_text=(indent "")
+						line_text = (indent "")
  						file_array[++line] = line_text
  						++diff_array["idiff"]
 					}
@@ -98,12 +123,37 @@ function process_patch_file_0001(file_array, diff_array,
 					if (esync_rebase_index <= 18) {
 						++diff_array["idiff"]
 					}
-					else if (file_array[line] ~ "sys/inotify.h \\\\$") {
-						sub(text2regexp("sys/inotify.h"), "sys/ioctl.h", file_array[line])
-						++diff_array["idiff"]
+					else if ((esync_rebase_index >= 19) && (esync_rebase_index <= 32)) {
+						if (file_array[line] ~ text2regexp("sys/inotify.h \\$")) {
+							sub(text2regexp("sys/inotify.h"), "sys/ioctl.h", file_array[line])
+							++diff_array["idiff"]
+						}
+					}
+					else {
+						if (file_array[line] ~ text2regexp("^ sys/elf32.h \\$")) {
+							line_text = (indent "sys/cdio.h \\")
+							file_array[line] = line_text
+							++diff_array["idiff"]
+						}
 					}
 				}
 				if (diff_array["idiff"] == 2) {
+					if (esync_rebase_index <= 32) {
+						++diff_array["idiff"]
+					}
+					else {
+						if (file_array[line] ~ text2regexp("^ sys/exec_elf.h \\$")) {
+							line_text = (indent "sys/filio.h \\")
+							file_array[line] = line_text
+							line_text = (indent "sys/ioctl.h \\")
+							file_array[++line] = line_text
+							line_text = (indent "sys/ipc.h \\")
+							file_array[++line] = line_text
+							++diff_array["idiff"]
+						}
+					}
+				}
+				if (diff_array["idiff"] == 3) {
 					++diff_array["idiff"]
 					++complete
 				}
@@ -157,11 +207,11 @@ function process_patch_file_0001(file_array, diff_array,
 				}
 				else if (diff_array["idiff"] == 4) {
 					if (file_array[line] ~ text2regexp("dnl **** Check for OpenLDAP ***")) {
-						line_text=(indent "    ;;")
+						line_text = (indent "    ;;")
 						file_array[line] = line_text
-						line_text=(indent "esac")
+						line_text = (indent "esac")
 						file_array[++line] = line_text
-						line_text=(indent "")
+						line_text = (indent "")
  						file_array[++line] = line_text
  						++diff_array["idiff"]
 					}
@@ -172,9 +222,33 @@ function process_patch_file_0001(file_array, diff_array,
 				}
 			}
 		}
+		else if ((diff_array["file"] == "/include/config.h.in") && (complete >= 6)) {
+			preprocess_diff_file(line, diff_array)
+
+			if (diff_array["ihunk"] == 1) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 31) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("/* Define if we can use ppdev.h for parallel port access */")) {
+                        line_text = (indent "/* Define to 1 if you have the <port.h> header file. */")
+                        file_array[line] = line_text
+                        line_text = (indent "#undef HAVE_PORT_H")
+                        file_array[++line] = line_text
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 2) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+        }
 	}
 
-	if (complete == 6) diff_array["exit code"] = 0
+	if (complete == 7) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0001(file_array, diff_array,
@@ -298,9 +372,9 @@ function process_patch_file_0002(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ REQ_terminate_job,$")) {
-						line_text=(indent "REQ_suspend_process,")
+						line_text = (indent "REQ_suspend_process,")
 						insert_array_entry(file_array, ++line, line_text)
-						line_text=(indent "REQ_resume_process,")
+						line_text = (indent "REQ_resume_process,")
 						insert_array_entry(file_array, ++line, line_text)
 						++diff_array["idiff"]
 					}
@@ -328,9 +402,9 @@ function process_patch_file_0002(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ struct terminate_job_request terminate_job_request;$")) {
-						line_text=(indent "struct suspend_process_request suspend_process_request;")
+						line_text = (indent "struct suspend_process_request suspend_process_request;")
 						insert_array_entry(file_array, ++line, line_text)
-						line_text=(indent "struct resume_process_request resume_process_request;")
+						line_text = (indent "struct resume_process_request resume_process_request;")
 						insert_array_entry(file_array, ++line, line_text)
 						++diff_array["idiff"]
 					}
@@ -358,16 +432,20 @@ function process_patch_file_0002(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ struct terminate_job_reply terminate_job_reply;$")) {
-						line_text=(indent "struct suspend_process_reply suspend_process_reply;")
+						line_text = (indent "struct suspend_process_reply suspend_process_reply;")
 						insert_array_entry(file_array, ++line, line_text)
-						line_text=(indent "struct resume_process_reply resume_process_reply;")
+						line_text = (indent "struct resume_process_reply resume_process_reply;")
 						insert_array_entry(file_array, ++line, line_text)
 						++diff_array["idiff"]
 					}
 				}
 				else if (diff_array["idiff"] == 3) {
 					if (file_array[line] ~ "^ #define SERVER_PROTOCOL_VERSION [[:digit:]][[:digit:]][[:digit:]]$") {
-						file_array[line] = indent
+                        if (esync_rebase_index <= 30)
+                            line_text = indent
+                        else
+                            line_text = (indent "/* ### protocol_version begin ### */")
+						file_array[line] = line_text
 						++diff_array["idiff"]
 					}
 				}
@@ -385,35 +463,22 @@ function process_patch_file_0002(file_array, diff_array,
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index <= 11) {
-						diff_array["idiff"]+=3
+						diff_array["idiff"]+=2
 					}
 					else if (is_new_hunk(file_array[line])) {
-						if (esync_rebase_index <= 29)
-						    split("0 0 0 1", array_diff_lines)
-						else
-						    split("0 0 0 0", array_diff_lines)
+						split("0 0 0 1", array_diff_lines)
 						change_array_entry_diff(file_array, line, array_diff_lines)
 						++diff_array["idiff"]
 					}
 				}
 				else if (diff_array["idiff"] == 2) {
-					if (esync_rebase_index <= 29) {
-						++diff_array["idiff"]
-					}
-					else if (file_array[line] ~ text2regexp("^+#include \"windef.h\"$")) {
-						delete file_array[line]
-						++line
-						++diff_array["idiff"]
-					}
-				}
-				else if (diff_array["idiff"] == 3) {
 					if (file_array[line] ~ text2regexp("^+ no_open_file, /* open_file */$")) {
-						line_text="+    no_kernel_obj_list,        /* get_kernel_obj_list */"
+						line_text = "+    no_kernel_obj_list,        /* get_kernel_obj_list */"
 						insert_array_entry(file_array, ++line, line_text)
 						++diff_array["idiff"]
 					}
 				}
-				if (diff_array["idiff"] == 4) {
+				if (diff_array["idiff"] == 3) {
 					++diff_array["idiff"]
 					++complete
 				}
@@ -474,9 +539,9 @@ function process_patch_file_0002(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ DECL_HANDLER(terminate_job);$")) {
-						line_text=(indent "DECL_HANDLER(suspend_process);")
+						line_text = (indent "DECL_HANDLER(suspend_process);")
 						insert_array_entry(file_array, ++line, line_text)
-						line_text=(indent "DECL_HANDLER(resume_process);")
+						line_text = (indent "DECL_HANDLER(resume_process);")
 						insert_array_entry(file_array, ++line, line_text)
 						++diff_array["idiff"]
 					}
@@ -504,14 +569,24 @@ function process_patch_file_0002(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ (req_handler)req_terminate_job,$")) {
-						line_text=(indent "(req_handler)req_suspend_process,")
+						line_text = (indent "(req_handler)req_suspend_process,")
 						insert_array_entry(file_array, ++line, line_text)
-						line_text=(indent "(req_handler)req_resume_process,")
+						line_text = (indent "(req_handler)req_resume_process,")
 						insert_array_entry(file_array, ++line, line_text)
 						++diff_array["idiff"]
 					}
 				}
-				if (diff_array["idiff"] == 3) {
+				else if (diff_array["idiff"] == 3) {
+					if (esync_rebase_index <= 35) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("^ C_ASSERT( sizeof(affinity_t) == 8 );$")) {
+						line_text = (indent "C_ASSERT( sizeof(abstime_t) == 8 );")
+						file_array[line] = line_text
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 4) {
 					++diff_array["idiff"]
 					++complete
 				}
@@ -592,9 +667,9 @@ function process_patch_file_0002(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ (dump_func)dump_terminate_job_request,$")) {
-						line_text=(indent "(dump_func)dump_suspend_process_request,")
+						line_text = (indent "(dump_func)dump_suspend_process_request,")
 						insert_array_entry(file_array, ++line, line_text)
-						line_text=(indent "(dump_func)dump_resume_process_request,")
+						line_text = (indent "(dump_func)dump_resume_process_request,")
 						insert_array_entry(file_array, ++line, line_text)
 						++diff_array["idiff"]
 					}
@@ -622,9 +697,9 @@ function process_patch_file_0002(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ \"terminate_job\",$")) {
-						line_text=(indent "\"suspend_process\",")
+						line_text = (indent "\"suspend_process\",")
 						insert_array_entry(file_array, ++line, line_text)
-						line_text=(indent "\"resume_process\",")
+						line_text = (indent "\"resume_process\",")
 						insert_array_entry(file_array, ++line, line_text)
 						++diff_array["idiff"]
 					}
@@ -880,10 +955,10 @@ function process_patch_file_0009(file_array, diff_array,
 							delete file_array[line]
 							delete file_array[++line]
 							++line
-							line_text=(indent "{")
+							line_text = (indent "{")
 							insert_array_entry(file_array, ++line, line_text)
 							indent=(indent "    ")
-							line_text=(indent "req->handle = wine_server_obj_handle( handle );")
+							line_text = (indent "req->handle = wine_server_obj_handle( handle );")
 							insert_array_entry(file_array, ++line, line_text)
 							++diff_array["idiff"]
 							++complete
@@ -927,7 +1002,7 @@ function process_patch_file_0010(file_array, diff_array,
 						split("+55 0 +55 0", array_diff_lines)
 						change_array_entry_diff(file_array, line, array_diff_lines)
 						if ((esync_rebase_index >= 10) || ((esync_rebase_index == 9) && staging)) {
-							line_text=" NTSTATUS WINAPI NtResetEvent( HANDLE handle, LONG *prev_state )"
+							line_text = " NTSTATUS WINAPI NtResetEvent( HANDLE handle, LONG *prev_state )"
 							insert_array_entry(file_array, ++line, line_text)
 						}
 						++diff_array["idiff"]
@@ -956,14 +1031,14 @@ function process_patch_file_0010(file_array, diff_array,
 				else if (diff_array["idiff"] == 4) {
 					if (file_array[line] ~ text2regexp("if (NumberOfThreadsReleased) *NumberOfThreadsReleased = 0;$")) {
 						if ((esync_rebase_index == 9) && !staging) {
-							line_text="if (prev_state) *prev_state = 0;"
+							line_text = "if (prev_state) *prev_state = 0;"
 							file_array[line] = (indent line_text)
 							file_array[++line] = " "
 						}
 						else {
-							line_text="{"
+							line_text = "{"
 							file_array[line] = (indent line_text)
-							line_text= "req->handle = wine_server_obj_handle( handle );"
+							line_text =  "req->handle = wine_server_obj_handle( handle );"
 							indent=(indent "    ")
 							file_array[++line] = (indent line_text)
 						}
@@ -1002,12 +1077,12 @@ function process_patch_file_0011(file_array, diff_array,
 				}
 				else if (diff_array["idiff"] == 2) {
 					if (file_array[line] ~ text2regexp("^ if (PulseCount)")) {
-						line_text=(indent "SERVER_START_REQ( event_op )")
+						line_text = (indent "SERVER_START_REQ( event_op )")
 						file_array[line] = line_text
-						line_text=(indent "{")
+						line_text = (indent "{")
 						file_array[++line] = line_text
 						indent=(indent "    ")
-						line_text=(indent "req->handle = wine_server_obj_handle( handle );")
+						line_text = (indent "req->handle = wine_server_obj_handle( handle );")
 						file_array[++line] = line_text
 						++diff_array["idiff"]
 						++complete
@@ -1070,9 +1145,9 @@ function process_patch_file_0014(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ REQ_set_job_completion_port,$")) {
-						line_text=(indent "REQ_suspend_process,")
+						line_text = (indent "REQ_suspend_process,")
 						file_array[line] = line_text
-						line_text=(indent "REQ_resume_process,")
+						line_text = (indent "REQ_resume_process,")
 						file_array[++line] = line_text
 						++diff_array["idiff"]
 					}
@@ -1090,9 +1165,9 @@ function process_patch_file_0014(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ struct set_job_completion_port_request set_job_completion_port_request;$")) {
-						line_text=(indent "struct suspend_process_request suspend_process_request;")
+						line_text = (indent "struct suspend_process_request suspend_process_request;")
 						file_array[line] = line_text
-						line_text=(indent "struct resume_process_request resume_process_request;")
+						line_text = (indent "struct resume_process_request resume_process_request;")
 						file_array[++line] = line_text
 						++diff_array["idiff"]
 					}
@@ -1116,9 +1191,9 @@ function process_patch_file_0014(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ struct set_job_completion_port_reply set_job_completion_port_reply;$")) {
-						line_text=(indent "struct suspend_process_reply suspend_process_reply;")
+						line_text = (indent "struct suspend_process_reply suspend_process_reply;")
 						file_array[line] = line_text
-						line_text=(indent "struct resume_process_reply resume_process_reply;")
+						line_text = (indent "struct resume_process_reply resume_process_reply;")
 						file_array[++line] = line_text
 						++diff_array["idiff"]
 					}
@@ -1128,7 +1203,12 @@ function process_patch_file_0014(file_array, diff_array,
 						# patch: 0014-server-Add-a-request-to-get-the-eventfd-file-descrip.patch
 						# for esync release tarball: esyncb4478b7.tgz
 						# has invalid line counts... Fix this!
-						file_array[line] = " "
+						indent=" "
+						if (esync_rebase_index <= 30)
+							line_text = indent
+						else
+							line_text = (indent "/* ### protocol_version begin ### */")
+						file_array[line] = line_text
 						++line
 						line_count=(esync_rebase_index <= 7) ? 1 : 0
 						while(!is_new_diff_file(file_array[line])) {
@@ -1194,9 +1274,9 @@ function process_patch_file_0014(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ DECL_HANDLER(set_job_completion_port);$")) {
-						line_text=(indent "DECL_HANDLER(suspend_process);")
+						line_text = (indent "DECL_HANDLER(suspend_process);")
 						file_array[line] = line_text
-						line_text=(indent "DECL_HANDLER(resume_process);")
+						line_text = (indent "DECL_HANDLER(resume_process);")
 						file_array[++line] = line_text
 						++diff_array["idiff"]
 					}
@@ -1214,14 +1294,24 @@ function process_patch_file_0014(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ (req_handler)req_set_job_completion_port,$")) {
-						line_text=(indent "(req_handler)req_suspend_process,")
+						line_text = (indent "(req_handler)req_suspend_process,")
 						file_array[line] = line_text
-						line_text=(indent "(req_handler)req_resume_process,")
+						line_text = (indent "(req_handler)req_resume_process,")
 						file_array[++line] = line_text
 						++diff_array["idiff"]
 					}
 				}
-				if (diff_array["idiff"] == 2) {
+				else if (diff_array["idiff"] == 2) {
+					if (esync_rebase_index <= 35) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("^ C_ASSERT( sizeof(affinity_t) == 8 );$")) {
+						line_text = (indent "C_ASSERT( sizeof(abstime_t) == 8 );")
+						file_array[line] = line_text
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 3) {
 					++diff_array["idiff"]
 					++complete
 				}
@@ -1256,9 +1346,9 @@ function process_patch_file_0014(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ (dump_func)dump_set_job_completion_port_request,$")) {
-						line_text=(indent "(dump_func)dump_suspend_process_request,")
+						line_text = (indent "(dump_func)dump_suspend_process_request,")
 						file_array[line] = line_text
-						line_text=(indent "(dump_func)dump_resume_process_request,")
+						line_text = (indent "(dump_func)dump_resume_process_request,")
 						file_array[++line] = line_text
 						++diff_array["idiff"]
 					}
@@ -1276,9 +1366,9 @@ function process_patch_file_0014(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ \"set_job_completion_port\",$")) {
-						line_text=(indent "\"suspend_process\",")
+						line_text = (indent "\"suspend_process\",")
 						file_array[line] = line_text
-						line_text=(indent "\"resume_process\",")
+						line_text = (indent "\"resume_process\",")
 						file_array[++line] = line_text
 						++diff_array["idiff"]
 					}
@@ -1350,25 +1440,10 @@ function process_patch_file_0015(file_array, diff_array,
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
-		if (diff_array["file"] == "/server/esync.c") {
+		if (diff_array["file"] == "/server/process.c") {
 			preprocess_diff_file(line, diff_array)
 
-			if (diff_array["ihunk"] == 1)  {
-				preprocess_diff_file_hunk(line, file_array, diff_array)
-				if (diff_array["idiff"] == 1) {
-					++diff_array["idiff"]
-				}
-				if (diff_array["idiff"] == 2) {
-					++diff_array["idiff"]
-					++complete
-				}
-				diff_array["exit end line"]=line
-			}
-		}
-		else if (diff_array["file"] == "/server/process.c") {
-			preprocess_diff_file(line, diff_array)
-
-			if ((diff_array["ihunk"] == 2) && (complete >= 1)) {
+			if (diff_array["ihunk"] == 2) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index <= 17) {
@@ -1390,7 +1465,7 @@ function process_patch_file_0015(file_array, diff_array,
 				}
 				diff_array["exit end line"]=line
 			}
-			else if ((diff_array["ihunk"] == 4) && (complete >= 2)) {
+			else if ((diff_array["ihunk"] == 4) && (complete >= 1)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index <= 17) {
@@ -1412,7 +1487,7 @@ function process_patch_file_0015(file_array, diff_array,
 				}
 				diff_array["exit end line"]=line
 			}
-			else if ((diff_array["ihunk"] == 5) && (complete >= 3)) {
+			else if ((diff_array["ihunk"] == 5) && (complete >= 2)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index >= 6) {
@@ -1436,7 +1511,7 @@ function process_patch_file_0015(file_array, diff_array,
 		else if (diff_array["file"] == "/server/process.h") {
 			preprocess_diff_file(line, diff_array)
 
-			if ((diff_array["ihunk"] == 1) && (complete >= 4)) {
+			if ((diff_array["ihunk"] == 1) && (complete >= 3)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index <= 17) {
@@ -1461,7 +1536,7 @@ function process_patch_file_0015(file_array, diff_array,
 		}
 	}
 
-	if (complete == 5) diff_array["exit code"] = 0
+	if (complete == 4) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0015(file_array, diff_array,
@@ -1979,8 +2054,8 @@ function process_patch_file_0023(file_array, diff_array,
 				}
 				else if (diff_array["idiff"] == 2) {
 					if (file_array[line] ~ text2regexp("^+@ cdecl __wine_esync_set_queue_fd(long)$")) {
-						if (staging)	line_text=" @ cdecl __wine_user_shared_data()"
-						else			line_text=" @ cdecl __wine_init_windows_dir(wstr wstr)"
+						if (staging)	line_text = " @ cdecl __wine_user_shared_data()"
+						else			line_text = " @ cdecl __wine_init_windows_dir(wstr wstr)"
 						insert_array_entry(file_array, ++line, line_text)
 						++diff_array["idiff"]
 						++complete
@@ -2001,7 +2076,7 @@ function process_patch_file_0023(file_array, diff_array,
 					}
 					else if (is_new_hunk(file_array[line])) {
 						indent="     "
-						line_text=(indent "thread_data->reply_fd   = -1;")
+						line_text = (indent "thread_data->reply_fd   = -1;")
 						insert_array_entry(file_array, ++line, line_text)
 						++diff_array["idiff"]
 					}
@@ -2085,7 +2160,7 @@ function process_staging_patch_file_0023(file_array, diff_array,
 		else if (diff_array["file"] == "/dlls/ntdll/thread.c") {
 			preprocess_diff_file(line, diff_array)
 
-			if ((diff_array["ihunk"] == 2) && (complete >= 1)) {
+			if ((diff_array["ihunk"] == 2) && (complete >= 2)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index <= 4) {
@@ -2224,7 +2299,7 @@ function process_patch_file_0024(file_array, diff_array,
 				else if (diff_array["idiff"] == 2) {
 					if (staging || (esync_rebase_index >= 9)) {
 						if (file_array[line] ~ text2regexp("static void dump_thread( struct object *obj, int verbose );$")) {
-							line_text=(indent "static struct object_type *thread_get_type( struct object *obj );")
+							line_text = (indent "static struct object_type *thread_get_type( struct object *obj );")
 							insert_array_entry(file_array, ++line, line_text)
 							++diff_array["idiff"]
 						}
@@ -2374,10 +2449,10 @@ function process_patch_file_0025(file_array, diff_array,
 				else if (diff_array["idiff"] == 4) {
 					if (sub(text2regexp("struct list requests;"), "& ", file_array[line])) {
 						if (esync_rebase_index >= 21) {
-							line_text=(indent "struct irp_call       *current_call;   /* call currently executed on client side */")
+							line_text = (indent "struct irp_call       *current_call;   /* call currently executed on client side */")
 							insert_array_entry(file_array, ++line, line_text)
 						}
-						line_text=(indent "struct wine_rb_tree    kernel_objects; /* map of objects that have client side pointer associated */")
+						line_text = (indent "struct wine_rb_tree    kernel_objects; /* map of objects that have client side pointer associated */")
 						insert_array_entry(file_array, ++line, line_text)
 						if (sub(text2regexp("int esync_fd;"), "& ", file_array[++line])) ++diff_array["idiff"]
 					}
@@ -2395,7 +2470,7 @@ function process_patch_file_0025(file_array, diff_array,
 						++complete
 					}
 					else if (sub("^ }$", " ", file_array[line])) {
-						line_text=(indent "    while ((ptr = list_head( &manager->requests )))")
+						line_text = (indent "    while ((ptr = list_head( &manager->requests )))")
 						file_array[++line] = line_text
 						++diff_array["idiff"]
 						++complete
@@ -2562,9 +2637,9 @@ function process_patch_file_0033(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ REQ_set_job_completion_port,$")) {
-						line_text=(indent "REQ_suspend_process,")
+						line_text = (indent "REQ_suspend_process,")
 						file_array[line] = line_text
-						line_text=(indent "REQ_resume_process,")
+						line_text = (indent "REQ_resume_process,")
 						file_array[++line] = line_text
 						++diff_array["idiff"]
 					}
@@ -2582,9 +2657,9 @@ function process_patch_file_0033(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ struct set_job_completion_port_request set_job_completion_port_request;$")) {
-						line_text=(indent "struct suspend_process_request suspend_process_request;")
+						line_text = (indent "struct suspend_process_request suspend_process_request;")
 						file_array[line] = line_text
-						line_text=(indent "struct resume_process_request resume_process_request;")
+						line_text = (indent "struct resume_process_request resume_process_request;")
 						file_array[++line] = line_text
 						++diff_array["idiff"]
 					}
@@ -2612,9 +2687,9 @@ function process_patch_file_0033(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ struct set_job_completion_port_reply set_job_completion_port_reply;$")) {
-						line_text=(indent "struct suspend_process_reply suspend_process_reply;")
+						line_text = (indent "struct suspend_process_reply suspend_process_reply;")
 						file_array[line] = line_text
-						line_text=(indent "struct resume_process_reply resume_process_reply;")
+						line_text = (indent "struct resume_process_reply resume_process_reply;")
 						file_array[++line] = line_text
 						++diff_array["idiff"]
 					}
@@ -2646,9 +2721,9 @@ function process_patch_file_0033(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ DECL_HANDLER(set_job_completion_port);$")) {
-						line_text=(indent "DECL_HANDLER(suspend_process);")
+						line_text = (indent "DECL_HANDLER(suspend_process);")
 						file_array[line] = line_text
-						line_text=(indent "DECL_HANDLER(resume_process);")
+						line_text = (indent "DECL_HANDLER(resume_process);")
 						file_array[++line] = line_text
 						++diff_array["idiff"]
 					}
@@ -2666,9 +2741,9 @@ function process_patch_file_0033(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ (req_handler)req_set_job_completion_port,$")) {
-						line_text=(indent "(req_handler)req_suspend_process,")
+						line_text = (indent "(req_handler)req_suspend_process,")
 						file_array[line] = line_text
-						line_text=(indent "(req_handler)req_resume_process,")
+						line_text = (indent "(req_handler)req_resume_process,")
 						file_array[++line] = line_text
 						++diff_array["idiff"]
 					}
@@ -2690,9 +2765,9 @@ function process_patch_file_0033(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ (dump_func)dump_set_job_completion_port_request,$")) {
-						line_text=(indent "(dump_func)dump_suspend_process_request,")
+						line_text = (indent "(dump_func)dump_suspend_process_request,")
 						file_array[line] = line_text
-						line_text=(indent "(dump_func)dump_resume_process_request,")
+						line_text = (indent "(dump_func)dump_resume_process_request,")
 						file_array[++line] = line_text
 						++diff_array["idiff"]
 					}
@@ -2710,9 +2785,9 @@ function process_patch_file_0033(file_array, diff_array,
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ \"set_job_completion_port\",$")) {
-						line_text=(indent "\"suspend_process\",")
+						line_text = (indent "\"suspend_process\",")
 						file_array[line] = line_text
-						line_text=(indent "\"resume_process\",")
+						line_text = (indent "\"resume_process\",")
 						file_array[++line] = line_text
 						++diff_array["idiff"]
 					}
@@ -2727,6 +2802,43 @@ function process_patch_file_0033(file_array, diff_array,
 	}
 
 	if (complete == 7) diff_array["exit code"] = 0
+}
+
+function process_patch_file_0040(file_array, diff_array,
+	complete, indent, line, line_text)
+{
+	diff_array["exit start line"]=0
+	for (line = 1 ; line <= file_array[0] ; ++line) {
+		indent = get_indent(file_array[line])
+		preprocess_patch_file_line(file_array[line], diff_array)
+
+		if (diff_array["file"] == "/server/timer.c") {
+			preprocess_diff_file(line, diff_array)
+
+			if (diff_array["ihunk"] == 5) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 34) {
+						++diff_array["idiff"]
+					}
+					else {
+						if (file_array[line] ~ text2regexp("timer->when = (expire <= 0) ? current_time - expire : max( expire, current_time );")) {
+							line_text=(indent "timer->when     = (expire <= 0) ? expire - monotonic_time : max( expire, current_time );")
+							file_array[line] = line_text
+							++diff_array["idiff"]
+						}
+					}
+				}
+				if (diff_array["idiff"] == 2) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+	}
+
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0041(file_array, diff_array,
@@ -2773,31 +2885,7 @@ function process_patch_file_0041(file_array, diff_array,
 		else if (diff_array["file"] == "/server/esync.c") {
 			preprocess_diff_file(line, diff_array)
 
-			if ((diff_array["ihunk"] == 1) && (complete >= 2)) {
-				preprocess_diff_file_hunk(line, file_array, diff_array)
-				if (diff_array["idiff"] == 1) {
-					if (esync_rebase_index <= 29) {
-						diff_array["idiff"] += 2
-					}
-					else if (is_new_hunk(file_array[line])) {
-						split("0 -1 0 -1", array_diff_lines)
-						change_array_entry_diff(file_array, line, array_diff_lines)
-						++diff_array["idiff"]
-					}
-				}
-				else if (diff_array["idiff"] == 2) {
-					if (file_array[line] ~ text2regexp("^ #include \"windef.h\"$")) {
-						delete file_array[line]
-						++diff_array["idiff"]
-					}
-				}
-				if (diff_array["idiff"] == 3) {
-					++diff_array["idiff"]
-					++complete
-				}
-				diff_array["exit end line"]=line
-			}
-			else if ((diff_array["ihunk"] == 2) && (complete >= 3)) {
+			if ((diff_array["ihunk"] == 2) && (complete >= 2)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index <= 29) {
@@ -2821,7 +2909,7 @@ function process_patch_file_0041(file_array, diff_array,
 		else if (diff_array["file"] == "/server/main.c") {
 			preprocess_diff_file(line, diff_array)
 
-			if ((diff_array["ihunk"] == 1) && (complete >= 4)) {
+			if ((diff_array["ihunk"] == 1) && (complete >= 3)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index <= 29) {
@@ -2836,11 +2924,30 @@ function process_patch_file_0041(file_array, diff_array,
 					if (file_array[line] ~ text2regexp("^ /* command-line options */$")) {
 						line_text = (indent "int debug_level = 0;")
 						insert_array_entry(file_array, ++line, line_text)
-						++line
 						++diff_array["idiff"]
 					}
 				}
-				else if (diff_array["idiff"] == 3) {
+				if (diff_array["idiff"] == 3) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+			else if ((diff_array["ihunk"] == 2) && (complete >= 4)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 33) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("^ init_signals();$")) {
+						line_text = (indent "set_current_time();")
+						file_array[line] = line_text
+						line_text = (indent "init_signals();")
+						file_array[++line] = line_text
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 2) {
 					++diff_array["idiff"]
 					++complete
 				}
@@ -2908,7 +3015,7 @@ function process_patch_file_0042(file_array, diff_array,
 						++complete
 					}
 					else if (file_array[line] ~ text2regexp("^ WINE_DEFAULT_DEBUG_CHANNEL(thread);$")) {
-						line_text=(" " "WINE_DECLARE_DEBUG_CHANNEL(relay);")
+						line_text = (" " "WINE_DECLARE_DEBUG_CHANNEL(relay);")
 						file_array[++line] = line_text
 						++diff_array["idiff"]
 						++complete
@@ -2920,7 +3027,7 @@ function process_patch_file_0042(file_array, diff_array,
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (file_array[line] ~ text2regexp("^ NtCreateKeyedEvent( &keyed_event, GENERIC_READ | GENERIC_WRITE, NULL, 0 );$")) {
-						line_text=" "
+						line_text = " "
 						file_array[++line] = line_text
 						line_text = (indent "return exe_file;")
 						file_array[++line] = line_text
@@ -3096,7 +3203,7 @@ function process_patch_file_0045(file_array, diff_array,
 					}
 					else if (is_new_hunk(file_array[line])) {
 						indent="     "
-						line_text=(indent "thread_data->wait_fd[0] = -1;")
+						line_text = (indent "thread_data->wait_fd[0] = -1;")
 						insert_array_entry(file_array, ++line, line_text)
 						++diff_array["idiff"]
 					}
@@ -3126,7 +3233,12 @@ function process_patch_file_0045(file_array, diff_array,
 				}
 				else if (diff_array["idiff"] == 2) {
 					if (file_array[line] ~ text2regexp("^-#define SERVER_PROTOCOL_VERSION ")) {
-						file_array[line] = " "
+						indent=" "
+						if (esync_rebase_index <= 30)
+							line_text = indent
+						else
+							line_text = (indent "/* ### protocol_version begin ### */")
+						file_array[line] = line_text
 						++line
 						while(!is_new_diff_file(file_array[line]))
 							delete file_array[line++]
@@ -3137,10 +3249,32 @@ function process_patch_file_0045(file_array, diff_array,
 				diff_array["exit end line"]=line
 			}
 		}
+		else if ((diff_array["file"] == "/server/request.h") && (complete >= 3)) {
+			preprocess_diff_file(line, diff_array)
+
+			if (diff_array["ihunk"] == 2) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 35) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("^ C_ASSERT( sizeof(affinity_t) == 8 );$")) {
+						line_text = (indent "C_ASSERT( sizeof(abstime_t) == 8 );")
+						file_array[line] = line_text
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 2) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+		}
 		else if (diff_array["file"] == "/server/thread.c") {
 			preprocess_diff_file(line, diff_array)
 
-			if ((diff_array["ihunk"] == 1) && (complete >= 3)) {
+			if ((diff_array["ihunk"] == 1) && (complete >= 4)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index <= 28) {
@@ -3165,7 +3299,7 @@ function process_patch_file_0045(file_array, diff_array,
 		else if (diff_array["file"] == "/server/thread.h") {
 			preprocess_diff_file(line, diff_array)
 
-			if ((diff_array["ihunk"] == 1) && (complete >= 4)) {
+			if ((diff_array["ihunk"] == 1) && (complete >= 5)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index >= 16) {
@@ -3208,7 +3342,7 @@ function process_patch_file_0045(file_array, diff_array,
 		else if (diff_array["file"] == "/server/trace.c") {
 			preprocess_diff_file(line, diff_array)
 
-			if ((diff_array["ihunk"] == 1) && (complete >= 5)) {
+			if ((diff_array["ihunk"] == 1) && (complete >= 6)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index != 7) {
@@ -3229,7 +3363,7 @@ function process_patch_file_0045(file_array, diff_array,
 		}
 	}
 
-	if (complete == 6) diff_array["exit code"] = 0
+	if (complete == 7) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0045(file_array, diff_array,
@@ -3306,11 +3440,11 @@ function process_staging_patch_file_0045(file_array, diff_array,
 
 				if (diff_array["idiff"] == 1) {
 					if (file_array[line] ~ text2regexp("^+ thread->esync_apc_fd = -1;$")) {
-						line_text="thread->exit_poll       = NULL;"
+						line_text = "thread->exit_poll       = NULL;"
 						file_array[++line] = (indent line_text)
-						line_text="thread->shm_fd          = -1;"
+						line_text = "thread->shm_fd          = -1;"
 						file_array[++line] = (indent line_text)
-						line_text="thread->shm             = NULL;"
+						line_text = "thread->shm             = NULL;"
 						file_array[++line] = (indent line_text)
 						++diff_array["idiff"]
 						++complete
@@ -3326,11 +3460,11 @@ function process_staging_patch_file_0045(file_array, diff_array,
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (file_array[line] ~ text2regexp("^+ int esync_apc_fd; /* esync apc fd (signalled when APCs are present) */$")) {
-						line_text="struct timeout_user   *exit_poll;     /* poll if the thread/process has exited already */"
+						line_text = "struct timeout_user   *exit_poll;     /* poll if the thread/process has exited already */"
 						file_array[++line] = (indent line_text)
-						line_text="int                    shm_fd;        /* file descriptor for thread local shared memory */"
+						line_text = "int                    shm_fd;        /* file descriptor for thread local shared memory */"
 						file_array[++line] = (indent line_text)
-						line_text="shmlocal_t            *shm;           /* thread local shared memory pointer */"
+						line_text = "shmlocal_t            *shm;           /* thread local shared memory pointer */"
 						file_array[++line] = (indent line_text)
 						++diff_array["idiff"]
 						++complete
@@ -3740,7 +3874,12 @@ function process_patch_file_0079(file_array, diff_array,
 				}
 				else if (diff_array["idiff"] == 2) {
 					if (file_array[line] ~ text2regexp("^-#define SERVER_PROTOCOL_VERSION ")) {
-						file_array[line] = " "
+						indent=" "
+						if (esync_rebase_index <= 30)
+							line_text = indent
+						else
+							line_text = (indent "/* ### protocol_version begin ### */")
+						file_array[line] = line_text
 						++line
 						while(!is_new_diff_file(file_array[line]))
 							delete file_array[line++]
@@ -3751,7 +3890,29 @@ function process_patch_file_0079(file_array, diff_array,
 				diff_array["exit end line"]=line
 			}
 		}
-		else if ((diff_array["file"] == "/server/trace.c") && (complete >= 1)) {
+		else if ((diff_array["file"] == "/server/request.h") && (complete >= 1)) {
+			preprocess_diff_file(line, diff_array)
+
+			if (diff_array["ihunk"] == 2) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 35) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("^ C_ASSERT( sizeof(affinity_t) == 8 );$")) {
+						line_text = (indent "C_ASSERT( sizeof(abstime_t) == 8 );")
+						file_array[line] = line_text
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 2) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+		else if ((diff_array["file"] == "/server/trace.c") && (complete >= 2)) {
 			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
@@ -3774,27 +3935,27 @@ function process_patch_file_0079(file_array, diff_array,
 						++complete
 					}
 					else if ((diff_array["idiff"] == 1) && (file_array[line] ~ text2regexp("^-- $"))) {
-						line_text="@@ -5460,4 +5554,5 @@ static const struct"
+						line_text = "@@ -5460,4 +5554,5 @@ static const struct"
 						insert_array_entry(file_array, line, line_text)
-						line_text="     { \"INVALID_OWNER\",               STATUS_INVALID_OWNER },"
+						line_text = "     { \"INVALID_OWNER\",               STATUS_INVALID_OWNER },"
 						insert_array_entry(file_array, ++line, line_text)
-						line_text="     { \"INVALID_PARAMETER\",           STATUS_INVALID_PARAMETER },"
+						line_text = "     { \"INVALID_PARAMETER\",           STATUS_INVALID_PARAMETER },"
 						insert_array_entry(file_array, ++line, line_text)
-						line_text="+    { \"INVALID_PARAMETER_4\",         STATUS_INVALID_PARAMETER_4 },"
-						insert_array_entry(file_array, ++line, line_text)
-						if (esync_rebase_index <= 3)
-							line_text="     { \"INVALID_SECURITY_DESCR\",      STATUS_INVALID_SECURITY_DESCR },"
-						else if (esync_rebase_index == 4)
-							line_text="     { \"INVALID_READ_MODE\",           STATUS_INVALID_READ_MODE },"
-						else
-							line_text="     { \"INVALID_PIPE_STATE\",          STATUS_INVALID_PIPE_STATE },"
+						line_text = "+    { \"INVALID_PARAMETER_4\",         STATUS_INVALID_PARAMETER_4 },"
 						insert_array_entry(file_array, ++line, line_text)
 						if (esync_rebase_index <= 3)
-							line_text="     { \"IO_TIMEOUT\",                  STATUS_IO_TIMEOUT },"
+							line_text = "     { \"INVALID_SECURITY_DESCR\",      STATUS_INVALID_SECURITY_DESCR },"
 						else if (esync_rebase_index == 4)
-							line_text="     { \"INVALID_SECURITY_DESCR\",      STATUS_INVALID_SECURITY_DESCR },"
+							line_text = "     { \"INVALID_READ_MODE\",           STATUS_INVALID_READ_MODE },"
 						else
-							line_text="     { \"INVALID_READ_MODE\",           STATUS_INVALID_READ_MODE },"
+							line_text = "     { \"INVALID_PIPE_STATE\",          STATUS_INVALID_PIPE_STATE },"
+						insert_array_entry(file_array, ++line, line_text)
+						if (esync_rebase_index <= 3)
+							line_text = "     { \"IO_TIMEOUT\",                  STATUS_IO_TIMEOUT },"
+						else if (esync_rebase_index == 4)
+							line_text = "     { \"INVALID_SECURITY_DESCR\",      STATUS_INVALID_SECURITY_DESCR },"
+						else
+							line_text = "     { \"INVALID_READ_MODE\",           STATUS_INVALID_READ_MODE },"
 						insert_array_entry(file_array, ++line, line_text)
 						++diff_array["idiff"]
 						++complete
@@ -3805,7 +3966,7 @@ function process_patch_file_0079(file_array, diff_array,
 		}
 	}
 
-	if (complete == 2) diff_array["exit code"] = 0
+	if (complete == 3) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0079(file_array, diff_array,
@@ -4768,6 +4929,7 @@ function process_patch_file(file_array, diff_array)
 	}
 	else if (patch_number == "0040") {
 		process_patch_file_delete_target_hunk(file_array, diff_array, "/include/wine/server_protocol.h", 2)
+		process_patch_file_0040(file_array, diff_array)
 	}
 	else if (patch_number == "0041") {
 		process_patch_file_0041(file_array, diff_array)
