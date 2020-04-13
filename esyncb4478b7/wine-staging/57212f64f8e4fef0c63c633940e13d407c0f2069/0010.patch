@@ -1,5 +1,5 @@
 --- a/0010-ntdll-Implement-NtResetEvent.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0010-ntdll-Implement-NtResetEvent.patch	2019-12-19 22:35:48.632410603 +0000
++++ b/0010-ntdll-Implement-NtResetEvent.patch	2020-04-12 23:48:30.832411071 +0100
 @@ -2,14 +2,12 @@
  From: Zebediah Figura <z.figura12@gmail.com>
  Date: Fri, 8 Jun 2018 15:44:49 -0500
