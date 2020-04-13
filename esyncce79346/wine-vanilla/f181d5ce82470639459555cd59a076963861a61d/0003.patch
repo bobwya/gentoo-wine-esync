@@ -1,0 +1,34 @@
+--- a/0003-ntdll-Create-eventfd-based-objects-for-semaphores.patch	2018-11-01 17:19:43.000000000 +0000
++++ b/0003-ntdll-Create-eventfd-based-objects-for-semaphores.patch	2020-04-12 23:48:25.004697042 +0100
+@@ -2,9 +2,7 @@
+ From: Zebediah Figura <z.figura12@gmail.com>
+ Date: Thu, 7 Jun 2018 20:29:21 -0500
+ Subject: [PATCH 03/83] ntdll: Create eventfd-based objects for semaphores.
+-
+ This patch break things, of course. That is fine. Its purpose is to prevent a Massive Patch Munge.
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  dlls/ntdll/Makefile.in  |   1 +
+@@ -16,7 +14,6 @@
+  6 files changed, 184 insertions(+), 3 deletions(-)
+  create mode 100644 dlls/ntdll/esync.c
+  create mode 100644 dlls/ntdll/esync.h
+-
+ diff --git a/dlls/ntdll/Makefile.in b/dlls/ntdll/Makefile.in
+ index ed4bb94e4d..b75e8308ac 100644
+ --- a/dlls/ntdll/Makefile.in
+@@ -276,7 +273,7 @@
+  #include "ntdll_misc.h"
+ +#include "esync.h"
+  
+- WINE_DEFAULT_DEBUG_CHANNEL(ntdll);
++ WINE_DEFAULT_DEBUG_CHANNEL(sync);
+  
+ @@ -190,6 +192,9 @@ NTSTATUS WINAPI NtCreateSemaphore( OUT PHANDLE SemaphoreHandle,
+      if (MaximumCount <= 0 || InitialCount < 0 || InitialCount > MaximumCount)
+@@ -290,4 +287,3 @@
+      SERVER_START_REQ( create_semaphore )
+ -- 
+ 2.19.1
+-

@@ -1,5 +1,5 @@
 --- a/0023-ntdll-wineandroid.drv-winemac.drv-winex11.drv-Store-.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0023-ntdll-wineandroid.drv-winemac.drv-winex11.drv-Store-.patch	2019-12-19 22:35:30.104152119 +0000
++++ b/0023-ntdll-wineandroid.drv-winemac.drv-winex11.drv-Store-.patch	2020-04-12 23:48:20.085940315 +0100
 @@ -3,11 +3,8 @@
  Date: Tue, 12 Jun 2018 10:01:08 -0500
  Subject: [PATCH 23/83] ntdll, wineandroid.drv, winemac.drv, winex11.drv: Store

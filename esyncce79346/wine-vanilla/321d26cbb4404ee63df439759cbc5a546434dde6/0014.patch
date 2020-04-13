@@ -1,0 +1,127 @@
+--- a/0014-server-Add-a-request-to-get-the-eventfd-file-descrip.patch	2018-11-01 17:19:43.000000000 +0000
++++ b/0014-server-Add-a-request-to-get-the-eventfd-file-descrip.patch	2020-04-12 23:48:28.340533058 +0100
+@@ -3,7 +3,6 @@
+ Date: Fri, 8 Jun 2018 18:55:49 -0500
+ Subject: [PATCH 14/83] server: Add a request to get the eventfd file
+  descriptor associated with a waitable handle.
+-
+ Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+ ---
+  include/wine/server_protocol.h | 14 ++++++++++++++
+@@ -12,7 +11,6 @@
+  server/request.h               |  5 +++++
+  server/trace.c                 |  8 ++++++++
+  5 files changed, 61 insertions(+)
+-
+ diff --git a/include/wine/server_protocol.h b/include/wine/server_protocol.h
+ index 98470eca3c..554fa10835 100644
+ --- a/include/wine/server_protocol.h
+@@ -36,29 +34,29 @@
+  {
+      REQ_new_process,
+ @@ -5967,6 +5978,7 @@ enum request
+-     REQ_set_job_completion_port,
+-     REQ_terminate_job,
++     REQ_suspend_process,
++     REQ_resume_process,
+      REQ_create_esync,
+ +    REQ_get_esync_fd,
+      REQ_NB_REQUESTS
+  };
+  
+ @@ -6266,6 +6278,7 @@ union generic_request
+-     struct set_job_completion_port_request set_job_completion_port_request;
+-     struct terminate_job_request terminate_job_request;
++     struct suspend_process_request suspend_process_request;
++     struct resume_process_request resume_process_request;
+      struct create_esync_request create_esync_request;
+ +    struct get_esync_fd_request get_esync_fd_request;
+  };
+  union generic_reply
+  {
+-@@ -6563,6 +6576,7 @@ union generic_reply
+-     struct set_job_completion_port_reply set_job_completion_port_reply;
+-     struct terminate_job_reply terminate_job_reply;
++@@ -6934,6 +6947,7 @@ union generic_reply
++     struct suspend_process_reply suspend_process_reply;
++     struct resume_process_reply resume_process_reply;
+      struct create_esync_reply create_esync_reply;
+ +    struct get_esync_fd_reply get_esync_fd_reply;
+  };
+  
+- #define SERVER_PROTOCOL_VERSION 570
++ /* ### protocol_version begin ### */
+ diff --git a/server/esync.c b/server/esync.c
+ index e761475678..e775b3bd28 100644
+ --- a/server/esync.c
+@@ -99,7 +97,7 @@
+ index b743674ebd..250590573e 100644
+ --- a/server/protocol.def
+ +++ b/server/protocol.def
+-@@ -3865,3 +3865,9 @@ struct handle_info
++@@ -3978,6 +3978,12 @@ struct handle_info
+  @REPLY
+      obj_handle_t handle;        /* handle to the object */
+  @END
+@@ -109,26 +107,29 @@
+ +    obj_handle_t handle;        /* handle to the object */
+ +@REPLY
+ +@END
++ 
++ 
++ /* Suspend a process */
+ diff --git a/server/request.h b/server/request.h
+ index 242143d2c3..272f79dc04 100644
+ --- a/server/request.h
+ +++ b/server/request.h
+ @@ -404,6 +404,7 @@ DECL_HANDLER(set_job_limits);
+- DECL_HANDLER(set_job_completion_port);
+- DECL_HANDLER(terminate_job);
++ DECL_HANDLER(suspend_process);
++ DECL_HANDLER(resume_process);
+  DECL_HANDLER(create_esync);
+ +DECL_HANDLER(get_esync_fd);
+  
+  #ifdef WANT_REQUEST_HANDLERS
+  
+ @@ -702,6 +703,7 @@ static const req_handler req_handlers[REQ_NB_REQUESTS] =
+-     (req_handler)req_set_job_completion_port,
+-     (req_handler)req_terminate_job,
++     (req_handler)req_suspend_process,
++     (req_handler)req_resume_process,
+      (req_handler)req_create_esync,
+ +    (req_handler)req_get_esync_fd,
+  };
+  
+- C_ASSERT( sizeof(affinity_t) == 8 );
++ C_ASSERT( sizeof(abstime_t) == 8 );
+ @@ -2414,6 +2416,9 @@ C_ASSERT( FIELD_OFFSET(struct create_esync_request, flags) == 20 );
+  C_ASSERT( sizeof(struct create_esync_request) == 24 );
+  C_ASSERT( FIELD_OFFSET(struct create_esync_reply, handle) == 8 );
+@@ -156,8 +157,8 @@
+      (dump_func)dump_new_process_request,
+      (dump_func)dump_exec_process_request,
+ @@ -4847,6 +4852,7 @@ static const dump_func req_dumpers[REQ_NB_REQUESTS] = {
+-     (dump_func)dump_set_job_completion_port_request,
+-     (dump_func)dump_terminate_job_request,
++     (dump_func)dump_suspend_process_request,
++     (dump_func)dump_resume_process_request,
+      (dump_func)dump_create_esync_request,
+ +    (dump_func)dump_get_esync_fd_request,
+  };
+@@ -172,8 +173,8 @@
+  
+  static const char * const req_names[REQ_NB_REQUESTS] = {
+ @@ -5437,6 +5444,7 @@ static const char * const req_names[REQ_NB_REQUESTS] = {
+-     "set_job_completion_port",
+-     "terminate_job",
++     "suspend_process",
++     "resume_process",
+      "create_esync",
+ +    "get_esync_fd",
+  };
+@@ -181,4 +182,3 @@
+  static const struct
+ -- 
+ 2.19.1
+-
