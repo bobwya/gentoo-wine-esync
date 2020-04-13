@@ -107,8 +107,9 @@ function text2regexp(text,
 		startmarker=sub("^\\^", "", regexp)
 		endmarker=sub("\\$$", "", regexp)
 		# Escape all control regex characters
-		gsub("\\\\", "[&]", regexp)
-		gsub("\\!|\\\"|\\#|\\$|\\%|\\&|\x27|\\(|\\)|\\+|\\,|\\-|\\.|\\/|\\:|\\;|\x3c|\\=|\x3e|\\?|\\@|\\[|\\]|\\{|\\|\\}|\\~", "[&]", regexp)
+		gsub("\\[|\\]", "[&]", regexp)
+		gsub("[\\\\]", "[&&]", regexp)
+		gsub("\\!|\\\"|\\#|\\$|\\%|\\&|\x27|\\(|\\)|\\+|\\,|\\-|\\.|\\/|\\:|\\;|\x3c|\\=|\x3e|\\?|\\@|\\{|\\|\\}|\\~", "[&]", regexp)
 		gsub("\\*", ".*", regexp)
 		gsub("\x20", "[[:blank:]][[:blank:]]*", regexp)
 		regexp=((startmarker ? "^" : "") regexp (endmarker ? "$" : ""))
