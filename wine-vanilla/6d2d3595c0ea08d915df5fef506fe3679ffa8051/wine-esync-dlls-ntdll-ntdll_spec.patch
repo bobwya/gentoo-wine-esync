@@ -1,0 +1,10 @@
+diff --git a/dlls/ntdll/ntdll.spec b/dlls/ntdll/ntdll.spec
+index e61a2578da5..4f81396a8a1 100644
+--- a/dlls/ntdll/ntdll.spec
++++ b/dlls/ntdll/ntdll.spec
+@@ -1583,3 +1583,5 @@
+ # Filesystem
+ @ cdecl wine_nt_to_unix_file_name(ptr ptr long long)
+ @ cdecl wine_unix_to_nt_file_name(ptr ptr)
++
++@ cdecl __wine_esync_set_queue_fd(long)

@@ -1,0 +1,21 @@
+diff --git a/dlls/winex11.drv/x11drv_main.c b/dlls/winex11.drv/x11drv_main.c
+index e6e61e801e1..d2142d5d8fd 100644
+--- a/dlls/winex11.drv/x11drv_main.c
++++ b/dlls/winex11.drv/x11drv_main.c
+@@ -640,6 +640,7 @@ void CDECL X11DRV_ThreadDetach(void)
+     }
+ }
+ 
++extern void __wine_esync_set_queue_fd( int fd );
+ 
+ /* store the display fd into the message queue */
+ static void set_queue_display_fd( Display *display )
+@@ -647,6 +648,8 @@ static void set_queue_display_fd( Display *display )
+     HANDLE handle;
+     int ret;
+ 
++    __wine_esync_set_queue_fd( ConnectionNumber(display) );
++
+     if (wine_server_fd_to_handle( ConnectionNumber(display), GENERIC_READ | SYNCHRONIZE, 0, &handle ))
+     {
+         MESSAGE( "x11drv: Can't allocate handle for display fd\n" );
