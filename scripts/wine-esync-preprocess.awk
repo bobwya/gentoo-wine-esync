@@ -881,12 +881,21 @@ function process_patch_file_0007(file_array, diff_array,
 
 			if (diff_array["ihunk"] == 2) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
-				if (diff_array["idiff"] <= 3) {
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 36) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("^+ * need to delegate to server_select(). */$")) {
+						sub(text2regexp("server_select()"),"server_wait()",file_array[line])
+						++diff_array["idiff"]
+					}
+                }
+				else if ((diff_array["idiff"] >= 2) && (diff_array["idiff"] <= 4)) {
 					if (sub(text2regexp("DPRINTF"), "TRACE", file_array[line])) {
 						++diff_array["idiff"]
 					}
 				}
-				if (diff_array["idiff"] == 4) {
+				if (diff_array["idiff"] == 5) {
 					++diff_array["idiff"]
 					++complete
 				}
@@ -3190,11 +3199,35 @@ function process_patch_file_0045(file_array, diff_array,
 				}
 				diff_array["exit end line"]=line
 			}
+			else if ((diff_array["ihunk"] == 9) && (complete >= 1)) {
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 36) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("^+ * delegate down to server_select(). */$")) {
+						sub(text2regexp("server_select()"),"server_wait()",file_array[line])
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (esync_rebase_index <= 36) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("^+ ret = server_select( NULL, 0, SELECT_INTERRUPTIBLE | SELECT_ALERTABLE, &zero );$")) {
+						sub(text2regexp("server_select("),"server_wait(",file_array[line])
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 3) {
+					++diff_array["idiff"]
+					++complete
+				}
+			}
 		}
 		else if (diff_array["file"] == "/dlls/ntdll/thread.c") {
 			preprocess_diff_file(line, diff_array)
 
-			if ((diff_array["ihunk"] == 1) && (complete >= 1)) {
+			if ((diff_array["ihunk"] == 1) && (complete >= 2)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index <= 13) {
@@ -3222,7 +3255,7 @@ function process_patch_file_0045(file_array, diff_array,
 		else if (diff_array["file"] == "/include/wine/server_protocol.h") {
 			preprocess_diff_file(line, diff_array)
 
-			if ((diff_array["ihunk"] == 4) && (complete >= 2)) {
+			if ((diff_array["ihunk"] == 4) && (complete >= 3)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (is_new_hunk(file_array[line])) {
@@ -3249,7 +3282,7 @@ function process_patch_file_0045(file_array, diff_array,
 				diff_array["exit end line"]=line
 			}
 		}
-		else if ((diff_array["file"] == "/server/request.h") && (complete >= 3)) {
+		else if ((diff_array["file"] == "/server/request.h") && (complete >= 4)) {
 			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 2) {
@@ -3274,7 +3307,7 @@ function process_patch_file_0045(file_array, diff_array,
 		else if (diff_array["file"] == "/server/thread.c") {
 			preprocess_diff_file(line, diff_array)
 
-			if ((diff_array["ihunk"] == 1) && (complete >= 4)) {
+			if ((diff_array["ihunk"] == 1) && (complete >= 5)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index <= 28) {
@@ -3299,7 +3332,7 @@ function process_patch_file_0045(file_array, diff_array,
 		else if (diff_array["file"] == "/server/thread.h") {
 			preprocess_diff_file(line, diff_array)
 
-			if ((diff_array["ihunk"] == 1) && (complete >= 5)) {
+			if ((diff_array["ihunk"] == 1) && (complete >= 6)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index >= 16) {
@@ -3342,7 +3375,7 @@ function process_patch_file_0045(file_array, diff_array,
 		else if (diff_array["file"] == "/server/trace.c") {
 			preprocess_diff_file(line, diff_array)
 
-			if ((diff_array["ihunk"] == 1) && (complete >= 6)) {
+			if ((diff_array["ihunk"] == 1) && (complete >= 7)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index != 7) {
@@ -3363,7 +3396,7 @@ function process_patch_file_0045(file_array, diff_array,
 		}
 	}
 
-	if (complete == 7) diff_array["exit code"] = 0
+	if (complete == 8) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0045(file_array, diff_array,
@@ -3381,8 +3414,9 @@ function process_staging_patch_file_0045(file_array, diff_array,
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (is_new_hunk(file_array[line])) {
-						delete file_array[++line]
+						split("50 0 50 0", array_diff_lines)
 						change_array_entry_diff(file_array, line, array_diff_lines)
+						delete file_array[++line]
 						++diff_array["idiff"]
 					}
 				}
@@ -3521,6 +3555,62 @@ function process_patch_file_0051(file_array, diff_array,
 				if (diff_array["idiff"] == 1) {
 					if (file_array[line] ~ text2regexp("static NTSTATUS (WINAPI *pNtAllocateVirtualMemory)(HANDLE, PVOID *, ULONG, SIZE_T *, ULONG, ULONG);")) {
 						sub(text2regexp("(HANDLE, PVOID *, ULONG, SIZE_T *, ULONG, ULONG)"),"(HANDLE, PVOID *, ULONG_PTR, SIZE_T *, ULONG, ULONG)", file_array[line])
+						++diff_array["idiff"]
+						++complete
+					}
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+	}
+
+	if (complete == 1) diff_array["exit code"] = 0
+}
+
+function process_patch_file_0055(file_array, diff_array,
+	complete, indent, line, line_text)
+{
+	diff_array["exit start line"]=0
+	for (line = 1 ; line <= file_array[0] ; ++line) {
+		indent = get_indent(file_array[line])
+		preprocess_patch_file_line(file_array[line], diff_array)
+
+		if (diff_array["file"] == "/dlls/ntdll/esync.c") {
+			preprocess_diff_file(line, diff_array)
+
+			if (diff_array["ihunk"] == 1) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (file_array[line] ~ text2regexp("ret = server_select( &select_op, offsetof( select_op_t, wait.handles[1] ), 0, &zero );$")) {
+						sub(text2regexp("server_select("),"server_wait(", file_array[line])
+						++diff_array["idiff"]
+						++complete
+					}
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+	}
+
+	if (complete == 1) diff_array["exit code"] = 0
+}
+
+function process_patch_file_0056(file_array, diff_array,
+	complete, indent, line, line_text)
+{
+	diff_array["exit start line"]=0
+	for (line = 1 ; line <= file_array[0] ; ++line) {
+		indent = get_indent(file_array[line])
+		preprocess_patch_file_line(file_array[line], diff_array)
+
+		if (diff_array["file"] == "/dlls/ntdll/critsection.c") {
+			preprocess_diff_file(line, diff_array)
+
+			if (diff_array["ihunk"] == 1) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (file_array[line] ~ text2regexp("ret = server_select( &select_op, offsetof( select_op_t, wait.handles[1] ), 0, &time );$")) {
+						sub(text2regexp("server_select("),"server_wait(", file_array[line])
 						++diff_array["idiff"]
 						++complete
 					}
@@ -3680,6 +3770,34 @@ function process_patch_file_0064(file_array, diff_array,
 	}
 
 	if (complete == 4) diff_array["exit code"] = 0
+}
+
+function process_patch_file_0070(file_array, diff_array,
+	complete, indent, line, line_text)
+{
+	diff_array["exit start line"]=0
+	for (line = 1 ; line <= file_array[0] ; ++line) {
+		indent = get_indent(file_array[line])
+		preprocess_patch_file_line(file_array[line], diff_array)
+
+		if (diff_array["file"] == "/dlls/ntdll/esync.c") {
+			preprocess_diff_file(line, diff_array)
+
+			if (diff_array["ihunk"] == 5) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (file_array[line] ~ text2regexp("^ * need to delegate to server_select(). */$")) {
+						sub(text2regexp("server_select()"),"server_wait()", file_array[line])
+						++diff_array["idiff"]
+						++complete
+					}
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+	}
+
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0074(file_array, diff_array,
@@ -3860,10 +3978,48 @@ function process_patch_file_0079(file_array, diff_array,
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
+		if (diff_array["file"] == "/dlls/ntdll/esync.c") {
+			preprocess_diff_file(line, diff_array)
+
+			if (diff_array["ihunk"] == 1) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 36) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("^ * need to delegate to server_select(). */$")) {
+						sub(text2regexp("server_select()"),"server_wait()", file_array[line])
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 2) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+			else if ((diff_array["ihunk"] == 2) && (complete >= 1)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 36) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("^- ret = server_select( &select_op, offsetof( select_op_t, wait.handles[1] ), 0, &zero );$")) {
+						sub(text2regexp("server_select("),"server_wait(", file_array[line])
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 2) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+		}
 		if (diff_array["file"] == "/include/wine/server_protocol.h") {
 			preprocess_diff_file(line, diff_array)
 
-			if (diff_array["ihunk"] == 4) {
+			if ((diff_array["ihunk"] == 4) && (complete >= 2)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (is_new_hunk(file_array[line])) {
@@ -3890,7 +4046,7 @@ function process_patch_file_0079(file_array, diff_array,
 				diff_array["exit end line"]=line
 			}
 		}
-		else if ((diff_array["file"] == "/server/request.h") && (complete >= 1)) {
+		else if ((diff_array["file"] == "/server/request.h") && (complete >= 3)) {
 			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 2) {
@@ -3912,7 +4068,7 @@ function process_patch_file_0079(file_array, diff_array,
 				diff_array["exit end line"]=line
 			}
 		}
-		else if ((diff_array["file"] == "/server/trace.c") && (complete >= 2)) {
+		else if ((diff_array["file"] == "/server/trace.c") && (complete >= 4)) {
 			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
@@ -3966,7 +4122,7 @@ function process_patch_file_0079(file_array, diff_array,
 		}
 	}
 
-	if (complete == 3) diff_array["exit code"] = 0
+	if (complete == 5) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0079(file_array, diff_array,
@@ -4970,6 +5126,14 @@ function process_patch_file(file_array, diff_array)
 		if (esync_rebase_index >= 25)
 			process_patch_file_0051(file_array, diff_array)
 	}
+    else if (patch_number == "0055") {
+		if (esync_rebase_index >= 37)
+			process_patch_file_0055(file_array, diff_array)
+	}
+    else if (patch_number == "0056") {
+		if (esync_rebase_index >= 37)
+			process_patch_file_0056(file_array, diff_array)
+	}
 	else if (patch_number == "0059") {
 		if (esync_rebase_index >= 20)
 			process_patch_file_0059(file_array, diff_array)
@@ -4977,6 +5141,10 @@ function process_patch_file(file_array, diff_array)
 	else if (patch_number == "0064") {
 		if ((staging && (esync_rebase_index <= 6)) || (esync_rebase_index == 7) || (esync_rebase_index >= 9))
 			process_patch_file_0064(file_array, diff_array)
+	}
+    else if (patch_number == "0070") {
+		if (esync_rebase_index >= 37)
+			process_patch_file_0070(file_array, diff_array)
 	}
 	else if (patch_number == "0074") {
 		if (esync_rebase_index <= 6)
@@ -5031,7 +5199,7 @@ function process_patch_file(file_array, diff_array)
 }
 
 BEGIN{
-	supported_patches="0001 0002 0003 0006 0007 0009 0010 0011 0013 0014 0015 0017 0020 0023 0024 0025 0026 0032 0033 0040 0041 0042 0044 0045 0048 0051 0059 0064 0074 0077 0078 0079 0084 0085 0086 0087 0088"
+	supported_patches="0001 0002 0003 0006 0007 0009 0010 0011 0013 0014 0015 0017 0020 0023 0024 0025 0026 0032 0033 0040 0041 0042 0044 0045 0048 0051 0055 0056 0059 0064 0070 0074 0077 0078 0079 0084 0085 0086 0087 0088"
 	if (staging) supported_patches=(supported_patches " 0022 ")
 
 	if (supported_patches !~ patch_number) {

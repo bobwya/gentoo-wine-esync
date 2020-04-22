@@ -76,7 +76,7 @@ function squash_array(sparse_array,
 {
 	total = sparse_array[0]
 	for (i = 1 ; i <= total ; ++i) {
-		if (sparse_array[i])
+		if (i in sparse_array)
 			sparse_array[++count] = sparse_array[i]
 	}
 	for (i = count+1 ; i <= total ; ++i) {
