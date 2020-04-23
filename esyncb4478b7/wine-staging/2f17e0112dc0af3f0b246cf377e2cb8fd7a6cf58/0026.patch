@@ -1,22 +1,6 @@
 --- a/0026-ntdll-Create-esync-objects-for-mutexes.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0026-ntdll-Create-esync-objects-for-mutexes.patch	2020-04-12 23:48:32.212343711 +0100
-@@ -2,7 +2,6 @@
- From: Zebediah Figura <z.figura12@gmail.com>
- Date: Sat, 9 Jun 2018 15:48:46 -0500
- Subject: [PATCH 26/83] ntdll: Create esync objects for mutexes.
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  dlls/ntdll/esync.c             | 39 +++++++++++++++++++++++++++++++++++++++
-@@ -11,7 +10,6 @@
-  include/wine/server_protocol.h |  3 ++-
-  server/protocol.def            |  1 +
-  5 files changed, 47 insertions(+), 1 deletion(-)
--
- diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
- index cb206bc..64947c2 100644
- --- a/dlls/ntdll/esync.c
-@@ -108,14 +106,6 @@
++++ b/0026-ntdll-Create-esync-objects-for-mutexes.patch	2020-04-23 17:16:55.157226098 +0100
+@@ -108,14 +108,6 @@
       ESYNC_MANUAL_SERVER,
       ESYNC_QUEUE,
   };
@@ -31,8 +15,3 @@
  diff --git a/server/protocol.def b/server/protocol.def
  index 2cae53b..7f4bc7b 100644
  --- a/server/protocol.def
-@@ -130,4 +120,3 @@
-  };
- -- 
- 2.7.4
--

@@ -1,24 +1,6 @@
 --- a/0003-ntdll-Create-eventfd-based-objects-for-semaphores.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0003-ntdll-Create-eventfd-based-objects-for-semaphores.patch	2020-04-12 23:48:32.031352533 +0100
-@@ -2,9 +2,7 @@
- From: Zebediah Figura <z.figura12@gmail.com>
- Date: Thu, 7 Jun 2018 20:29:21 -0500
- Subject: [PATCH 03/83] ntdll: Create eventfd-based objects for semaphores.
--
- This patch break things, of course. That is fine. Its purpose is to prevent a Massive Patch Munge.
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  dlls/ntdll/Makefile.in  |   1 +
-@@ -16,7 +14,6 @@
-  6 files changed, 184 insertions(+), 3 deletions(-)
-  create mode 100644 dlls/ntdll/esync.c
-  create mode 100644 dlls/ntdll/esync.h
--
- diff --git a/dlls/ntdll/Makefile.in b/dlls/ntdll/Makefile.in
- index ed4bb94..b75e830 100644
- --- a/dlls/ntdll/Makefile.in
-@@ -237,7 +234,7 @@
++++ b/0003-ntdll-Create-eventfd-based-objects-for-semaphores.patch	2020-04-23 17:16:55.048227447 +0100
+@@ -237,7 +237,7 @@
  +#include "esync.h"
   
   WINE_DEFAULT_DEBUG_CHANNEL(server);
@@ -27,8 +9,3 @@
  @@ -119,14 +120,14 @@ sigset_t server_block_set;  /* signals to block during server calls */
   static int fd_socket = -1;  /* socket to exchange file descriptors with the server */
   static pid_t server_pid;
-@@ -290,4 +287,3 @@
-      SERVER_START_REQ( create_semaphore )
- -- 
- 2.7.4
--

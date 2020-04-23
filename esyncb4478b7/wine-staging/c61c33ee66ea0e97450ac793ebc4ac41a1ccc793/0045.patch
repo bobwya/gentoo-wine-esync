@@ -1,24 +1,6 @@
 --- a/0045-server-ntdll-Implement-alertable-waits.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0045-server-ntdll-Implement-alertable-waits.patch	2020-04-12 23:48:29.842459479 +0100
-@@ -2,9 +2,7 @@
- From: Zebediah Figura <z.figura12@gmail.com>
- Date: Fri, 15 Jun 2018 14:12:22 -0500
- Subject: [PATCH 45/83] server, ntdll: Implement alertable waits.
--
- We do this quite simply by waiting on an extra eventfd descriptor, which the server signals when a user APC is queued.
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  dlls/ntdll/esync.c             | 94 ++++++++++++++++++++++++++++++++++++------
-@@ -19,7 +17,6 @@
-  server/thread.h                |  1 +
-  server/trace.c                 |  7 ++++
-  11 files changed, 146 insertions(+), 18 deletions(-)
--
- diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
- index 360a980..395c8d3 100644
- --- a/dlls/ntdll/esync.c
-@@ -73,12 +70,12 @@
++++ b/0045-server-ntdll-Implement-alertable-waits.patch	2020-04-23 17:16:53.702244142 +0100
+@@ -73,12 +73,12 @@
  @@ -728,6 +752,8 @@ NTSTATUS esync_wait_objects( DWORD count, const HANDLE *handles, BOOLEAN wait_an
   
           if (msgwait)
@@ -34,17 +16,19 @@
  @@ -766,10 +792,17 @@ NTSTATUS esync_wait_objects( DWORD count, const HANDLE *handles, BOOLEAN wait_an
           }
           if (msgwait)
-@@ -204,8 +201,8 @@
+@@ -203,9 +203,9 @@
+ index 7ee4f8c..12f10a6 100644
  --- a/dlls/ntdll/ntdll_misc.h
  +++ b/dlls/ntdll/ntdll_misc.h
- @@ -235,6 +235,7 @@ struct ntdll_thread_data
+-@@ -235,6 +235,7 @@ struct ntdll_thread_data
 -     BOOL               wow64_redir;   /* Wow64 filesystem redirection flag */
++@@ -285,6 +285,7 @@ struct ntdll_thread_data
       pthread_t          pthread_id;    /* pthread thread id */
 +     void              *pthread_stack; /* pthread stack */
       int                esync_queue_fd;/* fd to wait on for driver events */
  +    int                esync_apc_fd;  /* fd to wait on for user APCs */
   };
-@@ -223,7 +220,7 @@
+@@ -223,7 +223,7 @@
   
       signal_init_thread( teb );
       virtual_init_threading();
@@ -53,7 +37,7 @@
       thread_data->wait_fd[1]  = -1;
       thread_data->start_stack = (char *)teb->Tib.StackBase;
       thread_data->esync_queue_fd = -1;
-@@ -269,17 +266,14 @@
+@@ -269,17 +269,14 @@
   };
   union generic_reply
   {
@@ -72,7 +56,7 @@
  diff --git a/server/esync.c b/server/esync.c
  index 6adf996..8bf6e44 100644
  --- a/server/esync.c
-@@ -390,9 +384,9 @@
+@@ -390,9 +387,9 @@
       thread->token           = NULL;
       thread->esync_fd        = -1;
  +    thread->esync_apc_fd    = -1;
@@ -85,7 +69,7 @@
  @@ -289,7 +290,10 @@ struct thread *create_thread( int fd, struct process *process, const struct secu
       }
   
-@@ -438,9 +432,9 @@
+@@ -438,9 +435,9 @@
       struct token          *token;         /* security token associated with this thread */
       int                    esync_fd;      /* esync file descriptor (signalled on exit) */
  +    int                    esync_apc_fd;  /* esync apc fd (signalled when APCs are present) */
@@ -98,8 +82,3 @@
  diff --git a/server/trace.c b/server/trace.c
  index 26a84ba..5b1c7e1 100644
  --- a/server/trace.c
-@@ -482,4 +476,3 @@
-  static const struct
- -- 
- 2.7.4
--

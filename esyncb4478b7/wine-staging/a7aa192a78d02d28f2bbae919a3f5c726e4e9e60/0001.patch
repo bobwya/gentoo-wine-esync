@@ -1,22 +1,6 @@
 --- a/0001-configure-Check-for-sys-eventfd.h-ppoll-and-shm_open.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0001-configure-Check-for-sys-eventfd.h-ppoll-and-shm_open.patch	2020-04-12 23:48:28.884506387 +0100
-@@ -3,23 +3,19 @@
- Date: Wed, 13 Jun 2018 10:44:49 -0500
- Subject: [PATCH 01/83] configure: Check for sys/eventfd.h, ppoll(), and
-  shm_open().
--
- We use ppoll() instead of poll() for the better time granularity.
--
- Although perhaps we shouldn't since the server doesn't do this.
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  configure           | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++
-  configure.ac        | 12 ++++++++++
-  include/config.h.in |  9 +++++++
-  3 files changed, 89 insertions(+)
--
- diff --git a/configure b/configure
++++ b/0001-configure-Check-for-sys-eventfd.h-ppoll-and-shm_open.patch	2020-04-23 17:16:53.119251387 +0100
+@@ -19,7 +19,7 @@
  index c2483c8..196acc6 100755
  --- a/configure
  +++ b/configure
@@ -25,7 +9,7 @@
   	sys/elf32.h \
   	sys/epoll.h \
   	sys/event.h \
-@@ -27,7 +23,7 @@
+@@ -27,7 +27,7 @@
   	sys/exec_elf.h \
   	sys/filio.h \
   	sys/inotify.h \
@@ -34,7 +18,7 @@
   	poll \
   	popen \
   	port_create \
-@@ -35,7 +31,7 @@
+@@ -35,7 +35,7 @@
   	prctl \
   	pread \
   	proc_pidinfo \
@@ -43,7 +27,7 @@
   
   LIBS=$ac_save_LIBS
   
-@@ -112,7 +108,7 @@
+@@ -112,7 +112,7 @@
  index b64d99e..fae1a1a 100644
  --- a/configure.ac
  +++ b/configure.ac
@@ -52,7 +36,7 @@
   	sys/elf32.h \
   	sys/epoll.h \
   	sys/event.h \
-@@ -120,7 +116,7 @@
+@@ -120,7 +120,7 @@
   	sys/exec_elf.h \
   	sys/filio.h \
   	sys/inotify.h \
@@ -61,7 +45,7 @@
   	poll \
   	popen \
   	port_create \
-@@ -128,7 +124,7 @@
+@@ -128,7 +128,7 @@
   	prctl \
   	pread \
   	proc_pidinfo \
@@ -70,8 +54,3 @@
                   test "$ac_res" = "none required" || AC_SUBST(RT_LIBS,"$ac_res")])
   LIBS=$ac_save_LIBS
   
-@@ -181,4 +177,3 @@
-  
- -- 
- 2.7.4
--

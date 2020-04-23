@@ -1,21 +1,6 @@
 --- a/0064-server-Create-eventfd-descriptors-for-pseudo-fd-obje.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0064-server-Create-eventfd-descriptors-for-pseudo-fd-obje.patch	2020-04-12 23:48:31.833362196 +0100
-@@ -3,14 +3,12 @@
- Date: Sat, 7 Jul 2018 12:57:47 +0200
- Subject: [PATCH 64/83] server: Create eventfd descriptors for pseudo-fd
-  objects and use them for named pipes.
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  server/fd.c         | 22 ++++++++++++++++++++++
-  server/file.h       |  1 +
-  server/named_pipe.c |  4 ++--
-  3 files changed, 25 insertions(+), 2 deletions(-)
--
- diff --git a/server/fd.c b/server/fd.c
- index 3388de9..4d02b3b 100644
- --- a/server/fd.c
-@@ -24,9 +22,9 @@
++++ b/0064-server-Create-eventfd-descriptors-for-pseudo-fd-obje.patch	2020-04-23 17:16:54.926228958 +0100
+@@ -24,9 +24,9 @@
   #include "winternl.h"
   #include "winioctl.h"
  @@ -194,6 +195,7 @@ struct fd
@@ -26,7 +11,7 @@
  +    int                  esync_fd;    /* esync file descriptor */
   };
   
-@@ -42,16 +40,16 @@
+@@ -42,16 +42,16 @@
   
   /* check if the desired access is possible without violating */
  @@ -1608,6 +1613,7 @@ static struct fd *alloc_fd_object(void)
@@ -45,8 +30,3 @@
       fd->no_fd_status = STATUS_BAD_DEVICE_TYPE;
  +    fd->esync_fd   = -1;
       init_async_queue( &fd->read_q );
-@@ -127,4 +125,3 @@
-      pipe_end_get_fd,              /* get_fd */
- -- 
- 2.7.4
--

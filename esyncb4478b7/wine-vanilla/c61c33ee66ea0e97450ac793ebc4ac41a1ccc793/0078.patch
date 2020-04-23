@@ -1,24 +1,6 @@
 --- a/0078-ntdll-server-Initialize-the-shared-memory-portion-on.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0078-ntdll-server-Initialize-the-shared-memory-portion-on.patch	2020-04-12 23:48:08.146538147 +0100
-@@ -3,9 +3,7 @@
- Date: Sun, 29 Jul 2018 16:50:08 -0500
- Subject: [PATCH 78/83] ntdll, server: Initialize the shared memory portion on
-  the server side.
--
- Simply using a CS only prevents this race within one process.
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  dlls/ntdll/esync.c             | 100 +++---------------------------
-@@ -15,7 +13,6 @@
-  server/request.h               |   3 +-
-  server/trace.c                 |   1 +
-  6 files changed, 107 insertions(+), 137 deletions(-)
--
- diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
- index e3434e7..f678ae8 100644
- --- a/dlls/ntdll/esync.c
-@@ -218,14 +215,6 @@
++++ b/0078-ntdll-server-Initialize-the-shared-memory-portion-on.patch	2020-04-23 17:16:40.020416626 +0100
+@@ -218,14 +218,6 @@
   };
   struct create_esync_reply
   {
@@ -33,8 +15,3 @@
  diff --git a/server/esync.c b/server/esync.c
  index 3e78387..35e7a8a 100644
  --- a/server/esync.c
-@@ -434,4 +423,3 @@
-  
- -- 
- 2.7.4
--

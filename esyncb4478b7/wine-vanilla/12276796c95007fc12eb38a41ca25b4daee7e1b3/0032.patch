@@ -1,27 +1,6 @@
 --- a/0032-server-ntdll-Also-store-the-esync-type-in-the-server.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0032-server-ntdll-Also-store-the-esync-type-in-the-server.patch	2020-04-12 23:48:06.632614708 +0100
-@@ -2,12 +2,9 @@
- From: Zebediah Figura <z.figura12@gmail.com>
- Date: Sun, 10 Jun 2018 16:11:54 -0500
- Subject: [PATCH 32/83] server, ntdll: Also store the esync type in the server.
--
- And validate it there while we're at it.
--
- We need to do this because CreateEvent() ignores the passed-in parameter
- when opening an existing event.
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  dlls/ntdll/esync.c             | 23 +++++++++++++++--------
-@@ -17,7 +14,6 @@
-  server/request.h               |  4 +++-
-  server/trace.c                 |  2 ++
-  6 files changed, 50 insertions(+), 15 deletions(-)
--
- diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
- index 79d3c2d..0b373e3 100644
- --- a/dlls/ntdll/esync.c
-@@ -134,14 +130,6 @@
++++ b/0032-server-ntdll-Also-store-the-esync-type-in-the-server.patch	2020-04-23 17:16:39.108428309 +0100
+@@ -134,14 +134,6 @@
   };
   
   
@@ -36,8 +15,3 @@
  diff --git a/server/esync.c b/server/esync.c
  index ef02170..6cc212e 100644
  --- a/server/esync.c
-@@ -262,4 +250,3 @@
-  static void dump_get_esync_fd_request( const struct get_esync_fd_request *req )
- -- 
- 2.7.4
--

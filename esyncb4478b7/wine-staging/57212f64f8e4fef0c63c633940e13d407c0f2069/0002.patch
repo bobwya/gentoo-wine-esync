@@ -1,22 +1,6 @@
 --- a/0002-server-Create-server-objects-for-eventfd-based-synch.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0002-server-Create-server-objects-for-eventfd-based-synch.patch	2020-04-12 23:48:30.771414053 +0100
-@@ -3,7 +3,6 @@
- Date: Thu, 7 Jun 2018 20:09:59 -0500
- Subject: [PATCH 02/83] server: Create server objects for eventfd-based
-  synchronization objects.
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  include/wine/server_protocol.h |  19 ++++++
-@@ -14,7 +13,6 @@
-  server/trace.c                 |  16 +++++
-  6 files changed, 190 insertions(+)
-  create mode 100644 server/esync.c
--
- diff --git a/include/wine/server_protocol.h b/include/wine/server_protocol.h
- index e8611ce..be6c71f 100644
- --- a/include/wine/server_protocol.h
-@@ -65,7 +63,7 @@
++++ b/0002-server-Create-server-objects-for-eventfd-based-synch.patch	2020-04-23 17:16:54.272237067 +0100
+@@ -65,7 +65,7 @@
  +    struct create_esync_reply create_esync_reply;
   };
   
@@ -25,7 +9,7 @@
  diff --git a/server/Makefile.in b/server/Makefile.in
  index aaaa8d3..5d96d22 100644
  --- a/server/Makefile.in
-@@ -83,7 +81,7 @@
+@@ -83,7 +83,7 @@
  index 0000000..66cae24
  --- /dev/null
  +++ b/server/esync.c
@@ -34,7 +18,7 @@
  +/*
  + * eventfd-based synchronization objects
  + *
-@@ -149,6 +147,7 @@
+@@ -149,6 +149,7 @@
  +    directory_link_name,       /* link_name */
  +    default_unlink_name,       /* unlink_name */
  +    no_open_file,              /* open_file */
@@ -42,7 +26,7 @@
  +    no_close_handle,           /* close_handle */
  +    esync_destroy              /* destroy */
  +};
-@@ -224,7 +223,7 @@
+@@ -224,7 +225,7 @@
  index 1a76f22..84a5ac1 100644
  --- a/server/protocol.def
  +++ b/server/protocol.def
@@ -51,7 +35,7 @@
       obj_handle_t handle;          /* handle to the job */
       int          status;          /* process exit code */
   @END
-@@ -238,6 +237,9 @@
+@@ -238,6 +239,9 @@
  +@REPLY
  +    obj_handle_t handle;        /* handle to the object */
  +@END
@@ -61,8 +45,3 @@
  diff --git a/server/request.h b/server/request.h
  index 0e3f465..66dd2d5 100644
  --- a/server/request.h
-@@ -321,4 +323,3 @@
-  static const struct
- -- 
- 2.7.4
--
