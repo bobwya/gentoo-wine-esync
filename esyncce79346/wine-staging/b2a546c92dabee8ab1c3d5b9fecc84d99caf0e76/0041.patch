@@ -1,34 +1,6 @@
 --- a/0041-server-Allocate-shared-memory-segments-for-semaphore.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0041-server-Allocate-shared-memory-segments-for-semaphore.patch	2020-04-12 23:48:35.416187839 +0100
-@@ -3,19 +3,15 @@
- Date: Sun, 10 Jun 2018 23:12:16 -0500
- Subject: [PATCH 41/83] server: Allocate shared memory segments for semaphores
-  and mutexes.
--
- As has been described in the README, these two objects have state that can't
- be expressed (or read from) the eventfd descriptor. Namely, for semaphores
- we need to know the current lock count, and for mutexes we need to know the
-  owner tid and the recursion count. To make these work across processes, we
- store them in a global shared memory section.
--
- This patch has no effect by itself; it's for separation.
--
- We use the WINEPREFIX dir to discriminate shm sections for simultaneously
- running servers; this is based off of code in libwine (specifically
- init_server_dir()).
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  include/wine/server_protocol.h |  6 +++-
-@@ -26,7 +22,6 @@
-  server/request.h               |  6 ++--
-  server/trace.c                 |  2 ++
-  7 files changed, 83 insertions(+), 3 deletions(-)
--
- diff --git a/include/wine/server_protocol.h b/include/wine/server_protocol.h
- index 31619b9a48..1ead5f7ad1 100644
- --- a/include/wine/server_protocol.h
-@@ -49,14 +44,6 @@
++++ b/0041-server-Allocate-shared-memory-segments-for-semaphore.patch	2020-04-23 17:16:57.123201806 +0100
+@@ -49,14 +49,6 @@
   };
   
   
@@ -43,7 +15,7 @@
  diff --git a/server/esync.c b/server/esync.c
  index 399011ff0b..f1a46afc23 100644
  --- a/server/esync.c
-@@ -200,7 +187,7 @@
+@@ -200,7 +192,7 @@
   #include "wine/library.h"
   
   /* command-line options */
@@ -52,7 +24,7 @@
       sock_init();
       open_master_socket();
   
-@@ -208,6 +195,7 @@
+@@ -208,6 +200,7 @@
  +        esync_init();
  +
       if (debug_level) fprintf( stderr, "wineserver: starting (pid=%ld)\n", (long) getpid() );
@@ -60,8 +32,3 @@
       init_signals();
       init_directories();
  diff --git a/server/protocol.def b/server/protocol.def
-@@ -276,4 +264,3 @@
-  static void dump_get_esync_fd_request( const struct get_esync_fd_request *req )
- -- 
- 2.19.1
--

@@ -1,0 +1,17 @@
+--- a/0078-ntdll-server-Initialize-the-shared-memory-portion-on.patch	2018-11-01 17:19:44.000000000 +0000
++++ b/0078-ntdll-server-Initialize-the-shared-memory-portion-on.patch	2020-04-23 17:16:53.060252119 +0100
+@@ -218,14 +218,6 @@
+  };
+  struct create_esync_reply
+  {
+-@@ -6631,6 +6633,6 @@ union generic_reply
+-     struct get_esync_apc_fd_reply get_esync_apc_fd_reply;
+- };
+- 
+--#define SERVER_PROTOCOL_VERSION 575
+-+#define SERVER_PROTOCOL_VERSION 576
+- 
+- #endif /* __WINE_WINE_SERVER_PROTOCOL_H */
+ diff --git a/server/esync.c b/server/esync.c
+ index 3e78387e88..35e7a8a1fe 100644
+ --- a/server/esync.c

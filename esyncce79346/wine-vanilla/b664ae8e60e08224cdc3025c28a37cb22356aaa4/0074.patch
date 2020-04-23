@@ -1,15 +1,15 @@
 --- a/0074-ntdll-server-Abort-if-esync-is-enabled-for-the-serve.patch	2018-11-01 17:19:44.000000000 +0000
-+++ b/0074-ntdll-server-Abort-if-esync-is-enabled-for-the-serve.patch	2020-04-12 23:48:26.812608070 +0100
-@@ -1,16 +1,14 @@
++++ b/0074-ntdll-server-Abort-if-esync-is-enabled-for-the-serve.patch	2020-04-23 17:16:51.438272331 +0100
+@@ -1,13 +1,13 @@
 -From 7b617b003abd29e7869178cb8ca108802691159f Mon Sep 17 00:00:00 2001
 +From 4293d1e7797b999611ecc410b24052a1566715b6 Mon Sep 17 00:00:00 2001
  From: Zebediah Figura <z.figura12@gmail.com>
  Date: Sat, 4 Aug 2018 15:15:12 -0500
 -Subject: [PATCH 74/83] ntdll, server: Abort if esync is enabled for the server
 - but not the client, and vice versa.
--
 +Subject: [PATCH] ntdll, server: Abort if esync is enabled for the server but
 + not the client, and vice versa.
+ 
  Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
  ---
   dlls/ntdll/esync.c  | 28 +++++++++++++++++++++++++++-
@@ -17,11 +17,8 @@
 + dlls/ntdll/loader.c |  3 +--
   server/esync.c      | 12 ++++++++++++
   3 files changed, 40 insertions(+), 3 deletions(-)
--
- diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
- index 32cb68ad9b..4d3e29490d 100644
- --- a/dlls/ntdll/esync.c
-@@ -61,21 +59,21 @@
+ 
+@@ -61,21 +61,21 @@
   
       pagesize = sysconf( _SC_PAGESIZE );
   
@@ -53,10 +50,10 @@
  index a0745a2306..10001a243b 100644
  --- a/server/esync.c
  +++ b/server/esync.c
-@@ -99,5 +97,4 @@
+@@ -99,5 +99,5 @@
   
       if ((esync = create_esync( root, &name, objattr->attributes, req->initval, req->flags, req->type, sd )))
  -- 
 -2.19.1
--
 +2.23.0
+ 

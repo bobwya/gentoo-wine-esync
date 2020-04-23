@@ -1,24 +1,6 @@
 --- a/0007-ntdll-Implement-waiting-on-esync-objects.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0007-ntdll-Implement-waiting-on-esync-objects.patch	2020-04-12 23:48:25.032695663 +0100
-@@ -2,17 +2,14 @@
- From: Zebediah Figura <z.figura12@gmail.com>
- Date: Thu, 7 Jun 2018 21:23:52 -0500
- Subject: [PATCH 07/83] ntdll: Implement waiting on esync objects.
--
- This is the most basic case: WAIT_ANY. We use poll() (actually ppoll(), for
- the better granularity) to select on all of the handles that we can.
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  dlls/ntdll/esync.c | 161 +++++++++++++++++++++++++++++++++++++++++++++
-  dlls/ntdll/esync.h |   3 +
-  dlls/ntdll/sync.c  |   7 ++
-  3 files changed, 171 insertions(+)
--
- diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
- index 03a627a157..1b75fb8bc8 100644
- --- a/dlls/ntdll/esync.c
-@@ -119,14 +116,14 @@
++++ b/0007-ntdll-Implement-waiting-on-esync-objects.patch	2020-04-23 17:16:50.335286114 +0100
+@@ -119,14 +119,14 @@
  +    {
  +        TRACE("Waiting for %s of %d handles:", wait_any ? "any" : "all", count);
  +        for (i = 0; i < count; i++)
@@ -36,8 +18,3 @@
  +                (long) timeleft / TICKSPERSEC, (long) timeleft % TICKSPERSEC);
  +        }
  +    }
-@@ -223,4 +220,3 @@
-      for (i = 0; i < count; i++) select_op.wait.handles[i] = wine_server_obj_handle( handles[i] );
- -- 
- 2.19.1
--

@@ -1,21 +1,6 @@
 --- a/0009-ntdll-Implement-NtSetEvent.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0009-ntdll-Implement-NtSetEvent.patch	2020-04-12 23:48:33.318289824 +0100
-@@ -2,14 +2,12 @@
- From: Zebediah Figura <z.figura12@gmail.com>
- Date: Fri, 8 Jun 2018 15:41:01 -0500
- Subject: [PATCH 09/83] ntdll: Implement NtSetEvent().
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  dlls/ntdll/esync.c | 15 +++++++++++++++
-  dlls/ntdll/esync.h |  1 +
-  dlls/ntdll/sync.c  |  3 +++
-  3 files changed, 19 insertions(+)
--
- diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
- index 98e3f85515..39f42dbf04 100644
- --- a/dlls/ntdll/esync.c
-@@ -53,15 +51,14 @@
++++ b/0009-ntdll-Implement-NtSetEvent.patch	2020-04-23 17:16:55.836217697 +0100
+@@ -53,15 +53,15 @@
  --- a/dlls/ntdll/sync.c
  +++ b/dlls/ntdll/sync.c
  @@ -360,6 +360,9 @@ NTSTATUS WINAPI NtSetEvent( HANDLE handle, PULONG NumberOfThreadsReleased )
@@ -33,4 +18,4 @@
 +         req->handle = wine_server_obj_handle( handle );
  -- 
  2.19.1
--
+ 

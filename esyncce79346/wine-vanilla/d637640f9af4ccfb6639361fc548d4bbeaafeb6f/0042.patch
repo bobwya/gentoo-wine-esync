@@ -1,33 +1,27 @@
 --- a/0042-ntdll-Use-shared-memory-segments-to-store-semaphore-.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0042-ntdll-Use-shared-memory-segments-to-store-semaphore-.patch	2020-04-12 23:48:25.959650015 +0100
-@@ -1,22 +1,19 @@
++++ b/0042-ntdll-Use-shared-memory-segments-to-store-semaphore-.patch	2020-04-23 17:16:50.910278923 +0100
+@@ -1,8 +1,8 @@
 -From 56864692e4ed8f588a5dcee931e70fe6da0a1920 Mon Sep 17 00:00:00 2001
 +From 74673086285abb335d58cecf4327bf08034210a6 Mon Sep 17 00:00:00 2001
  From: Zebediah Figura <z.figura12@gmail.com>
  Date: Mon, 11 Jun 2018 13:10:36 -0500
 -Subject: [PATCH 42/83] ntdll: Use shared memory segments to store semaphore
 - and mutex state.
--
 +Subject: [PATCH] ntdll: Use shared memory segments to store semaphore and
 + mutex state.
+ 
  This patch is pretty big, because it restructures the underlying esync
  objects. Instead of wrapping a struct esync, the semaphore and mutex structs
- are now contained within it, as a pointer to shared memory. This also means
- that we can move a lot of common code to create_esync() and open_esync()
- since now we don't have to allocate separate structures.
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+@@ -14,7 +14,7 @@
  ---
   dlls/ntdll/esync.c  | 349 +++++++++++++++++++-------------------------
   dlls/ntdll/esync.h  |   1 +
 - dlls/ntdll/thread.c |   4 +
 + dlls/ntdll/loader.c |   4 +
   3 files changed, 155 insertions(+), 199 deletions(-)
--
+ 
  diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
- index 6409678e55..6a54405488 100644
- --- a/dlls/ntdll/esync.c
-@@ -657,28 +654,27 @@
+@@ -657,28 +657,28 @@
   extern NTSTATUS esync_close( HANDLE handle ) DECLSPEC_HIDDEN;
   
   extern NTSTATUS esync_create_semaphore(HANDLE *handle, ACCESS_MASK access,
@@ -69,5 +63,5 @@
 +     init_user_process_params( info_size );
  -- 
 -2.19.1
--
 +2.23.0
+ 

@@ -1,15 +1,17 @@
 --- null	1970-01-01 01:00:00.000000000 +0100
-+++ b/0084-server-Use-default_fd_get_esync_fd-for-directory-cha.patch	2020-04-12 23:48:23.627764974 +0100
-@@ -0,0 +1,36 @@
++++ b/0084-server-Use-default_fd_get_esync_fd-for-directory-cha.patch	2020-04-23 17:16:49.464297022 +0100
+@@ -0,0 +1,38 @@
 +From 770e803adbc13c78ee52c7e8435d651da854fcf1 Mon Sep 17 00:00:00 2001
 +From: Zebediah Figura <z.figura12@gmail.com>
 +Date: Wed, 24 Apr 2019 23:21:25 -0500
 +Subject: [PATCH] server: Create esync file descriptors for true file objects
 + and use them for directory change notifications.
++
 +---
 + server/change.c | 2 +-
 + server/fd.c     | 3 +++
 + 2 files changed, 4 insertions(+), 1 deletion(-)
++
 +diff --git a/server/change.c b/server/change.c
 +index 2be6a8360..9f07be705 100644
 +--- a/server/change.c

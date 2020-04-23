@@ -1,25 +1,6 @@
 --- a/0001-configure-Check-for-sys-eventfd.h-ppoll-and-shm_open.patch	2018-11-01 17:19:42.000000000 +0000
-+++ b/0001-configure-Check-for-sys-eventfd.h-ppoll-and-shm_open.patch	2020-04-12 23:48:18.068040621 +0100
-@@ -3,18 +3,14 @@
- Date: Wed, 13 Jun 2018 10:44:49 -0500
- Subject: [PATCH 01/83] configure: Check for sys/eventfd.h, ppoll(), and
-  shm_open().
--
- We use ppoll() instead of poll() for the better time granularity.
--
- Although perhaps we shouldn't since the server doesn't do this.
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  configure           | 68 +++++++++++++++++++++++++++++++++++++++++++++
-  configure.ac        | 12 ++++++++
-  include/config.h.in |  9 ++++++
-  3 files changed, 89 insertions(+)
--
- diff --git a/configure b/configure
- index 51e3d7fc14..eb0a11ca86 100755
- --- a/configure
-@@ -26,10 +22,10 @@
++++ b/0001-configure-Check-for-sys-eventfd.h-ppoll-and-shm_open.patch	2020-04-23 17:16:46.053339935 +0100
+@@ -26,10 +26,10 @@
  +	sys/eventfd.h \
   	sys/exec_elf.h \
   	sys/filio.h \
@@ -32,7 +13,7 @@
   	port_create \
  +	ppoll \
   	prctl \
-@@ -119,10 +115,10 @@
+@@ -119,10 +119,10 @@
  +	sys/eventfd.h \
   	sys/exec_elf.h \
   	sys/filio.h \
@@ -45,8 +26,3 @@
   	port_create \
  +	ppoll \
   	prctl \
-@@ -181,4 +177,3 @@
-  
- -- 
- 2.19.1
--

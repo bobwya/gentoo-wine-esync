@@ -1,23 +1,6 @@
 --- a/0001-configure-Check-for-sys-eventfd.h-ppoll-and-shm_open.patch	2018-11-01 17:19:42.000000000 +0000
-+++ b/0001-configure-Check-for-sys-eventfd.h-ppoll-and-shm_open.patch	2020-04-12 23:48:27.586570054 +0100
-@@ -3,42 +3,38 @@
- Date: Wed, 13 Jun 2018 10:44:49 -0500
- Subject: [PATCH 01/83] configure: Check for sys/eventfd.h, ppoll(), and
-  shm_open().
--
- We use ppoll() instead of poll() for the better time granularity.
--
- Although perhaps we shouldn't since the server doesn't do this.
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  configure           | 68 +++++++++++++++++++++++++++++++++++++++++++++
-  configure.ac        | 12 ++++++++
-  include/config.h.in |  9 ++++++
-  3 files changed, 89 insertions(+)
--
- diff --git a/configure b/configure
- index 51e3d7fc14..eb0a11ca86 100755
++++ b/0001-configure-Check-for-sys-eventfd.h-ppoll-and-shm_open.patch	2020-04-23 17:16:51.915266379 +0100
+@@ -20,25 +20,25 @@
  --- a/configure
  +++ b/configure
  @@ -7352,6 +7352,7 @@ for ac_header in \
@@ -50,7 +33,7 @@
  +if test "$ac_cv_header_sys_mman_h" = "yes" -a "x$RT_LIBS" = "x"
  +then
  +    ac_save_LIBS=$LIBS
-@@ -105,33 +101,33 @@
+@@ -105,33 +105,33 @@
  +fi
  +LIBS=$ac_save_LIBS
  +
@@ -94,7 +77,7 @@
  +dnl Check for shm_open which may be in -lrt
  +if test "$ac_cv_header_sys_mman_h" = "yes" -a "x$RT_LIBS" = "x"
  +then
-@@ -142,16 +138,16 @@
+@@ -142,16 +142,16 @@
  +fi
  +LIBS=$ac_save_LIBS
  +
@@ -116,8 +99,3 @@
   
  +/* Define to 1 if you have the `ppoll' function. */
  +#undef HAVE_PPOLL
-@@ -181,4 +177,3 @@
-  
- -- 
- 2.19.1
--

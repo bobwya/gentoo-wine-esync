@@ -1,24 +1,6 @@
 --- a/0045-server-ntdll-Implement-alertable-waits.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0045-server-ntdll-Implement-alertable-waits.patch	2020-04-12 23:48:14.691209150 +0100
-@@ -2,9 +2,7 @@
- From: Zebediah Figura <z.figura12@gmail.com>
- Date: Fri, 15 Jun 2018 14:12:22 -0500
- Subject: [PATCH 45/83] server, ntdll: Implement alertable waits.
--
- We do this quite simply by waiting on an extra eventfd descriptor, which the server signals when a user APC is queued.
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  dlls/ntdll/esync.c             | 94 +++++++++++++++++++++++++++++-----
-@@ -19,7 +17,6 @@
-  server/thread.h                |  1 +
-  server/trace.c                 |  7 +++
-  11 files changed, 146 insertions(+), 18 deletions(-)
--
- diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
- index 360a980db2..395c8d3366 100644
- --- a/dlls/ntdll/esync.c
-@@ -73,12 +70,12 @@
++++ b/0045-server-ntdll-Implement-alertable-waits.patch	2020-04-23 17:16:43.988366070 +0100
+@@ -73,12 +73,12 @@
  @@ -728,6 +752,8 @@ NTSTATUS esync_wait_objects( DWORD count, const HANDLE *handles, BOOLEAN wait_an
   
           if (msgwait)
@@ -34,7 +16,7 @@
  @@ -766,10 +792,17 @@ NTSTATUS esync_wait_objects( DWORD count, const HANDLE *handles, BOOLEAN wait_an
           }
           if (msgwait)
-@@ -216,8 +213,8 @@
+@@ -216,8 +216,8 @@
  --- a/dlls/ntdll/thread.c
  +++ b/dlls/ntdll/thread.c
  @@ -355,6 +355,7 @@ void thread_init(void)
@@ -44,7 +26,7 @@
       thread_data->esync_queue_fd = -1;
  +    thread_data->esync_apc_fd = -1;
   
-@@ -269,17 +266,14 @@
+@@ -269,17 +269,14 @@
   };
   union generic_reply
   {
@@ -63,8 +45,3 @@
  diff --git a/server/esync.c b/server/esync.c
  index 6adf996872..8bf6e441f1 100644
  --- a/server/esync.c
-@@ -482,4 +476,3 @@
-  static const struct
- -- 
- 2.19.1
--

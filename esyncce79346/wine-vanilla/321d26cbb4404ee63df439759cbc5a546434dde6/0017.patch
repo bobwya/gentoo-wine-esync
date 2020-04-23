@@ -1,25 +1,6 @@
 --- a/0017-server-Create-eventfd-file-descriptors-for-event-obj.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0017-server-Create-eventfd-file-descriptors-for-event-obj.patch	2020-04-12 23:48:28.364531881 +0100
-@@ -3,18 +3,14 @@
- Date: Fri, 8 Jun 2018 21:01:24 -0500
- Subject: [PATCH 17/83] server: Create eventfd file descriptors for event
-  objects.
--
- We still need this, since there are some events which the server signals.
--
- This lets system processes shut down.
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  server/esync.c |  8 ++++++++
-  server/esync.h |  1 +
-  server/event.c | 28 ++++++++++++++++++++++++++--
-  3 files changed, 35 insertions(+), 2 deletions(-)
--
- diff --git a/server/esync.c b/server/esync.c
- index 2e93493af1..e933d289b4 100644
- --- a/server/esync.c
-@@ -47,7 +43,7 @@
++++ b/0017-server-Create-eventfd-file-descriptors-for-event-obj.patch	2020-04-23 17:16:52.395260399 +0100
+@@ -47,7 +47,7 @@
  index a85be8de3d..41b4d6e054 100644
  --- a/server/event.c
  +++ b/server/event.c
@@ -28,7 +9,7 @@
   #include "thread.h"
   #include "request.h"
   #include "security.h"
-@@ -56,6 +52,7 @@
+@@ -56,6 +56,7 @@
   struct event
   {
       struct object  obj;             /* object header */
@@ -36,7 +17,7 @@
       int            manual_reset;    /* is it a manual reset event? */
       int            signaled;        /* event has been signaled */
  +    int            esync_fd;        /* esync file descriptor */
-@@ -68,6 +65,7 @@
+@@ -68,6 +69,7 @@
   static void event_satisfied( struct object *obj, struct wait_queue_entry *entry );
   static unsigned int event_map_access( struct object *obj, unsigned int access );
   static int event_signal( struct object *obj, unsigned int access);
@@ -44,7 +25,7 @@
  +static void event_destroy( struct object *obj );
   
   static const struct object_ops event_ops =
-@@ -81,9 +79,8 @@
+@@ -81,9 +83,8 @@
       event_satisfied,           /* satisfied */
       event_signal,              /* signal */
       no_get_fd,                 /* get_fd */
@@ -56,7 +37,7 @@
       no_close_handle,           /* close_handle */
  -    no_destroy                 /* destroy */
  +    event_destroy              /* destroy */
-@@ -91,7 +88,7 @@
+@@ -91,7 +92,7 @@
   
   
  @@ -121,6 +125,9 @@ struct event *create_event( struct object *root, const struct unicode_str *name,
@@ -65,7 +46,7 @@
               event->manual_reset = manual_reset;
               event->signaled     = initial_state;
  +
-@@ -135,9 +132,8 @@
+@@ -135,9 +136,9 @@
  +        close( event->esync_fd );
  +}
  +
@@ -76,4 +57,4 @@
 +     struct event *event = (struct event *)obj;
  -- 
  2.19.1
--
+ 

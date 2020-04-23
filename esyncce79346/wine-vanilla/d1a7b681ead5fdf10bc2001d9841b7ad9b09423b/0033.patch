@@ -1,22 +1,6 @@
 --- a/0033-ntdll-server-Implement-NtOpenSemaphore.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0033-ntdll-server-Implement-NtOpenSemaphore.patch	2020-04-12 23:48:21.395875363 +0100
-@@ -2,7 +2,6 @@
- From: Zebediah Figura <z.figura12@gmail.com>
- Date: Sun, 10 Jun 2018 00:29:27 -0500
- Subject: [PATCH 33/83] ntdll, server: Implement NtOpenSemaphore().
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  dlls/ntdll/esync.c             | 60 ++++++++++++++++++++++++++++++++++
-@@ -14,7 +13,6 @@
-  server/request.h               | 10 ++++++
-  server/trace.c                 | 18 ++++++++++
-  8 files changed, 156 insertions(+)
--
- diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
- index 0b373e36ed..f840b57171 100644
- --- a/dlls/ntdll/esync.c
-@@ -150,24 +148,24 @@
++++ b/0033-ntdll-server-Implement-NtOpenSemaphore.patch	2020-04-23 17:16:48.088314293 +0100
+@@ -150,24 +150,24 @@
   {
       struct request_header __header;
  @@ -5992,6 +6010,7 @@ enum request
@@ -47,7 +31,7 @@
       struct create_esync_reply create_esync_reply;
  +    struct open_esync_reply open_esync_reply;
       struct get_esync_fd_reply get_esync_fd_reply;
-@@ -242,16 +240,16 @@
+@@ -242,16 +242,16 @@
  --- a/server/request.h
  +++ b/server/request.h
  @@ -404,6 +404,7 @@ DECL_HANDLER(set_job_limits);
@@ -68,7 +52,7 @@
       (req_handler)req_create_esync,
  +    (req_handler)req_open_esync,
       (req_handler)req_get_esync_fd,
-@@ -299,8 +297,8 @@
+@@ -299,8 +299,8 @@
   {
       fprintf( stderr, " handle=%04x", req->handle );
  @@ -4859,6 +4874,7 @@ static const dump_func req_dumpers[REQ_NB_REQUESTS] = {
@@ -79,7 +63,7 @@
       (dump_func)dump_create_esync_request,
  +    (dump_func)dump_open_esync_request,
       (dump_func)dump_get_esync_fd_request,
-@@ -315,8 +313,8 @@
+@@ -315,8 +315,8 @@
   };
   
  @@ -5451,6 +5468,7 @@ static const char * const req_names[REQ_NB_REQUESTS] = {
@@ -90,8 +74,3 @@
       "create_esync",
  +    "open_esync",
       "get_esync_fd",
-@@ -324,4 +322,3 @@
-  
- -- 
- 2.19.1
--

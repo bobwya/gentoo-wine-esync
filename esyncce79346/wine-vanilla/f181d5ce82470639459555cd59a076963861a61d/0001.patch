@@ -1,25 +1,6 @@
 --- a/0001-configure-Check-for-sys-eventfd.h-ppoll-and-shm_open.patch	2018-11-01 17:19:42.000000000 +0000
-+++ b/0001-configure-Check-for-sys-eventfd.h-ppoll-and-shm_open.patch	2020-04-12 23:48:24.983698077 +0100
-@@ -3,18 +3,14 @@
- Date: Wed, 13 Jun 2018 10:44:49 -0500
- Subject: [PATCH 01/83] configure: Check for sys/eventfd.h, ppoll(), and
-  shm_open().
--
- We use ppoll() instead of poll() for the better time granularity.
--
- Although perhaps we shouldn't since the server doesn't do this.
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  configure           | 68 +++++++++++++++++++++++++++++++++++++++++++++
-  configure.ac        | 12 ++++++++
-  include/config.h.in |  9 ++++++
-  3 files changed, 89 insertions(+)
--
- diff --git a/configure b/configure
- index 51e3d7fc14..eb0a11ca86 100755
- --- a/configure
-@@ -26,19 +22,19 @@
++++ b/0001-configure-Check-for-sys-eventfd.h-ppoll-and-shm_open.patch	2020-04-23 17:16:50.305286490 +0100
+@@ -26,19 +26,19 @@
  +	sys/eventfd.h \
   	sys/exec_elf.h \
   	sys/filio.h \
@@ -44,7 +25,7 @@
  +if test "$ac_cv_header_sys_mman_h" = "yes" -a "x$RT_LIBS" = "x"
  +then
  +    ac_save_LIBS=$LIBS
-@@ -105,9 +101,9 @@
+@@ -105,9 +105,9 @@
  +fi
  +LIBS=$ac_save_LIBS
  +
@@ -57,7 +38,7 @@
  diff --git a/configure.ac b/configure.ac
  index b64d99e9d1..fae1a1a228 100644
  --- a/configure.ac
-@@ -119,19 +115,19 @@
+@@ -119,19 +119,19 @@
  +	sys/eventfd.h \
   	sys/exec_elf.h \
   	sys/filio.h \
@@ -82,7 +63,7 @@
  +dnl Check for shm_open which may be in -lrt
  +if test "$ac_cv_header_sys_mman_h" = "yes" -a "x$RT_LIBS" = "x"
  +then
-@@ -142,9 +138,9 @@
+@@ -142,9 +142,9 @@
  +fi
  +LIBS=$ac_save_LIBS
  +
@@ -95,8 +76,3 @@
  diff --git a/include/config.h.in b/include/config.h.in
  index c5a3cb4807..1ba9efb29e 100644
  --- a/include/config.h.in
-@@ -181,4 +177,3 @@
-  
- -- 
- 2.19.1
--

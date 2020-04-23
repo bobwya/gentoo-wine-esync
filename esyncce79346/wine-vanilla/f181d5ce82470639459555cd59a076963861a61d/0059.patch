@@ -1,21 +1,6 @@
 --- a/0059-kernel32-tests-Zigzag-test.patch	2018-11-01 17:19:44.000000000 +0000
-+++ b/0059-kernel32-tests-Zigzag-test.patch	2020-04-12 23:48:25.420676557 +0100
-@@ -2,14 +2,11 @@
- From: Zebediah Figura <z.figura12@gmail.com>
- Date: Tue, 26 Jun 2018 18:44:44 -0500
- Subject: [PATCH 59/83] kernel32/tests: Zigzag test.
--
- The primary function is to check for races. The secondary function is to measure performance.
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  dlls/kernel32/tests/sync.c | 79 ++++++++++++++++++++++++++++++++++++++
-  1 file changed, 79 insertions(+)
--
- diff --git a/dlls/kernel32/tests/sync.c b/dlls/kernel32/tests/sync.c
- index 8a4a01d33f..9b2e57c339 100644
- --- a/dlls/kernel32/tests/sync.c
-@@ -96,15 +93,14 @@
++++ b/0059-kernel32-tests-Zigzag-test.patch	2020-04-23 17:16:50.577283088 +0100
+@@ -96,13 +96,13 @@
  +    trace("count: %d\n", zigzag_count[0]);
  +}
  +
@@ -32,5 +17,3 @@
  +    test_zigzag_event();
   }
  -- 
- 2.19.1
--

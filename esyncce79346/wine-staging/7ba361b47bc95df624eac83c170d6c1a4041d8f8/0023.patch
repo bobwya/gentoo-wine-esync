@@ -1,26 +1,6 @@
 --- a/0023-ntdll-wineandroid.drv-winemac.drv-winex11.drv-Store-.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0023-ntdll-wineandroid.drv-winemac.drv-winex11.drv-Store-.patch	2020-04-12 23:48:34.051254150 +0100
-@@ -3,11 +3,8 @@
- Date: Tue, 12 Jun 2018 10:01:08 -0500
- Subject: [PATCH 23/83] ntdll, wineandroid.drv, winemac.drv, winex11.drv: Store
-  the thread's queue fd in ntdll.
--
- I originally had esync grab it from the server in order to avoid touching the USER drivers, but this doesn't really work since we might perform a MsgWait before ever doing any operations which might initialize the USER driver's thread data. Doing it this way also has the advantage that we won't use extra file descriptors.
--
- In any case I haven't bothered to guard this code with do_esync(); it'd require adding that function to each USER driver and it's pretty obvious it's not going to affect anything if esync is disabled.
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  dlls/ntdll/esync.c             | 6 ++++++
-@@ -18,7 +15,6 @@
-  dlls/winemac.drv/macdrv_main.c | 3 +++
-  dlls/winex11.drv/x11drv_main.c | 3 +++
-  7 files changed, 20 insertions(+)
--
- diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
- index f77c84a18f..c4faf69a13 100644
- --- a/dlls/ntdll/esync.c
-@@ -40,20 +36,23 @@
++++ b/0023-ntdll-wineandroid.drv-winemac.drv-winex11.drv-Store-.patch	2020-04-23 17:16:56.286212137 +0100
+@@ -40,20 +40,23 @@
  index 87b5d7078f..2c2445a58a 100644
  --- a/dlls/ntdll/ntdll.spec
  +++ b/dlls/ntdll/ntdll.spec
@@ -46,7 +26,7 @@
  +    int                esync_queue_fd;/* fd to wait on for driver events */
   };
   
-@@ -70,14 +69,14 @@
+@@ -70,14 +73,14 @@
   
       signal_init_thread( teb );
       virtual_init_threading();
@@ -64,8 +44,3 @@
  diff --git a/dlls/wineandroid.drv/window.c b/dlls/wineandroid.drv/window.c
  index aebe4c57b3..3bc3703eda 100644
  --- a/dlls/wineandroid.drv/window.c
-@@ -143,4 +142,3 @@
-          MESSAGE( "x11drv: Can't allocate handle for display fd\n" );
- -- 
- 2.19.1
--

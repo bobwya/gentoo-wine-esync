@@ -1,30 +1,6 @@
 --- a/0024-server-ntdll-Also-wait-on-the-queue-fd-when-waiting-.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0024-server-ntdll-Also-wait-on-the-queue-fd-when-waiting-.patch	2020-04-12 23:48:12.704308697 +0100
-@@ -3,15 +3,12 @@
- Date: Sat, 9 Jun 2018 14:44:54 -0500
- Subject: [PATCH 24/83] server, ntdll: Also wait on the queue fd when waiting
-  for driver events.
--
- Normally the server handles this, by polling on the fd during its main loop.
- The problem there is that the server only polls when the thread is waiting
- for messages. We want to replicate that behaviour, otherwise wineserver spins
- forever trying to wake up a thread that just doesn't care.
--
- With this patch, I'm finally able to interact with winecfg. Next step is to
- fix the 'drives' tab.
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  dlls/ntdll/esync.c             | 44 ++++++++++++++++++++++++----------
-@@ -26,7 +23,6 @@
-  server/thread.c                |  5 ++--
-  server/trace.c                 |  7 +++++-
-  11 files changed, 79 insertions(+), 25 deletions(-)
--
- diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
- index c4faf69a13..cb206bc0f5 100644
- --- a/dlls/ntdll/esync.c
-@@ -105,13 +101,13 @@
++++ b/0024-server-ntdll-Also-wait-on-the-queue-fd-when-waiting-.patch	2020-04-23 17:16:42.766381595 +0100
+@@ -105,13 +105,13 @@
           FIXME("Can't wait on esync and server objects at the same time!\n");
  @@ -491,6 +496,9 @@ NTSTATUS esync_wait_objects( DWORD count, const HANDLE *handles, BOOLEAN wait_an
           for (i = 0; i < count; i++)
@@ -41,7 +17,7 @@
           else
  @@ -508,10 +516,16 @@ NTSTATUS esync_wait_objects( DWORD count, const HANDLE *handles, BOOLEAN wait_an
               fds[i].fd = objs[i] ? objs[i]->fd : -1;
-@@ -328,8 +324,8 @@
+@@ -328,8 +328,8 @@
  --- a/server/thread.c
  +++ b/server/thread.c
  @@ -131,7 +131,7 @@ static const struct object_ops thread_apc_ops =
@@ -51,8 +27,3 @@
   static int thread_signaled( struct object *obj, struct wait_queue_entry *entry );
  -static int thread_get_esync_fd( struct object *obj );
  +static int thread_get_esync_fd( struct object *obj, enum esync_type *type );
-@@ -375,4 +371,3 @@
-  static const char * const req_names[REQ_NB_REQUESTS] = {
- -- 
- 2.19.1
--

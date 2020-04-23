@@ -1,26 +1,6 @@
 --- a/0025-server-Create-eventfd-descriptors-for-device-manager.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0025-server-Create-eventfd-descriptors-for-device-manager.patch	2020-04-12 23:48:17.641061890 +0100
-@@ -3,19 +3,15 @@
- Date: Sat, 9 Jun 2018 15:39:37 -0500
- Subject: [PATCH 25/83] server: Create eventfd descriptors for device manager
-  objects.
--
- We don't have to worry about synchronization here because
- wine_ntoskrnl_main_loop() is only ever called from one thread per winedevice
- process.
--
- This lets drivers like mountmgr finally work, and so winecfg can open the
- Drives tab.
--
- Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
- ---
-  server/device.c | 24 +++++++++++++++++++++++-
-  1 file changed, 23 insertions(+), 1 deletion(-)
--
- diff --git a/server/device.c b/server/device.c
- index 94309ba112..5c13a839ab 100644
- --- a/server/device.c
-@@ -28,11 +24,11 @@
++++ b/0025-server-Create-eventfd-descriptors-for-device-manager.patch	2020-04-23 17:16:45.790343259 +0100
+@@ -28,11 +28,11 @@
   
   /* IRP object */
   
@@ -37,7 +17,7 @@
   };
   
   static void device_manager_dump( struct object *obj, int verbose );
-@@ -82,22 +78,22 @@
+@@ -82,22 +82,22 @@
  +        if (do_esync())
  +            close( manager->esync_fd );
       }
@@ -65,8 +45,3 @@
  +
  +            if (do_esync() && list_empty( &manager->requests ))
  +                esync_clear( manager->esync_fd );
-@@ -106,4 +102,3 @@
-      else set_error( STATUS_PENDING );
- -- 
- 2.19.1
--
