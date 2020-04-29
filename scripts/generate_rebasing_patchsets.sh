@@ -65,6 +65,7 @@ ESYNC_PATCH[85]="0085-server-Only-signal-the-APC-fd-for-user-APCs.patch"
 ESYNC_PATCH[86]="0086-ntdll-Check-the-APC-fd-first.patch"
 ESYNC_PATCH[87]="0087-ntdll-esync-Lock-accessing-the-shm_addrs-array.patch"
 ESYNC_PATCH[88]="0088-ntdll-Get-rid-of-the-per-event-spinlock-for-auto-res.patch"
+ESYNC_PATCH[89]="0089-ntdll-server-Abandon-esync-mutexes-on-thread-exit.patch"
 
 SCRIPT_NAME="$(readlink -f "${0}")"
 SCRIPT_DIRECTORY="$(dirname "${SCRIPT_NAME}")"
@@ -212,10 +213,10 @@ function generate_rebased_esync_patchset()
 
 	printf "\\nRebasing esync patchset, for app-emulation/${_target_esync_version}, against Wine Git commit: %s\\n" "${ARRAY_ESYNC_PATCH_COMMITS[_esync_rebase_index]}"
 
-	for _patch_number in {84..88}; do
+	for _patch_number in {84..89}; do
 		touch "${_source_esync_directory}/${ESYNC_PATCH[_patch_number]}"
 	done
-	for _patch_file_path in "${_source_esync_directory}/"{0001..0088}*.patch; do
+	for _patch_file_path in "${_source_esync_directory}/"{0001..0089}*.patch; do
 		_patch_file="$(basename "${_patch_file_path}")"
 		_patch_number="${_patch_file:0:4}"
 		_target_patch="${_patch_number}.patch"

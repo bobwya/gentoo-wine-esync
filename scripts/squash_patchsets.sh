@@ -123,7 +123,7 @@ git_garbage_collect()
 	pushd "${__git_tree}" >/dev/null || die "pushd failed"
 	git am --abort &>/dev/null
 	git gc --auto || die "git gc failed"
-	git prune || die "git prune failed"
+	#git prune || die "git prune failed"
 	rm -f ".git/gc.log" &>/dev/null
 	popd >/dev/null || die "popd failed"
 }

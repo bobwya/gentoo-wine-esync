@@ -4818,7 +4818,7 @@ function generate_patch_file_0088(file_array, diff_array,
 	insert_array_entry(file_array, ++line, line_text)
 	line_text = "     if (debug_level)"
 	insert_array_entry(file_array, ++line, line_text)
-	line_text = "         fprintf( stderr, \"esync_set_event() fd=%d\n\", esync->fd );"
+	line_text = "         fprintf( stderr, \"esync_set_event() fd=%d\\n\", esync->fd );"
 	insert_array_entry(file_array, ++line, line_text)
 	line_text = " "
 	insert_array_entry(file_array, ++line, line_text)
@@ -4878,7 +4878,7 @@ function generate_patch_file_0088(file_array, diff_array,
 	insert_array_entry(file_array, ++line, line_text)
 	line_text = "     if (debug_level)"
 	insert_array_entry(file_array, ++line, line_text)
-	line_text = "         fprintf( stderr, \"esync_reset_event() fd=%d\n\", esync->fd );"
+	line_text = "         fprintf( stderr, \"esync_reset_event() fd=%d\\n\", esync->fd );"
 	insert_array_entry(file_array, ++line, line_text)
 	line_text = " "
 	insert_array_entry(file_array, ++line, line_text)
@@ -4937,6 +4937,410 @@ function generate_patch_file_0088(file_array, diff_array,
 	line_text = "-- "
 	insert_array_entry(file_array, ++line, line_text)
 	line_text = "2.23.0"
+	insert_array_entry(file_array, ++line, line_text)
+
+	complete = ++diff_array["idiff"]
+
+	if (complete == 1) diff_array["exit code"] = 0
+}
+
+function generate_patch_file_0089(file_array, diff_array,
+	complete, line, line_text)
+{
+	diff_array["exit start line"]=0
+	diff_array["idiff"]=0
+
+	line_text="From c00917721a5076b90e3e61a7d326ef485c1f9dfb Mon Sep 17 00:00:00 2001"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="From: Zebediah Figura <z.figura12@gmail.com>"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="Date: Mon, 17 Feb 2020 11:28:37 -0600"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="Subject: [PATCH] ntdll, server: Abandon esync mutexes on thread exit."
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=""
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="Signed-off-by: Zebediah Figura <z.figura12@gmail.com>"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="---"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" dlls/ntdll/esync.c | 31 ++++++++++++++++++++++++++-----"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" server/esync.c     | 32 +++++++++++++++++++++++++++++---"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" server/esync.h     |  1 +"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" server/thread.c    |  2 ++"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" 4 files changed, 58 insertions(+), 8 deletions(-)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=""
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="index 87f303403..c2190f2fd 100644"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="--- a/dlls/ntdll/esync.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+++ b/dlls/ntdll/esync.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="@@ -807,7 +807,7 @@ NTSTATUS esync_query_mutex( HANDLE handle, MUTANT_INFORMATION_CLASS class,"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="     out->CurrentCount = 1 - mutex->count;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="     out->OwnedByCaller = (mutex->tid == GetCurrentThreadId());"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="-    out->AbandonedState = FALSE;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+    out->AbandonedState = (mutex->tid == ~0);"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="     if (ret_len) *ret_len = sizeof(*out);"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="     return STATUS_SUCCESS;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="@@ -857,14 +857,19 @@ static int do_poll( struct pollfd *fds, nfds_t nfds, ULONGLONG *end )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="     return ret;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="-static void update_grabbed_object( struct esync *obj )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+/* Return TRUE if abandoned. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+static BOOL update_grabbed_object( struct esync *obj )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+    BOOL ret = FALSE;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="     if (obj->type == ESYNC_MUTEX)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="     {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="         struct mutex *mutex = obj->shm;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="         /* We don't have to worry about a race between this and read(); the"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="          * fact that we grabbed it means the count is now zero, so nobody else"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="          * can (and the only thread that can release it is us). */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+        if (mutex->tid == ~0)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+            ret = TRUE;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="         mutex->tid = GetCurrentThreadId();"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="         mutex->count++;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="     }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="@@ -885,6 +890,8 @@ static void update_grabbed_object( struct esync *obj )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="          * This might already be 0, but that's okay! */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="         event->signaled = 0;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="     }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+    return ret;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" /* A value of STATUS_NOT_IMPLEMENTED returned from this function means that we"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="@@ -1018,7 +1025,13 @@ static NTSTATUS __esync_wait_objects( DWORD count, const HANDLE *handles,"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                     {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                         if ((size = read( obj->fd, &value, sizeof(value) )) == sizeof(value))"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                         {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="-                            TRACE(\"Woken up by handle %p [%d].\\n\", handles[i], i);"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+                            if (mutex->tid == ~0)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+                            {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+                                TRACE(\"Woken up by abandoned mutex %p [%d].\\n\", handles[i], i);"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+                                i += STATUS_ABANDONED_WAIT_0;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+                            }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+                            else"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+                                TRACE(\"Woken up by handle %p [%d].\\n\", handles[i], i);"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                             mutex->tid = GetCurrentThreadId();"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                             mutex->count++;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                             return i;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="@@ -1136,7 +1149,8 @@ static NTSTATUS __esync_wait_objects( DWORD count, const HANDLE *handles,"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                             {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                                 /* We found our object. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                                 TRACE(\"Woken up by handle %p [%d].\\n\", handles[i], i);"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="-                                update_grabbed_object( obj );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+                                if (update_grabbed_object( obj ))"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+                                    return STATUS_ABANDONED_WAIT_0 + i;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                                 return i;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                             }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                         }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="@@ -1255,6 +1269,8 @@ tryagain:"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="             ret = poll( fds, pollcount, 0 );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="             if (ret == pollcount)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="             {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+                BOOL abandoned = FALSE;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                 /* Quick, grab everything. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                 for (i = 0; i < pollcount; i++)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                 {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="@@ -1295,8 +1311,13 @@ tryagain:"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                 /* Make sure to let ourselves know that we grabbed the mutexes"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                  * and semaphores. */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                 for (i = 0; i < count; i++)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="-                    update_grabbed_object( objs[i] );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+                    abandoned |= update_grabbed_object( objs[i] );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+                if (abandoned)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+                {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+                    TRACE(\"Wait successful, but some object(s) were abandoned.\\n\");"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+                    return STATUS_ABANDONED;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+                }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                 TRACE(\"Wait successful.\\n\");"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                 return STATUS_SUCCESS;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="             }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="diff --git a/server/esync.c b/server/esync.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="index 040e24e69..1b035bdb0 100644"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="--- a/server/esync.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+++ b/server/esync.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="@@ -104,12 +104,15 @@ void esync_init(void)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="     atexit( shm_cleanup );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+static struct list mutex_list = LIST_INIT(mutex_list);"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" struct esync"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="-    struct object   obj;    /* object header */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="-    int             fd;     /* eventfd file descriptor */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+    struct object   obj;            /* object header */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+    int             fd;             /* eventfd file descriptor */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="     enum esync_type type;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="-    unsigned int    shm_idx;    /* index into the shared memory section */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+    unsigned int    shm_idx;        /* index into the shared memory section */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+    struct list     mutex_entry;    /* entry in the mutex list (if applicable) */"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" };"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" static void esync_dump( struct object *obj, int verbose );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="@@ -168,6 +171,8 @@ static unsigned int esync_map_access( struct object *obj, unsigned int access )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" static void esync_destroy( struct object *obj )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="     struct esync *esync = (struct esync *)obj;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+    if (esync->type == ESYNC_MUTEX)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+        list_remove( &esync->mutex_entry );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="     close( esync->fd );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="@@ -301,6 +306,7 @@ static struct esync *create_esync( struct object *root, const struct unicode_str"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                 struct mutex *mutex = get_shm( esync->shm_idx );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                 mutex->tid = initval ? 0 : current->id;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                 mutex->count = initval ? 0 : 1;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+                list_add_tail( &mutex_list, &esync->mutex_entry );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="                 break;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="             }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="             default:"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="@@ -447,6 +453,26 @@ void esync_reset_event( struct esync *esync )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="     }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+void esync_abandon_mutexes( struct thread *thread )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+{"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+    unsigned int index = 0;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+    struct esync *esync;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+    LIST_FOR_EACH_ENTRY( esync, &mutex_list, struct esync, mutex_entry )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+    {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+        struct mutex *mutex = get_shm( esync->shm_idx );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+        if (mutex->tid == thread->id)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+        {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+            if (debug_level)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+                fprintf( stderr, \"esync_abandon_mutexes() fd=%d\\n\", esync->fd );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+            mutex->tid = ~0;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+            mutex->count = 0;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+            esync_wake_fd( esync->fd );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+        }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+    }"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+}"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" DECL_HANDLER(create_esync)"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="     struct esync *esync;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="diff --git a/server/esync.h b/server/esync.h"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="index cea025d93..125da8e9d 100644"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="--- a/server/esync.h"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+++ b/server/esync.h"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="@@ -30,3 +30,4 @@ struct esync;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" extern const struct object_ops esync_ops;"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" void esync_set_event( struct esync *esync );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text=" void esync_reset_event( struct esync *esync );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+void esync_abandon_mutexes( struct thread *thread );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="diff --git a/server/thread.c b/server/thread.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="index d1923b4e8..1d5bca525 100644"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="--- a/server/thread.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+++ b/server/thread.c"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="@@ -1253,6 +1253,8 @@ void kill_thread( struct thread *thread, int violent_death )"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="     kill_console_processes( thread, 0 );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="     debug_exit_thread( thread );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="     abandon_mutexes( thread );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+    if (do_esync())"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="+        esync_abandon_mutexes( thread );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="     if (violent_death)"
+	insert_array_entry(file_array, ++line, line_text)	
+	line_text="     {"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="         send_thread_signal( thread, SIGQUIT );"
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="-- "
+	insert_array_entry(file_array, ++line, line_text)
+	line_text="2.25.0"
 	insert_array_entry(file_array, ++line, line_text)
 
 	complete = ++diff_array["idiff"]
@@ -5186,6 +5590,9 @@ function process_patch_file(file_array, diff_array)
 	else if (patch_number == "0088") {
 		generate_patch_file_0088(file_array, diff_array)
 	}
+	else if (patch_number == "0089") {
+		generate_patch_file_0089(file_array, diff_array)
+	}
 
 	if (diff_array["exit code"]) return diff_array["exit code"]
 
@@ -5199,7 +5606,7 @@ function process_patch_file(file_array, diff_array)
 }
 
 BEGIN{
-	supported_patches="0001 0002 0003 0006 0007 0009 0010 0011 0013 0014 0015 0017 0020 0023 0024 0025 0026 0032 0033 0040 0041 0042 0044 0045 0048 0051 0055 0056 0059 0064 0070 0074 0077 0078 0079 0084 0085 0086 0087 0088"
+	supported_patches="0001 0002 0003 0006 0007 0009 0010 0011 0013 0014 0015 0017 0020 0023 0024 0025 0026 0032 0033 0040 0041 0042 0044 0045 0048 0051 0055 0056 0059 0064 0070 0074 0077 0078 0079 0084 0085 0086 0087 0088 0089"
 	if (staging) supported_patches=(supported_patches " 0022 ")
 
 	if (supported_patches !~ patch_number) {
@@ -5218,3 +5625,4 @@ END{
 		exit diff_array["exit code"]
 	}
 }
+
