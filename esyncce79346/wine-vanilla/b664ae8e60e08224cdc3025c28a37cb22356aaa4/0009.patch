@@ -1,5 +1,5 @@
 --- a/0009-ntdll-Implement-NtSetEvent.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0009-ntdll-Implement-NtSetEvent.patch	2020-04-23 17:16:51.151275913 +0100
++++ b/0009-ntdll-Implement-NtSetEvent.patch	2020-04-29 20:41:31.476366133 +0100
 @@ -52,16 +52,16 @@
  index 84abb0d205..c8047bfa3e 100644
  --- a/dlls/ntdll/sync.c

@@ -1,5 +1,5 @@
 --- a/0023-ntdll-wineandroid.drv-winemac.drv-winex11.drv-Store-.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0023-ntdll-wineandroid.drv-winemac.drv-winex11.drv-Store-.patch	2020-04-23 17:16:47.289324350 +0100
++++ b/0023-ntdll-wineandroid.drv-winemac.drv-winex11.drv-Store-.patch	2020-04-29 20:41:27.438381982 +0100
 @@ -63,9 +63,9 @@
  --- a/dlls/ntdll/thread.c
  +++ b/dlls/ntdll/thread.c

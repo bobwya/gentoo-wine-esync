@@ -1,6 +1,6 @@
 --- null	1970-01-01 01:00:00.000000000 +0100
-+++ b/0088-ntdll-Get-rid-of-the-per-event-spinlock-for-auto-res.patch	2020-04-23 17:16:50.293286639 +0100
-@@ -0,0 +1,209 @@
++++ b/0088-ntdll-Get-rid-of-the-per-event-spinlock-for-auto-res.patch	2020-04-29 20:41:30.580369651 +0100
+@@ -0,0 +1,207 @@
 +From c41dc5b8c422be3914cd31c239ec586a091b8a3b Mon Sep 17 00:00:00 2001
 +From: Zebediah Figura <zfigura@codeweavers.com>
 +Date: Mon, 10 Jun 2019 11:25:34 -0400
@@ -148,8 +148,7 @@
 ++++ b/server/esync.c
 +@@ -396,9 +396,12 @@ void esync_set_event( struct esync *esync )
 +     if (debug_level)
-+         fprintf( stderr, "esync_set_event() fd=%d
-+", esync->fd );
++         fprintf( stderr, "esync_set_event() fd=%d\n", esync->fd );
 + 
 +-    /* Acquire the spinlock. */
 +-    while (interlocked_cmpxchg( &event->locked, 1, 0 ))
@@ -179,8 +178,7 @@
 + void esync_reset_event( struct esync *esync )
 +@@ -421,9 +427,12 @@ void esync_reset_event( struct esync *esync )
 +     if (debug_level)
-+         fprintf( stderr, "esync_reset_event() fd=%d
-+", esync->fd );
++         fprintf( stderr, "esync_reset_event() fd=%d\n", esync->fd );
 + 
 +-    /* Acquire the spinlock. */
 +-    while (interlocked_cmpxchg( &event->locked, 1, 0 ))

@@ -1,5 +1,5 @@
 --- a/0007-ntdll-Implement-waiting-on-esync-objects.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0007-ntdll-Implement-waiting-on-esync-objects.patch	2020-04-23 17:16:52.747256015 +0100
++++ b/0007-ntdll-Implement-waiting-on-esync-objects.patch	2020-04-29 20:41:33.142359593 +0100
 @@ -71,7 +71,7 @@
  +}
  +

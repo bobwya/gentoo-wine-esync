@@ -1,5 +1,5 @@
 --- a/0001-configure-Check-for-sys-eventfd.h-ppoll-and-shm_open.patch	2018-11-01 17:19:42.000000000 +0000
-+++ b/0001-configure-Check-for-sys-eventfd.h-ppoll-and-shm_open.patch	2020-04-23 17:16:42.662382918 +0100
++++ b/0001-configure-Check-for-sys-eventfd.h-ppoll-and-shm_open.patch	2020-04-29 20:41:22.592400990 +0100
 @@ -28,8 +28,8 @@
   	sys/filio.h \
   	sys/inotify.h \

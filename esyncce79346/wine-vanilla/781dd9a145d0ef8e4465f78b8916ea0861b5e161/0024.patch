@@ -1,5 +1,5 @@
 --- a/0024-server-ntdll-Also-wait-on-the-queue-fd-when-waiting-.patch	2018-11-01 17:19:43.000000000 +0000
-+++ b/0024-server-ntdll-Also-wait-on-the-queue-fd-when-waiting-.patch	2020-04-23 17:16:46.540333791 +0100
++++ b/0024-server-ntdll-Also-wait-on-the-queue-fd-when-waiting-.patch	2020-04-29 20:41:26.653385062 +0100
 @@ -105,13 +105,13 @@
           FIXME("Can't wait on esync and server objects at the same time!\n");
  @@ -491,6 +496,9 @@ NTSTATUS esync_wait_objects( DWORD count, const HANDLE *handles, BOOLEAN wait_an

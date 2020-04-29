@@ -1,5 +1,5 @@
 --- a/0051-kernel32-tests-Add-some-tests-for-wait-timeouts.patch	2018-11-01 17:19:44.000000000 +0000
-+++ b/0051-kernel32-tests-Add-some-tests-for-wait-timeouts.patch	2020-04-23 17:16:51.751268426 +0100
++++ b/0051-kernel32-tests-Add-some-tests-for-wait-timeouts.patch	2020-04-29 20:41:32.098363692 +0100
 @@ -14,7 +14,7 @@
  +++ b/dlls/kernel32/tests/sync.c
  @@ -54,6 +54,7 @@ static BOOLEAN (WINAPI *pTryAcquireSRWLockShared)(PSRWLOCK);
