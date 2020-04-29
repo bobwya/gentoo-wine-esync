@@ -1,5 +1,5 @@
 --- a/0042-ntdll-Use-shared-memory-segments-to-store-semaphore-.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0042-ntdll-Use-shared-memory-segments-to-store-semaphore-.patch	2020-04-23 17:16:38.780432518 +0100
++++ b/0042-ntdll-Use-shared-memory-segments-to-store-semaphore-.patch	2020-04-29 20:41:18.472417140 +0100
 @@ -668,7 +668,7 @@
  +#include "esync.h"
   

@@ -1,5 +1,5 @@
 --- a/0074-ntdll-server-Abort-if-esync-is-enabled-for-the-serve.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0074-ntdll-server-Abort-if-esync-is-enabled-for-the-serve.patch	2020-04-23 17:16:55.344223784 +0100
++++ b/0074-ntdll-server-Abort-if-esync-is-enabled-for-the-serve.patch	2020-04-29 20:41:35.867348890 +0100
 @@ -66,7 +66,7 @@
  --- a/dlls/ntdll/thread.c
  +++ b/dlls/ntdll/thread.c

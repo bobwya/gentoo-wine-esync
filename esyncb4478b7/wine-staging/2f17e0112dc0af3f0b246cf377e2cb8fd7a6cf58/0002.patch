@@ -1,5 +1,5 @@
 --- a/0002-server-Create-server-objects-for-eventfd-based-synch.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0002-server-Create-server-objects-for-eventfd-based-synch.patch	2020-04-23 17:16:55.042227521 +0100
++++ b/0002-server-Create-server-objects-for-eventfd-based-synch.patch	2020-04-29 20:41:35.555350116 +0100
 @@ -65,7 +65,7 @@
  +    struct create_esync_reply create_esync_reply;
   };

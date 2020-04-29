@@ -1,5 +1,5 @@
 --- a/0006-ntdll-Close-esync-objects.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0006-ntdll-Close-esync-objects.patch	2020-04-23 17:16:54.676232058 +0100
++++ b/0006-ntdll-Close-esync-objects.patch	2020-04-29 20:41:35.171351624 +0100
 @@ -63,7 +63,7 @@
  +#include "esync.h"
   #include "wine/server.h"

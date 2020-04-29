@@ -1,5 +1,5 @@
 --- a/0007-ntdll-Implement-waiting-on-esync-objects.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0007-ntdll-Implement-waiting-on-esync-objects.patch	2020-04-23 17:16:40.837406182 +0100
++++ b/0007-ntdll-Implement-waiting-on-esync-objects.patch	2020-04-29 20:41:20.668408533 +0100
 @@ -119,14 +119,14 @@
  +    {
  +        TRACE("Waiting for %s of %d handles:", wait_any ? "any" : "all", count);

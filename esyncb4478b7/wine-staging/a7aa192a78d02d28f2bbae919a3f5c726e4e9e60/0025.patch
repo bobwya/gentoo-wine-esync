@@ -1,5 +1,5 @@
 --- a/0025-server-Create-eventfd-descriptors-for-device-manager.patch	2018-10-07 03:47:11.000000000 +0100
-+++ b/0025-server-Create-eventfd-descriptors-for-device-manager.patch	2020-04-23 17:16:53.233249970 +0100
++++ b/0025-server-Create-eventfd-descriptors-for-device-manager.patch	2020-04-29 20:41:33.653357586 +0100
 @@ -74,10 +74,10 @@
   static void device_manager_destroy( struct object *obj )
   {
