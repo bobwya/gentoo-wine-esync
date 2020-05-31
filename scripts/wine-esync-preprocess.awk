@@ -764,10 +764,155 @@ function process_patch_file_0003(file_array, diff_array,
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
-		if (diff_array["file"] == "/dlls/ntdll/sync.c") {
+		if (diff_array["file"] == "/dlls/ntdll/ntdll_misc.h") {
 			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 40) {
+						diff_array["idiff"] += 3
+					}
+					else if (esync_rebase_index == 41) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("^ extern int server_remove_fd_from_cache( HANDLE handle ) DECLSPEC_HIDDEN;$")) {
+						indent=" "
+						line_text="extern unsigned int server_wait( const select_op_t *select_op, data_size_t size,"
+						file_array[line]=(indent line_text)
+						line_text="                                 UINT flags, const LARGE_INTEGER *timeout ) DECLSPEC_HIDDEN;"
+						file_array[++line]=(indent line_text)
+						line_text="extern unsigned int server_queue_process_apc( HANDLE process, const apc_call_t *call, apc_result_t *result ) DECLSPEC_HIDDEN;"
+						file_array[++line]=(indent line_text)
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^ extern int server_pipe( int fd[2] ) DECLSPEC_HIDDEN;$")) {
+						delete file_array[line]
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 3) {
+					if (file_array[line] ~ text2regexp("^ data_size_t *ret_len ) DECLSPEC_HIDDEN;$")) {
+						indent=" "
+						line_text=(indent "extern NTSTATUS validate_open_object_attributes( const OBJECT_ATTRIBUTES *attr ) DECLSPEC_HIDDEN;")
+						insert_array_entry(file_array, ++line, line_text)
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 4) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+		else if (diff_array["file"] == "/dlls/ntdll/server.c") {
+			preprocess_diff_file(line, diff_array)
+			if ((diff_array["ihunk"] == 1) && (complete >= 1)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 37) {
+						diff_array["idiff"] += 2
+					}
+					else if (file_array[line] ~ text2regexp("^ #include \"wine/server.h\"$")) {
+						delete file_array[line]
+						++line
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^+#include \"esync.h\"$")) {
+						indent=" "
+						line_text=(indent "#include \"ddk/wdm.h\"")
+						insert_array_entry(file_array, line, line_text)
+						++line
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 3) {
+					if (esync_rebase_index <= 41) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("^ WINE_DEFAULT_DEBUG_CHANNEL(server);$")) {
+						indent=" "
+						line_text="/* Some versions of glibc don't define this */"
+						file_array[line]=(indent line_text)
+						line_text="#ifndef SCM_RIGHTS"
+						file_array[++line]=(indent line_text)
+						++diff_array["idiff"]
+					}
+				}
+
+				if (diff_array["idiff"] == 4) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+			else if ((diff_array["ihunk"] == 2) && (complete >= 2)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 40) {
+						diff_array["idiff"] += 2
+					}
+					else if (esync_rebase_index == 41) {
+						if (is_new_hunk(file_array[line])) {
+							diff_array["idiff"] += sub(text2regexp("sigset_t server_block_set;  /* signals to block during server calls */"),
+														"timeout_t server_start_time = 0;  /* time of server startup */",
+														file_array[line])
+						}
+					}
+					else if (is_new_hunk(file_array[line])) {
+						while(!is_new_hunk(file_array[line])) {
+							delete file_array[line]
+							++line
+						}
+						--line
+						diff_array["idiff"] += 2
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^ static int fd_socket = -1; /* socket to exchange file descriptors with the server */$")) {
+						indent=" "
+						file_array[line]=indent
+						line_text="sigset_t server_block_set;  /* signals to block during server calls */"
+						file_array[++line]=(indent line_text)
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 3) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+			else if ((diff_array["ihunk"] == 3) && (complete >= 3)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 40) {
+						++diff_array["idiff"]
+					}
+					else if (is_new_hunk(file_array[line])) {
+						while(!is_new_diff_file(file_array[line])) {
+							delete file_array[line]
+							++line
+						}
+						--line
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 2) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+ 			}
+		}
+		else if (diff_array["file"] == "/dlls/ntdll/sync.c") {
+			preprocess_diff_file(line, diff_array)
+			if ((diff_array["ihunk"] == 1) && (complete >= 4)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (file_array[line] ~ text2regexp("^ WINE_DEFAULT_DEBUG_CHANNEL(ntdll);$")) {
@@ -782,7 +927,7 @@ function process_patch_file_0003(file_array, diff_array,
 		}
 	}
 
-	if (complete == 1) diff_array["exit code"] = 0
+	if (complete == 5) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0003(file_array, diff_array,
@@ -825,11 +970,41 @@ function process_patch_file_0006(file_array, diff_array,
 
 			if (diff_array["ihunk"] == 1) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
-				if ((diff_array["idiff"] == 1) && (file_array[line] ~ "^ #include \"wine/server.h\"$")) {
-					line_text = " "
-					file_array[++line] = line_text
-					line_text = (indent "WINE_DEFAULT_DEBUG_CHANNEL(ntdll);")
-					file_array[++line] = line_text
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 2) {
+						if (file_array[line] ~ text2regexp("^ #include \"wine/server.h\"$")) {
+							indent=" "
+							file_array[++line] = indent
+							line_text="WINE_DEFAULT_DEBUG_CHANNEL(ntdll);"
+							file_array[++line] = (indent line_text)
+							++diff_array["idiff"]
+						}
+					}
+					else {
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 2) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+			else if ((diff_array["ihunk"] == 2) && (complete >= 1)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index >= 42) {
+						if (file_array[line] ~ text2regexp("^ int fd = server_remove_fd_from_cache( handle );$")) {
+							diff_array["idiff"] += sub(text2regexp("server_remove_fd_from_cache( handle );"),
+													   "unix_funcs->server_remove_fd_from_cache( handle );",
+													   file_array[line])
+						}
+					}
+					else {
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 2) {
 					++diff_array["idiff"]
 					++complete
 				}
@@ -838,7 +1013,7 @@ function process_patch_file_0006(file_array, diff_array,
 		}
 	}
 
-	if (complete == 1) diff_array["exit code"] = 0
+	if (complete == 2) diff_array["exit code"] = 0
 }
 
 function process_staging_patch_file_0006(file_array, diff_array,
@@ -908,20 +1083,77 @@ function process_patch_file_0007(file_array, diff_array,
 }
 
 function process_patch_file_0009(file_array, diff_array,
-	complete, indent, line, line_text)
+	array_diff_lines, complete, indent, line, line_text)
 {
 	diff_array["exit start line"]=0
 	for (line = 1 ; line <= file_array[0] ; ++line) {
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
-
-		if (diff_array["file"] == "/dlls/ntdll/sync.c") {
+		if (diff_array["file"] == "/dlls/ntdll/esync.c") {
 			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
-					if (esync_rebase_index == 9) {
+					if (is_new_hunk(file_array[line])) {
+						split("0 0 0 6", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^+NTSTATUS esync_set_event( HANDLE handle )$")) {
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 3) {
+					if (file_array[line] ~ text2regexp("^+ if (write( event->obj.fd, &value, sizeof(value) ) == -1)")) {
+						indent="+"
+						line_text = (indent "    if (prev)")
+						insert_array_entry(file_array, line, line_text)
+						line_text = (indent "    {")
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = (indent "        FIXME(\"Can't write previous value.\\n\");")
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = (indent "        *prev = 1;")
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = (indent "    }")
+						insert_array_entry(file_array, ++line, line_text)
+						insert_array_entry(file_array, ++line, indent)
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 4) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+		else if (diff_array["file"] == "/dlls/ntdll/esync.h") {
+			preprocess_diff_file(line, diff_array)
+
+			if ((diff_array["ihunk"] == 1) && (complete >= 1)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (file_array[line] ~ text2regexp("^+extern NTSTATUS esync_set_event( HANDLE handle ) DECLSPEC_HIDDEN;$")) {
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+		else if (diff_array["file"] == "/dlls/ntdll/sync.c") {
+			preprocess_diff_file(line, diff_array)
+
+			if ((diff_array["ihunk"] == 1) && (complete >= 2)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 8) {
 						++diff_array["idiff"]
 					}
 					else if (is_new_hunk(file_array[line])) {
@@ -932,10 +1164,9 @@ function process_patch_file_0009(file_array, diff_array,
 						change_array_entry_diff(file_array, line, array_diff_lines)
 						++diff_array["idiff"]
 					}
-					diff_array["exit end line"]=line
 				}
 				else if (diff_array["idiff"] == 2) {
-					if ((esync_rebase_index == 9) && !staging) {
+					if (((esync_rebase_index == 9) && !staging) || (esync_rebase_index <= 8)) {
 						++diff_array["idiff"]
 					}
 					else if (file_array[line-1] ~ text2regexp(" @@ NTSTATUS WINAPI *")) {
@@ -943,10 +1174,9 @@ function process_patch_file_0009(file_array, diff_array,
 						insert_array_entry(file_array, line, line_text)
 						++diff_array["idiff"]
 					}
-					diff_array["exit end line"]=line
 				}
 				else if (diff_array["idiff"] == 3) {
-					if ((esync_rebase_index == 9) && !staging) {
+					if (((esync_rebase_index == 9) && !staging) || (esync_rebase_index <= 8)) {
 						++diff_array["idiff"]
 					}
 					else if (file_array[line] ~ text2regexp("^ NTSTATUS ret;$")) {
@@ -955,10 +1185,14 @@ function process_patch_file_0009(file_array, diff_array,
 					}
 				}
 				else if (diff_array["idiff"] == 4) {
+					if (file_array[line] ~ text2regexp("^+ return esync_set_event( handle );$")) {
+						diff_array["idiff"] += sub(text2regexp("( handle )"),"( handle, prev_state )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 5) {
 					if (file_array[line] ~ text2regexp("/* FIXME: set NumberOfThreadsReleased */$")) {
-						if ((esync_rebase_index == 9) && !staging) {
+						if (((esync_rebase_index == 9) && !staging) || (esync_rebase_index <= 8)) {
 							++diff_array["idiff"]
-							++complete
 						}
 						else {
 							delete file_array[line]
@@ -970,15 +1204,19 @@ function process_patch_file_0009(file_array, diff_array,
 							line_text = (indent "req->handle = wine_server_obj_handle( handle );")
 							insert_array_entry(file_array, ++line, line_text)
 							++diff_array["idiff"]
-							++complete
 						}
 					}
 				}
+				if (diff_array["idiff"] == 6) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (complete == 1) diff_array["exit code"] = 0
+	if (complete == 3) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0010(file_array, diff_array,
@@ -989,15 +1227,77 @@ function process_patch_file_0010(file_array, diff_array,
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
-		if (diff_array["file"] == "/dlls/ntdll/sync.c") {
+		if (diff_array["file"] == "/dlls/ntdll/esync.c") {
 			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
+					if (is_new_hunk(file_array[line])) {
+						split("0 0 0 6", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^+NTSTATUS esync_reset_event( HANDLE handle )$")) {
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 3) {
+					if (file_array[line] ~ text2regexp("^+ if (!event) return STATUS_INVALID_HANDLE;$")) {
+						indent="+"
+						insert_array_entry(file_array, ++line, indent)
+						line_text = (indent "    if (prev)")
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = (indent "    {")
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = (indent "        FIXME(\"Can't write previous value.\\n\");")
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = (indent "        *prev = 1;")
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = (indent "    }")
+						insert_array_entry(file_array, ++line, line_text)
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 4) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+		else if (diff_array["file"] == "/dlls/ntdll/esync.h") {
+			preprocess_diff_file(line, diff_array)
+
+			if ((diff_array["ihunk"] == 1) && (complete >= 1)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (file_array[line] ~ text2regexp("^ extern NTSTATUS esync_set_event( HANDLE handle ) DECLSPEC_HIDDEN;$")) {
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^+extern NTSTATUS esync_reset_event( HANDLE handle ) DECLSPEC_HIDDEN;$")) {
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				if (diff_array["idiff"] == 3) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+		else if (diff_array["file"] == "/dlls/ntdll/sync.c") {
+			preprocess_diff_file(line, diff_array)
+
+			if ((diff_array["ihunk"] == 1) && (complete >= 2)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index <= 8) {
-						diff_array["idiff"] += 4
-						++complete
+						diff_array["idiff"] += 2
 					}
 					else if (is_new_hunk(file_array[line])) {
 						if ((esync_rebase_index >= 10) || ((esync_rebase_index == 9) && staging))
@@ -1029,6 +1329,11 @@ function process_patch_file_0010(file_array, diff_array,
 					diff_array["exit end line"]=line
 				}
 				else if (diff_array["idiff"] == 3) {
+					if (file_array[line] ~ text2regexp("^+ return esync_reset_event( handle );$")) {
+						diff_array["idiff"] += sub(text2regexp("( handle )"),"( handle, prev_state )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 4) {
 					if ((esync_rebase_index <= 8) || ((esync_rebase_index == 9) && !staging)) {
 						++diff_array["idiff"]
 					}
@@ -1037,14 +1342,14 @@ function process_patch_file_0010(file_array, diff_array,
 					}
 					diff_array["exit end line"]=line
 				}
-				else if (diff_array["idiff"] == 4) {
+				else if (diff_array["idiff"] == 5) {
 					if (file_array[line] ~ text2regexp("if (NumberOfThreadsReleased) *NumberOfThreadsReleased = 0;$")) {
 						if ((esync_rebase_index == 9) && !staging) {
 							line_text = "if (prev_state) *prev_state = 0;"
 							file_array[line] = (indent line_text)
 							file_array[++line] = " "
 						}
-						else {
+						else if (esync_rebase_index >= 9) {
 							line_text = "{"
 							file_array[line] = (indent line_text)
 							line_text =  "req->handle = wine_server_obj_handle( handle );"
@@ -1052,15 +1357,18 @@ function process_patch_file_0010(file_array, diff_array,
 							file_array[++line] = (indent line_text)
 						}
 						++diff_array["idiff"]
-						++complete
 					}
 					diff_array["exit end line"]=line
+				}
+				if (diff_array["idiff"] == 6) {
+					++diff_array["idiff"]
+					++complete
 				}
 			}
 		}
 	}
 
-	if (complete == 1) diff_array["exit code"] = 0
+	if (complete == 3) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0011(file_array, diff_array,
@@ -1071,20 +1379,101 @@ function process_patch_file_0011(file_array, diff_array,
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
-		if (diff_array["file"] == "/dlls/ntdll/sync.c") {
+		if (diff_array["file"] == "/dlls/ntdll/esync.c") {
 			preprocess_diff_file(line, diff_array)
 
 			if (diff_array["ihunk"] == 1) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
+
 				if (diff_array["idiff"] == 1) {
-					if (sub(text2regexp("NTSTATUS WINAPI NtPulseEvent( HANDLE handle, PULONG PulseCount )$"),
-										"NTSTATUS WINAPI NtPulseEvent( HANDLE handle, LONG *prev_state )",
-							file_array[line])) {
+					if (is_new_hunk(file_array[line])) {
+						split("0 0 0 6", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^+NTSTATUS esync_pulse_event( HANDLE handle )$")) {
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 3) {
+					if (file_array[line] ~ text2regexp("^+ if (!event) return STATUS_INVALID_HANDLE;$")) {
+						indent="+"
+						insert_array_entry(file_array, ++line, indent)
+						line_text = (indent "    if (prev)")
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = (indent "    {")
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = (indent "        FIXME(\"Can't write previous value.\\n\");")
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = (indent "        *prev = 1;")
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = (indent "    }")
+						insert_array_entry(file_array, ++line, line_text)
 						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 4) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+		else if (diff_array["file"] == "/dlls/ntdll/esync.h") {
+			preprocess_diff_file(line, diff_array)
+
+			if ((diff_array["ihunk"] == 1) && (complete >= 1)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (file_array[line] ~ text2regexp("^ extern NTSTATUS esync_set_event( HANDLE handle ) DECLSPEC_HIDDEN;$")) {
+						sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^ extern NTSTATUS esync_reset_event( HANDLE handle ) DECLSPEC_HIDDEN;$")) {
+						sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 3) {
+					if (file_array[line] ~ text2regexp("^+extern NTSTATUS esync_pulse_event( HANDLE handle ) DECLSPEC_HIDDEN;$")) {
+						sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 4) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+		else if (diff_array["file"] == "/dlls/ntdll/sync.c") {
+			preprocess_diff_file(line, diff_array)
+
+			if ((diff_array["ihunk"] == 1) && (complete >= 2)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 8) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("NTSTATUS WINAPI NtPulseEvent( HANDLE handle, PULONG PulseCount )$")) {
+						diff_array["idiff"]+=sub("PULONG PulseCount","LONG *prev_state )",file_array[line])
 					}
 					diff_array["exit end line"]=line
 				}
 				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^+ return esync_pulse_event( handle );$")) {
+						diff_array["idiff"]+=sub(text2regexp("( handle )"),"( handle, prev_state )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 3) {
+					if (esync_rebase_index <= 8) {
+						++diff_array["idiff"]
+					}
 					if (file_array[line] ~ text2regexp("^ if (PulseCount)")) {
 						line_text = (indent "SERVER_START_REQ( event_op )")
 						file_array[line] = line_text
@@ -1094,15 +1483,18 @@ function process_patch_file_0011(file_array, diff_array,
 						line_text = (indent "req->handle = wine_server_obj_handle( handle );")
 						file_array[++line] = line_text
 						++diff_array["idiff"]
-						++complete
 					}
 					diff_array["exit end line"]=line
+				}
+				if (diff_array["idiff"] == 4) {
+					++diff_array["idiff"]
+					++complete
 				}
 			}
 		}
 	}
 
-	if (complete == 1) diff_array["exit code"] = 0
+	if (complete == 3) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0013(file_array, diff_array,
@@ -2080,10 +2472,11 @@ function process_patch_file_0023(file_array, diff_array,
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index <= 13) {
-						diff_array["idiff"] += 2
-						++complete
+						diff_array["idiff"] += 3
 					}
 					else if (is_new_hunk(file_array[line])) {
+						if (esync_rebase_index >= 26)
+							sub(text2regexp("void thread_init(void)"),"TEB *thread_init(void)",file_array[line])
 						indent="     "
 						line_text = (indent "thread_data->reply_fd   = -1;")
 						insert_array_entry(file_array, ++line, line_text)
@@ -2096,9 +2489,38 @@ function process_patch_file_0023(file_array, diff_array,
 						delete file_array[line]
 						++line
 						++diff_array["idiff"]
-						++complete
 					}
 					diff_array["exit end line"]=line
+				}
+				else if (diff_array["idiff"] == 3) {
+					if (esync_rebase_index <= 37) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("^ signal_init_thread( teb );$")) {
+						indent=" "
+						if (esync_rebase_index == 38) {
+							line_text="    debug_init();"
+							file_array[line]=(indent line_text)
+						}
+						else {
+							line_text="    unix_funcs->dbg_init();"
+							file_array[line]=(indent line_text)
+						}
+						if (esync_rebase_index <= 39) {
+							line_text="    init_paths();"
+							file_array[++line]=(indent line_text)
+						}
+						else {
+							line_text="    unix_funcs->get_paths( &build_dir, &data_dir, &config_dir );"
+							file_array[++line]=(indent line_text)
+						}
+						++diff_array["idiff"]
+					}
+					diff_array["exit end line"]=line
+				}
+				if (diff_array["idiff"] == 4) {
+					++diff_array["idiff"]
+					++complete
 				}
 			}
 		}
@@ -2628,6 +3050,128 @@ function process_staging_patch_file_0025(file_array, diff_array,
 	if (complete == 1) diff_array["exit code"] = 0
 }
 
+function process_patch_file_0026(file_array, diff_array,
+	complete, indent, line, line_text)
+{
+	diff_array["exit start line"]=0
+	for (line = 1 ; line <= file_array[0] ; ++line) {
+		indent = get_indent(file_array[line])
+		preprocess_patch_file_line(file_array[line], diff_array)
+
+		if (diff_array["file"] == "/dlls/ntdll/esync.c") {
+			preprocess_diff_file(line, diff_array)
+
+			if (diff_array["ihunk"] == 2) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (is_new_hunk(file_array[line])) {
+						diff_array["idiff"]+=sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				if (diff_array["idiff"] == 2) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+		else if (diff_array["file"] == "/dlls/ntdll/esync.h") {
+			preprocess_diff_file(line, diff_array)
+
+			if ((diff_array["ihunk"] == 1) && (complete >= 1)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (file_array[line] ~ text2regexp("^ extern NTSTATUS esync_set_event( HANDLE handle ) DECLSPEC_HIDDEN;$")) {
+						diff_array["idiff"]+=sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^ extern NTSTATUS esync_reset_event( HANDLE handle ) DECLSPEC_HIDDEN;$")) {
+						diff_array["idiff"]+=sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 3) {
+					if (file_array[line] ~ text2regexp("^ extern NTSTATUS esync_pulse_event( HANDLE handle ) DECLSPEC_HIDDEN;$")) {
+						diff_array["idiff"]+=sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				if (diff_array["idiff"] == 4) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+	}
+
+	if (complete == 2) diff_array["exit code"] = 0
+}
+
+function process_patch_file_0027(file_array, diff_array,
+	complete, indent, line, line_text)
+{
+	diff_array["exit start line"]=0
+	for (line = 1 ; line <= file_array[0] ; ++line) {
+		indent = get_indent(file_array[line])
+		preprocess_patch_file_line(file_array[line], diff_array)
+
+		if (diff_array["file"] == "/dlls/ntdll/esync.h") {
+			preprocess_diff_file(line, diff_array)
+
+			if (diff_array["ihunk"] == 1) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (is_new_hunk(file_array[line])) {
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^ extern NTSTATUS esync_pulse_event( HANDLE handle ) DECLSPEC_HIDDEN;$")) {
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				if (diff_array["idiff"] == 3) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+	}
+
+	if (complete == 1) diff_array["exit code"] = 0
+}
+
+function process_patch_file_0031(file_array, diff_array,
+	complete, indent, line, line_text)
+{
+	diff_array["exit start line"]=0
+	for (line = 1 ; line <= file_array[0] ; ++line) {
+		indent = get_indent(file_array[line])
+		preprocess_patch_file_line(file_array[line], diff_array)
+
+		if (diff_array["file"] == "/dlls/ntdll/esync.c") {
+			preprocess_diff_file(line, diff_array)
+
+			if (diff_array["ihunk"] == 1) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (file_array[line] ~ text2regexp("^+ ret = esync_set_event( signal );$")) {
+						diff_array["idiff"] += sub(text2regexp("( signal )"),"( signal, NULL )",file_array[line])
+					}
+				}
+				if (diff_array["idiff"] == 2) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+	}
+
+	if (complete == 1) diff_array["exit code"] = 0
+}
+
 function process_patch_file_0033(file_array, diff_array,
 	complete, indent, line, line_text)
 {
@@ -2811,6 +3355,37 @@ function process_patch_file_0033(file_array, diff_array,
 	}
 
 	if (complete == 7) diff_array["exit code"] = 0
+}
+
+function process_patch_file_0034(file_array, diff_array,
+	complete, indent, line, line_text)
+{
+	diff_array["exit start line"]=0
+	for (line = 1 ; line <= file_array[0] ; ++line) {
+		indent = get_indent(file_array[line])
+		preprocess_patch_file_line(file_array[line], diff_array)
+
+		if (diff_array["file"] == "/dlls/ntdll/esync.c") {
+			preprocess_diff_file(line, diff_array)
+
+			if (diff_array["ihunk"] == 1) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (file_array[line] ~ text2regexp("^ NTSTATUS esync_set_event( HANDLE handle )$")) {
+						sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+	}
+
+	if (complete == 1) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0040(file_array, diff_array,
@@ -3013,29 +3588,142 @@ function process_patch_file_0042(file_array, diff_array,
 		indent = get_indent(file_array[line])
 		preprocess_patch_file_line(file_array[line], diff_array)
 
-		if (diff_array["file"] == "/dlls/ntdll/thread.c") {
+		if (diff_array["file"] == "/dlls/ntdll/esync.c") {
 			preprocess_diff_file(line, diff_array)
-
-			if (diff_array["ihunk"] == 1) {
+			if (diff_array["ihunk"] == 9) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (is_new_hunk(file_array[line])) {
+						split("0 -2 0 -2", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^ NTSTATUS esync_set_event( HANDLE handle )$")) {
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 3) {
+					if (file_array[line] ~ text2regexp("+ if (!obj) return STATUS_INVALID_HANDLE;$")) {
+						indent=" "
+						line_text = indent
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = (indent "    if (prev)")
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = (indent "    {")
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = "@@ -508,7 +487,7 @@ NTSTATUS esync_set_event( HANDLE handle, LONG *prev )"
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = (indent "        *prev = 1;")
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = (indent "    }")
+						insert_array_entry(file_array, ++line, line_text)
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 4) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+			else if ((diff_array["ihunk"] == 10) && (complete >= 1)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (is_new_hunk(file_array[line])) {
+						split("0 -22 0 -22", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^ NTSTATUS esync_reset_event( HANDLE handle )$")) {
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 3) {
+					if (file_array[line] ~ text2regexp("+ if (!obj) return STATUS_INVALID_HANDLE;$")) {
+						indent=" "
+						line_text = indent
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = (indent "    if (prev)")
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = (indent "    {")
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = "@@ -530,19 +509,19 @@ NTSTATUS esync_reset_event( HANDLE handle, LONG *prev )"
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = (indent "    }")
+						insert_array_entry(file_array, ++line, line_text)
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 4) {
+					if (file_array[line] ~ text2regexp("^ NTSTATUS esync_pulse_event( HANDLE handle )$")) {
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 5) {
+					if (file_array[line] ~ text2regexp("+ if (!obj) return STATUS_INVALID_HANDLE;$")) {
+						indent=" "
+						line += 2
+						line_text = (indent "    if (prev)")
+						insert_array_entry(file_array, line, line_text)
+						line_text = (indent "    {")
+						insert_array_entry(file_array, ++line, line_text)
+						line_text = "@@ -553,9 +532,9 @@ NTSTATUS esync_pulse_event( HANDLE handle, LONG *prev )"
+						insert_array_entry(file_array, ++line, line_text)
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 6) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+			else if ((diff_array["ihunk"] == 11) && (complete >= 2)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (is_new_hunk(file_array[line])) {
+# 						split("0 2 0 2", array_diff_lines)
+# 						change_array_entry_diff(file_array, line, array_diff_lines)
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				if (diff_array["idiff"] == 2) {
+					++diff_array["idiff"]
+					++complete
+				}
+			}
+		}
+		else if (diff_array["file"] == "/dlls/ntdll/thread.c") {
+			preprocess_diff_file(line, diff_array)
+			if ((diff_array["ihunk"] == 1)  && (complete >= 3)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index >= 1) {
 						++diff_array["idiff"]
-						++complete
 					}
 					else if (file_array[line] ~ text2regexp("^ WINE_DEFAULT_DEBUG_CHANNEL(thread);$")) {
 						line_text = (" " "WINE_DECLARE_DEBUG_CHANNEL(relay);")
 						file_array[++line] = line_text
 						++diff_array["idiff"]
-						++complete
 					}
+				}
+				if (diff_array["idiff"] == 2) {
+					++diff_array["idiff"]
+					++complete
 				}
 				diff_array["exit end line"]=line
 			}
-			else if ((diff_array["ihunk"] == 2) && (complete >= 1)) {
+			else if ((diff_array["ihunk"] == 2) && (complete >= 4)) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
-					if (file_array[line] ~ text2regexp("^ NtCreateKeyedEvent( &keyed_event, GENERIC_READ | GENERIC_WRITE, NULL, 0 );$")) {
+					if (esync_rebase_index >= 7) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("^ NtCreateKeyedEvent( &keyed_event, GENERIC_READ | GENERIC_WRITE, NULL, 0 );$")) {
 						line_text = " "
 						file_array[++line] = line_text
 						line_text = (indent "return exe_file;")
@@ -3043,15 +3731,18 @@ function process_patch_file_0042(file_array, diff_array,
 						while(file_array[++line] ~ "^[[:blank:]]*$")
 							delete file_array[line]
 						++diff_array["idiff"]
-						++complete
 					}
+				}
+				if (diff_array["idiff"] == 2) {
+					++diff_array["idiff"]
+					++complete
 				}
 				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (complete == 2) diff_array["exit code"] = 0
+	if (complete == 5) diff_array["exit code"] = 0
 }
 
 function regenerate_patch_file_0042(file_array, diff_array,
@@ -3231,10 +3922,11 @@ function process_patch_file_0045(file_array, diff_array,
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
 					if (esync_rebase_index <= 13) {
-						diff_array["idiff"] += 2
-						++complete
+						diff_array["idiff"] += 3
 					}
 					else if (is_new_hunk(file_array[line])) {
+						if (esync_rebase_index >= 26)
+							sub(text2regexp("void thread_init(void)"),"TEB *thread_init(void)",file_array[line])
 						indent="     "
 						line_text = (indent "thread_data->wait_fd[0] = -1;")
 						insert_array_entry(file_array, ++line, line_text)
@@ -3246,9 +3938,38 @@ function process_patch_file_0045(file_array, diff_array,
 					if (file_array[line] ~ text2regexp("^ thread_data->debug_info = &debug_info;$")) {
 						delete file_array[line]
 						++diff_array["idiff"]
-						++complete
 					}
 					diff_array["exit end line"]=line
+				}
+				else if (diff_array["idiff"] == 3) {
+					if (esync_rebase_index <= 37) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("^ signal_init_thread( teb );$")) {
+						indent=" "
+						if (esync_rebase_index == 38) {
+							line_text="    debug_init();"
+							file_array[line]=(indent line_text)
+						}
+						else {
+							line_text="    unix_funcs->dbg_init();"
+							file_array[line]=(indent line_text)
+						}
+						if (esync_rebase_index <= 39) {
+							line_text="    init_paths();"
+							file_array[++line]=(indent line_text)
+						}
+						else {
+							line_text="    unix_funcs->get_paths( &build_dir, &data_dir, &config_dir );"
+							file_array[++line]=(indent line_text)
+						}
+						++diff_array["idiff"]
+					}
+					diff_array["exit end line"]=line
+				}
+				if (diff_array["idiff"] == 4) {
+					++diff_array["idiff"]
+					++complete
 				}
 			}
 		}
@@ -3567,6 +4288,105 @@ function process_patch_file_0051(file_array, diff_array,
 	if (complete == 1) diff_array["exit code"] = 0
 }
 
+function process_patch_file_0052(file_array, diff_array,
+	complete, indent, line, line_text)
+{
+	diff_array["exit start line"]=0
+	for (line = 1 ; line <= file_array[0] ; ++line) {
+		indent = get_indent(file_array[line])
+		preprocess_patch_file_line(file_array[line], diff_array)
+
+		if (diff_array["file"] == "/dlls/ntdll/esync.c") {
+			preprocess_diff_file(line, diff_array)
+
+			if (diff_array["ihunk"] == 6) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (file_array[line] ~ text2regexp("^ NTSTATUS esync_set_event( HANDLE handle )$")) {
+						sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^ if (write( obj->fd, &value, sizeof(value) ) == -1)$")) {
+						indent=" "
+						line_text = (indent "    if (prev)")
+						file_array[line] = line_text
+						line_text = (indent "    {")
+						file_array[++line] = line_text
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 3) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+			else if ((diff_array["ihunk"] == 7) && (complete >= 1)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (is_new_hunk(file_array[line])) {
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^ NTSTATUS esync_reset_event( HANDLE handle )$")) {
+						sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 3) {
+					if (file_array[line] ~ text2regexp("^ /* we don't care about the return value */$")) {
+						indent = " "
+						line_text = (indent "    if (prev)")
+						file_array[line] = line_text
+						line_text = (indent "    {")
+						file_array[++line] = line_text
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 4) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+			else if ((diff_array["ihunk"] == 8) && (complete >= 2)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (is_new_hunk(file_array[line])) {
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^ NTSTATUS esync_pulse_event( HANDLE handle )$")) {
+						sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 3) {
+					if (file_array[line] ~ text2regexp("^ /* This isn't really correct; an application could miss the write.$")) {
+						indent = " "
+						line_text = (indent "    if (prev)")
+						file_array[line] = line_text
+						line_text = (indent "    {")
+						file_array[++line] = line_text
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 4) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+	}
+
+	if (complete == 3) diff_array["exit code"] = 0
+}
+
 function process_patch_file_0055(file_array, diff_array,
 	complete, indent, line, line_text)
 {
@@ -3783,21 +4603,267 @@ function process_patch_file_0070(file_array, diff_array,
 		if (diff_array["file"] == "/dlls/ntdll/esync.c") {
 			preprocess_diff_file(line, diff_array)
 
-			if (diff_array["ihunk"] == 5) {
+			
+			if (diff_array["ihunk"] == 3) {
 				preprocess_diff_file_hunk(line, file_array, diff_array)
 				if (diff_array["idiff"] == 1) {
-					if (file_array[line] ~ text2regexp("^ * need to delegate to server_select(). */$")) {
+					if (is_new_hunk(file_array[line])) {
+						split("1 6 1 3", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^+static inline void small_pause(void)$")) {
+						sub("^ ","+",file_array[line-2])
+						sub("^ ","+",file_array[line-1])
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 3) {
+					if (file_array[line] ~ text2regexp("^+#endif$")) {
+						sub("^[+]"," ",file_array[line+1])
+						sub("^[+]"," ",file_array[line+2])
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 4) {
+					if (file_array[line] ~ text2regexp("^ NTSTATUS esync_set_event( HANDLE handle )$")) {
+						sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 5) {
+					if (file_array[line] ~ text2regexp("^+ struct event *event;$")) {
+						indent="+"
+						line_text = (indent "    LONG current;")
+						insert_array_entry(file_array, ++line, line_text)
+						
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 6) {
+					if (file_array[line] ~ text2regexp("^ TRACE(\"%p.\\n\", handle);$")) {
+						indent="+"
+						sub("^ ","-",file_array[line])
+						line_text = (indent "    TRACE(\"handle %p, prev %p.\\n\", handle, prev);")
+						insert_array_entry(file_array, ++line, line_text)
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 7) {
+					if (file_array[line] ~ text2regexp("^- if (write( obj->fd, &value, sizeof(value) ) == -1)$")) {
+						sub("^ ","+",file_array[line-1])
+						delete file_array[line]
+						delete file_array[++line]
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 8) {
+					if (file_array[line] ~ text2regexp("^+ small_pause();$")) {
+						sub("^[+]"," ",file_array[++line])
+						indent="-"
+						line_text=(indent "    if (prev)")
+						insert_array_entry(file_array, ++line, line_text)
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 9) {
+					if (file_array[line] ~ text2regexp("^+ if (!interlocked_xchg( &event->signaled, 1 ))$")) {
+						diff_array["idiff"] += sub(text2regexp("interlocked_xchg( &event->signaled, 1 )"),"(current = &)",file_array[line])
+						sub("^[+]"," ",file_array[line+1])
+					}
+				}
+				else if (diff_array["idiff"] == 10) {
+					if (file_array[line] ~ text2regexp("^+ if (write( obj->fd, &value, sizeof(value) ) == -1)$")) {
+						diff_array["idiff"] += sub("^[+]"," ",file_array[line+2])
+						indent="-"
+						line_text=(indent "        FIXME(\"Can't write previous value.\\n\");")
+						insert_array_entry(file_array, line, line_text)
+						line_text=(indent "        *prev = 1;")
+						insert_array_entry(file_array, ++line, line_text)
+					}
+				}
+				else if (diff_array["idiff"] == 11) {
+					if (file_array[line] ~ text2regexp("^+ /* Release the spinlock. */$")) {
+						sub("^[+]"," ",file_array[line-1])
+						indent="-"
+						line_text=(indent "    if (write( obj->fd, &value, sizeof(value) ) == -1)")
+						insert_array_entry(file_array, line, line_text)
+						line_text=(indent "        return FILE_GetNtStatus();")
+						insert_array_entry(file_array, ++line, line_text)
+						indent="+"
+						line_text=(indent "    if (prev) *prev = current;")
+						insert_array_entry(file_array, ++line, line_text)
+						line_text=indent
+						insert_array_entry(file_array, ++line, line_text)
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 12) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+			else if ((diff_array["ihunk"] == 4) && (complete >= 1)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (is_new_hunk(file_array[line])) {
+						split("0 6 0 3", array_diff_lines)
+						change_array_entry_diff(file_array, line, array_diff_lines)
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^+ struct event *event;$")) {
+						indent="+"
+						line_text=(indent "    LONG current;")
+						insert_array_entry(file_array, ++line, line_text)
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 3) {
+					if (file_array[line] ~ text2regexp("^ TRACE(\"%p.\\n\", handle);$")) {
+						sub("^ ","-",file_array[line])
+						indent="+"
+						line_text=(indent "    TRACE(\"handle %p, prev %p.\\n\", handle, prev);")
+						insert_array_entry(file_array, ++line, line_text)
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 4) {
+					if (file_array[line] ~ text2regexp("^- /* we don't care about the return value */$")) {
+						sub("^ ","+",file_array[line-1])
+						delete file_array[line]
+						delete file_array[++line]
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 5) {
+					if (file_array[line] ~ text2regexp("^+ /* Only bother signaling the fd if we weren't already signaled. */$")) {
+						diff_array["idiff"] += sub("^[+]"," ",file_array[line-1])
+						indent="-"
+						line_text=(indent "    if (prev)")
+						insert_array_entry(file_array, line, line_text)
+						++line
+					}
+				}
+				else if (diff_array["idiff"] == 6) {
+					if (file_array[line] ~ text2regexp("^+ if (interlocked_xchg( &event->signaled, 0 ))$")) {
+						sub(text2regexp("interlocked_xchg( &event->signaled, 0 )"),"(current = &)",file_array[line])
+						diff_array["idiff"] += sub("^[+]"," ",file_array[++line])
+					}
+				}
+				else if (diff_array["idiff"] == 7) {
+					if (file_array[line] ~ text2regexp("^+ /* we don't care about the return value */$")) {
+						indent="-"
+						line_text=(indent "        FIXME(\"Can't write previous value.\\n\");")
+						insert_array_entry(file_array, line, line_text)
+						line_text=(indent "        *prev = 1;")
+						insert_array_entry(file_array, ++line, line_text)
+						++diff_array["idiff"]
+					}
+				}
+				else if (diff_array["idiff"] == 8) {
+					if (file_array[line] ~ text2regexp("^+ read( obj->fd, &value, sizeof(value) );$")) {
+						sub("^[+]"," ",file_array[line+1])
+						diff_array["idiff"] += sub("^[+]"," ",file_array[line+2])
+					}
+				}
+				else if (diff_array["idiff"] == 9) {
+					if (file_array[line] ~ text2regexp("^+ /* Release the spinlock. */$")) {
+						indent="-"
+						line_text=(indent "    /* we don't care about the return value */")
+						insert_array_entry(file_array, line, line_text)
+						line_text=(indent "    read( obj->fd, &value, sizeof(value) );")
+						insert_array_entry(file_array, ++line, line_text)
+						indent="+"
+						line_text=(indent "    if (prev) *prev = current;")
+						insert_array_entry(file_array, ++line, line_text)
+						line_text=indent
+						insert_array_entry(file_array, ++line, line_text)
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 10) {
+					++diff_array["idiff"]
+					++complete
+				}
+			}
+			else if ((diff_array["ihunk"] == 5) && (complete >= 2)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				line_text="@@ -559,17 +662,18 @@ NTSTATUS esync_pulse_event( HANDLE handle, LONG *prev )"
+				insert_array_entry(file_array, line, line_text)
+				line_text=" {"
+				insert_array_entry(file_array, ++line, line_text)
+				line_text="     static uint64_t value = 1;"
+				insert_array_entry(file_array, ++line, line_text)
+				line_text="     struct esync *obj;"
+				insert_array_entry(file_array, ++line, line_text)
+				line_text="+    struct event *event;"
+				insert_array_entry(file_array, ++line, line_text)
+				line_text="+    LONG current;"
+				insert_array_entry(file_array, ++line, line_text)
+				line_text="     NTSTATUS ret;"
+				insert_array_entry(file_array, ++line, line_text)
+				line_text=" "
+				insert_array_entry(file_array, ++line, line_text)
+				line_text="     TRACE(\"%p.\\n\", handle);"
+				insert_array_entry(file_array, ++line, line_text)
+				line_text=" "
+				insert_array_entry(file_array, ++line, line_text)
+				line_text="     if ((ret = get_object( handle, &obj ))) return ret;"
+				insert_array_entry(file_array, ++line, line_text)
+				line_text="+    event = obj->shm;"
+				insert_array_entry(file_array, ++line, line_text)
+				line_text=" "
+				insert_array_entry(file_array, ++line, line_text)
+				line_text="-    if (prev)"
+				insert_array_entry(file_array, ++line, line_text)
+				line_text="-    {"
+				insert_array_entry(file_array, ++line, line_text)
+				line_text="-        FIXME(\"Can't write previous value.\\n\");"
+				insert_array_entry(file_array, ++line, line_text)
+				line_text="-        *prev = 1;"
+				insert_array_entry(file_array, ++line, line_text)
+				line_text="-    }"
+				insert_array_entry(file_array, ++line, line_text)
+				line_text="+    /* Acquire the spinlock. */"
+				insert_array_entry(file_array, ++line, line_text)
+				line_text="+    while (interlocked_cmpxchg( &event->locked, 1, 0 ))"
+				insert_array_entry(file_array, ++line, line_text)
+				line_text="+        small_pause();"
+				insert_array_entry(file_array, ++line, line_text)
+				line_text=" "
+				insert_array_entry(file_array, ++line, line_text)
+				line_text="     /* This isn't really correct; an application could miss the write."
+				insert_array_entry(file_array, ++line, line_text)
+				line_text="      * Unfortunately we can't really do much better. Fortunately this is rarely"
+				insert_array_entry(file_array, ++line, line_text)
+				++diff_array["idiff"]
+				++complete
+			}
+			else if ((diff_array["ihunk"] == 6) && (complete >= 3)) {
+				if (diff_array["idiff"] == 1) {
+					if (esync_rebase_index <= 36) {
+						++diff_array["idiff"]
+					}
+					else if (file_array[line] ~ text2regexp("^ * need to delegate to server_select(). */$")) {
 						sub(text2regexp("server_select()"),"server_wait()", file_array[line])
 						++diff_array["idiff"]
-						++complete
 					}
+				}
+				if (diff_array["idiff"] == 2) {
+					++diff_array["idiff"]
+					++complete
 				}
 				diff_array["exit end line"]=line
 			}
 		}
 	}
 
-	if (complete == 1) diff_array["exit code"] = 0
+	if (complete == 4) diff_array["exit code"] = 0
 }
 
 function process_patch_file_0074(file_array, diff_array,
@@ -4160,6 +5226,74 @@ function process_staging_patch_file_0079(file_array, diff_array,
 	}
 
 	if (complete == 1) diff_array["exit code"] = 0
+}
+
+function process_patch_file_0080(file_array, diff_array,
+	complete, indent, line, line_text)
+{
+	diff_array["exit start line"]=0
+	for (line = 1 ; line <= file_array[0] ; ++line) {
+		indent = get_indent(file_array[line])
+		preprocess_patch_file_line(file_array[line], diff_array)
+
+		if (diff_array["file"] == "/dlls/ntdll/esync.c") {
+			preprocess_diff_file(line, diff_array)
+
+			if (diff_array["ihunk"] == 1) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (is_new_hunk(file_array[line])) {
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^ NTSTATUS esync_reset_event( HANDLE handle )$")) {
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 3) {
+					if (file_array[line] ~ text2regexp("^ NTSTATUS ret;$")) {
+						diff_array["idiff"] += sub(text2regexp("NTSTATUS ret;"),"LONG current;",file_array[line])
+					}
+				}
+				if (diff_array["idiff"] == 4) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+			else if ((diff_array["ihunk"] == 2) && (complete >= 1)) {
+				preprocess_diff_file_hunk(line, file_array, diff_array)
+				if (diff_array["idiff"] == 1) {
+					if (is_new_hunk(file_array[line])) {
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 2) {
+					if (file_array[line] ~ text2regexp("^ NTSTATUS esync_pulse_event( HANDLE handle )$")) {
+						diff_array["idiff"] += sub(text2regexp("( HANDLE handle )"),"( HANDLE handle, LONG *prev )",file_array[line])
+					}
+				}
+				else if (diff_array["idiff"] == 3) {
+					if (file_array[line] ~ text2regexp("^ NTSTATUS ret;$")) {
+						indent=" "
+						line_text=(indent "    struct event *event;")
+						file_array[line] = line_text
+						line_text=(indent "    LONG current;")
+						file_array[++line] = line_text
+						++diff_array["idiff"]
+					}
+				}
+				if (diff_array["idiff"] == 4) {
+					++diff_array["idiff"]
+					++complete
+				}
+				diff_array["exit end line"]=line
+			}
+		}
+	}
+
+	if (complete == 2) diff_array["exit code"] = 0
 }
 
 function generate_patch_file_0084(file_array, diff_array,
@@ -4648,7 +5782,7 @@ function generate_patch_file_0088(file_array, diff_array,
 	insert_array_entry(file_array, ++line, line_text)
 	line_text = "-            return FILE_GetNtStatus();"
 	insert_array_entry(file_array, ++line, line_text)
-	line_text = "+            ERR(\"write: %s\n\", strerror(errno));"
+	line_text = "+            ERR(\"write: %s\\n\", strerror(errno));"
 	insert_array_entry(file_array, ++line, line_text)
 	line_text = "     }"
 	insert_array_entry(file_array, ++line, line_text)
@@ -4734,7 +5868,7 @@ function generate_patch_file_0088(file_array, diff_array,
 	insert_array_entry(file_array, ++line, line_text)
 	line_text = "+        {"
 	insert_array_entry(file_array, ++line, line_text)
-	line_text = "+            ERR(\"read: %s\n\", strerror(errno));"
+	line_text = "+            ERR(\"read: %s\\n\", strerror(errno));"
 	insert_array_entry(file_array, ++line, line_text)
 	line_text = "+        }"
 	insert_array_entry(file_array, ++line, line_text)
@@ -5320,24 +6454,55 @@ function generate_patch_file_0089(file_array, diff_array,
 	insert_array_entry(file_array, ++line, line_text)
 	line_text="+++ b/server/thread.c"
 	insert_array_entry(file_array, ++line, line_text)
-	line_text="@@ -1253,6 +1253,8 @@ void kill_thread( struct thread *thread, int violent_death )"
+	if ((esync_rebase_index <= 8) || !staging)
+		line_text="@@ -1152,6 +1152,8 @@ void kill_thread( struct thread *thread, int violent_death )"
+	else
+		line_text="@@ -1253,6 +1253,8 @@ void kill_thread( struct thread *thread, int violent_death )"
 	insert_array_entry(file_array, ++line, line_text)
-	line_text="     kill_console_processes( thread, 0 );"
-	insert_array_entry(file_array, ++line, line_text)
-	line_text="     debug_exit_thread( thread );"
-	insert_array_entry(file_array, ++line, line_text)
-	line_text="     abandon_mutexes( thread );"
-	insert_array_entry(file_array, ++line, line_text)
+	if (!staging) {
+		line_text="     debug_exit_thread( thread );"
+		insert_array_entry(file_array, ++line, line_text)
+		line_text="     abandon_mutexes( thread );"
+		insert_array_entry(file_array, ++line, line_text)
+		line_text="     wake_up( &thread->obj, 0 );"
+		insert_array_entry(file_array, ++line, line_text)
+	}
+	else {
+		line_text="     kill_console_processes( thread, 0 );"
+		insert_array_entry(file_array, ++line, line_text)
+		line_text="     debug_exit_thread( thread );"
+		insert_array_entry(file_array, ++line, line_text)
+		line_text="     abandon_mutexes( thread );"
+		insert_array_entry(file_array, ++line, line_text)
+	}
 	line_text="+    if (do_esync())"
 	insert_array_entry(file_array, ++line, line_text)
 	line_text="+        esync_abandon_mutexes( thread );"
 	insert_array_entry(file_array, ++line, line_text)
-	line_text="     if (violent_death)"
-	insert_array_entry(file_array, ++line, line_text)	
-	line_text="     {"
-	insert_array_entry(file_array, ++line, line_text)
-	line_text="         send_thread_signal( thread, SIGQUIT );"
-	insert_array_entry(file_array, ++line, line_text)
+	if (!staging) {
+		line_text="     if (violent_death) send_thread_signal( thread, SIGQUIT );"
+		insert_array_entry(file_array, ++line, line_text)
+		line_text="     cleanup_thread( thread );"
+		insert_array_entry(file_array, ++line, line_text)
+		line_text="     remove_process_thread( thread->process, thread );"
+		insert_array_entry(file_array, ++line, line_text)
+	}
+	else if (esync_rebase_index <= 8) {
+		line_text="     if (violent_death) send_thread_signal( thread, SIGQUIT );"
+		insert_array_entry(file_array, ++line, line_text)
+		line_text="     check_terminated( thread );"
+		insert_array_entry(file_array, ++line, line_text)
+		line_text="     cleanup_thread( thread );"
+		insert_array_entry(file_array, ++line, line_text)
+	}
+	else {
+		line_text="     if (violent_death)"
+		insert_array_entry(file_array, ++line, line_text)
+		line_text="     {"
+		insert_array_entry(file_array, ++line, line_text)
+		line_text="         send_thread_signal( thread, SIGQUIT );"
+		insert_array_entry(file_array, ++line, line_text)
+	}
 	line_text="-- "
 	insert_array_entry(file_array, ++line, line_text)
 	line_text="2.25.0"
@@ -5399,7 +6564,7 @@ function process_patch_file(file_array, diff_array)
 		if (staging) process_staging_patch_file_0003(file_array, diff_array)
 	}
 	else if (patch_number == "0006") {
-		if (!staging && (esync_rebase_index <= 2))
+		if (!staging)
 			process_patch_file_0006(file_array, diff_array)
 		else if (staging)
 			process_staging_patch_file_0006(file_array, diff_array)
@@ -5408,15 +6573,13 @@ function process_patch_file(file_array, diff_array)
 		process_patch_file_0007(file_array, diff_array)
 	}
 	else if (patch_number == "0009") {
-		if (esync_rebase_index >= 9)
-			process_patch_file_0009(file_array, diff_array)
+		process_patch_file_0009(file_array, diff_array)
 	}
 	else if (patch_number == "0010") {
 		process_patch_file_0010(file_array, diff_array)
 	}
 	else if (patch_number == "0011") {
-		if (esync_rebase_index >= 9)
-			process_patch_file_0011(file_array, diff_array)
+		process_patch_file_0011(file_array, diff_array)
 	}
 	else if (patch_number == "0013") {
 		process_patch_file_0013(file_array, diff_array)
@@ -5478,14 +6641,25 @@ function process_patch_file(file_array, diff_array)
 			process_staging_patch_file_0025(file_array, diff_array)
 		}
 	}
-	else if ((patch_number == "0026") && (esync_rebase_index <= 7)) {
-		process_patch_file_delete_target_hunk(file_array, diff_array, "/include/wine/server_protocol.h", 2)
+	else if (patch_number == "0026") {
+		process_patch_file_0026(file_array, diff_array)
+		if (esync_rebase_index <= 7)
+			process_patch_file_delete_target_hunk(file_array, diff_array, "/include/wine/server_protocol.h", 2)
+	}
+	else if (patch_number == "0027") {
+		process_patch_file_0027(file_array, diff_array)
+	}
+	else if (patch_number == "0031") {
+		process_patch_file_0031(file_array, diff_array)
 	}
 	else if ((patch_number == "0032") && (esync_rebase_index <= 7)) {
 		process_patch_file_delete_target_hunk(file_array, diff_array, "/include/wine/server_protocol.h", 2)
 	}
 	else if (patch_number == "0033") {
 		process_patch_file_0033(file_array, diff_array)
+	}
+	else if (patch_number == "0034") {
+		process_patch_file_0034(file_array, diff_array)
 	}
 	else if (patch_number == "0040") {
 		process_patch_file_delete_target_hunk(file_array, diff_array, "/include/wine/server_protocol.h", 2)
@@ -5503,8 +6677,7 @@ function process_patch_file(file_array, diff_array)
 		}
 	}
 	else if (patch_number == "0042") {
-		if (esync_rebase_index <= 6)
-			process_patch_file_0042(file_array, diff_array)
+		process_patch_file_0042(file_array, diff_array)
 		if (esync_rebase_index >= 27)
 			regenerate_patch_file_0042(file_array, diff_array)
 		if (!diff_array["exit code"] && staging) {
@@ -5530,6 +6703,9 @@ function process_patch_file(file_array, diff_array)
 		if (esync_rebase_index >= 25)
 			process_patch_file_0051(file_array, diff_array)
 	}
+	else if (patch_number == "0052") {
+        process_patch_file_0052(file_array, diff_array)
+	}
     else if (patch_number == "0055") {
 		if (esync_rebase_index >= 37)
 			process_patch_file_0055(file_array, diff_array)
@@ -5547,8 +6723,7 @@ function process_patch_file(file_array, diff_array)
 			process_patch_file_0064(file_array, diff_array)
 	}
     else if (patch_number == "0070") {
-		if (esync_rebase_index >= 37)
-			process_patch_file_0070(file_array, diff_array)
+        process_patch_file_0070(file_array, diff_array)
 	}
 	else if (patch_number == "0074") {
 		if (esync_rebase_index <= 6)
@@ -5574,6 +6749,9 @@ function process_patch_file(file_array, diff_array)
 			squash_array(file_array)
 			process_staging_patch_file_0079(file_array, diff_array)
 		}
+	}
+    else if (patch_number == "0080") {
+        process_patch_file_0080(file_array, diff_array)
 	}
 	else if (patch_number == "0084") {
 		generate_patch_file_0084(file_array, diff_array)
@@ -5606,13 +6784,8 @@ function process_patch_file(file_array, diff_array)
 }
 
 BEGIN{
-	supported_patches="0001 0002 0003 0006 0007 0009 0010 0011 0013 0014 0015 0017 0020 0023 0024 0025 0026 0032 0033 0040 0041 0042 0044 0045 0048 0051 0055 0056 0059 0064 0070 0074 0077 0078 0079 0084 0085 0086 0087 0088 0089"
+	supported_patches="0001 0002 0003 0006 0007 0009 0010 0011 0013 0014 0015 0017 0020 0023 0024 0025 0026 0027 0031 0032 0033 0034 0040 0041 0042 0044 0045 0048 0051 0052 0055 0056 0059 0064 0070 0074 0077 0078 0079 0080 0084 0085 0086 0087 0088 0089"
 	if (staging) supported_patches=(supported_patches " 0022 ")
-
-	if (supported_patches !~ patch_number) {
-		diff_array["exit code"]=255
-		exit diff_array["exit code"]
-	}
 }
 {
 	file_array[++line] = $0
