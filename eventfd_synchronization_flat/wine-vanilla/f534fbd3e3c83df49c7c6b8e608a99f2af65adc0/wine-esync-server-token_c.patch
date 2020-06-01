@@ -1,0 +1,12 @@
+diff --git a/server/token.c b/server/token.c
+index 5c35bcc19f6..1b7be096c82 100644
+--- a/server/token.c
++++ b/server/token.c
+@@ -146,6 +146,7 @@ static const struct object_ops token_ops =
+     no_add_queue,              /* add_queue */
+     NULL,                      /* remove_queue */
+     NULL,                      /* signaled */
++    NULL,                      /* get_esync_fd */
+     NULL,                      /* satisfied */
+     no_signal,                 /* signal */
+     no_get_fd,                 /* get_fd */

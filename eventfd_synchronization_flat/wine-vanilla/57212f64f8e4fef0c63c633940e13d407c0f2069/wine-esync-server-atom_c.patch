@@ -1,0 +1,12 @@
+diff --git a/server/atom.c b/server/atom.c
+index 3ff75407d9f..e79296f5ae8 100644
+--- a/server/atom.c
++++ b/server/atom.c
+@@ -80,6 +80,7 @@ static const struct object_ops atom_table_ops =
+     no_add_queue,                 /* add_queue */
+     NULL,                         /* remove_queue */
+     NULL,                         /* signaled */
++    NULL,                         /* get_esync_fd */
+     NULL,                         /* satisfied */
+     no_signal,                    /* signal */
+     no_get_fd,                    /* get_fd */

@@ -1,0 +1,22 @@
+diff --git a/dlls/ntdll/om.c b/dlls/ntdll/om.c
+index c3a17f77483..07455bee56a 100644
+--- a/dlls/ntdll/om.c
++++ b/dlls/ntdll/om.c
+@@ -34,6 +34,7 @@
+ #include "windef.h"
+ #include "winternl.h"
+ #include "ntdll_misc.h"
++#include "esync.h"
+ #include "wine/server.h"
+ #include "wine/exception.h"
+ 
+@@ -387,6 +388,9 @@ NTSTATUS close_handle( HANDLE handle )
+     NTSTATUS ret;
+     int fd = unix_funcs->server_remove_fd_from_cache( handle );
+ 
++    if (do_esync())
++        esync_close( handle );
++
+     SERVER_START_REQ( close_handle )
+     {
+         req->handle = wine_server_obj_handle( handle );

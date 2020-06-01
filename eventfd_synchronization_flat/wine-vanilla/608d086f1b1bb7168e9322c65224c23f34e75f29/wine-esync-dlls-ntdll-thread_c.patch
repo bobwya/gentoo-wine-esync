@@ -1,0 +1,22 @@
+diff --git a/dlls/ntdll/thread.c b/dlls/ntdll/thread.c
+index 621aaddfe34..a4f977fe86e 100644
+--- a/dlls/ntdll/thread.c
++++ b/dlls/ntdll/thread.c
+@@ -294,6 +294,8 @@ TEB *thread_init(void)
+     thread_data->reply_fd   = -1;
+     thread_data->wait_fd[0] = -1;
+     thread_data->wait_fd[1] = -1;
++    thread_data->esync_queue_fd = -1;
++    thread_data->esync_apc_fd = -1;
+ 
+     signal_init_thread( teb );
+     virtual_init_threading();
+@@ -572,6 +574,8 @@ NTSTATUS WINAPI RtlCreateUserThread( HANDLE process, SECURITY_DESCRIPTOR *descr,
+     thread_data->wait_fd[0]  = -1;
+     thread_data->wait_fd[1]  = -1;
+     thread_data->start_stack = (char *)teb->Tib.StackBase;
++    thread_data->esync_queue_fd = -1;
++    thread_data->esync_apc_fd = -1;
+ 
+     pthread_attr_init( &attr );
+     pthread_attr_setstack( &attr, teb->DeallocationStack,

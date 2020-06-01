@@ -1,0 +1,13 @@
+diff --git a/server/thread.h b/server/thread.h
+index 5d12d24dd89..8bb22219835 100644
+--- a/server/thread.h
++++ b/server/thread.h
+@@ -90,6 +90,8 @@ struct thread
+     struct list            kernel_object; /* list of kernel object pointers */
+     data_size_t            desc_len;      /* thread description length in bytes */
+     WCHAR                 *desc;          /* thread description string */
++    int                    esync_fd;      /* esync file descriptor (signalled on exit) */
++    int                    esync_apc_fd;  /* esync apc fd (signalled when APCs are present) */
+ };
+ 
+ struct thread_snapshot

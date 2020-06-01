@@ -1,0 +1,21 @@
+diff --git a/dlls/ntdll/loader.c b/dlls/ntdll/loader.c
+index fb20f5de6ca..eb71887fed5 100644
+--- a/dlls/ntdll/loader.c
++++ b/dlls/ntdll/loader.c
+@@ -47,6 +47,7 @@
+ #include "wine/server.h"
+ #include "ntdll_misc.h"
+ #include "ddk/wdm.h"
++#include "esync.h"
+ 
+ WINE_DEFAULT_DEBUG_CHANNEL(module);
+ WINE_DECLARE_DEBUG_CHANNEL(relay);
+@@ -4387,6 +4388,8 @@ void __wine_process_init(void)
+     peb->ProcessHeap = RtlCreateHeap( HEAP_GROWABLE, NULL, 0, 0, NULL, NULL );
+     peb->LoaderLock = &loader_section;
+ 
++    esync_init();
++
+     init_unix_codepage();
+     init_directories();
+     init_user_process_params( info_size );

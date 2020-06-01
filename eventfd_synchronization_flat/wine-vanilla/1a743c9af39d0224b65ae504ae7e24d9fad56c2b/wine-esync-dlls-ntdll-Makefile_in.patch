@@ -1,0 +1,12 @@
+diff --git a/dlls/ntdll/Makefile.in b/dlls/ntdll/Makefile.in
+index 643bcb64c38..c33f481b01a 100644
+--- a/dlls/ntdll/Makefile.in
++++ b/dlls/ntdll/Makefile.in
+@@ -16,6 +16,7 @@ C_SRCS = \
+ 	directory.c \
+ 	env.c \
+ 	error.c \
++	esync.c \
+ 	exception.c \
+ 	file.c \
+ 	handletable.c \

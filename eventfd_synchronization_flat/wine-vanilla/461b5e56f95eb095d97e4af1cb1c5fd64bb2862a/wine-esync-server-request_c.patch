@@ -1,0 +1,12 @@
+diff --git a/server/request.c b/server/request.c
+index d2adb08a183..0a91a7b77d8 100644
+--- a/server/request.c
++++ b/server/request.c
+@@ -97,6 +97,7 @@ static const struct object_ops master_socket_ops =
+     no_add_queue,                  /* add_queue */
+     NULL,                          /* remove_queue */
+     NULL,                          /* signaled */
++    NULL,                          /* get_esync_fd */
+     NULL,                          /* satisfied */
+     no_signal,                     /* signal */
+     no_get_fd,                     /* get_fd */

@@ -1,0 +1,20 @@
+diff --git a/server/debugger.c b/server/debugger.c
+index 401ce36a47a..ad581be8458 100644
+--- a/server/debugger.c
++++ b/server/debugger.c
+@@ -73,6 +73,7 @@ static const struct object_ops debug_event_ops =
+     add_queue,                     /* add_queue */
+     remove_queue,                  /* remove_queue */
+     debug_event_signaled,          /* signaled */
++    NULL,                          /* get_esync_fd */
+     no_satisfied,                  /* satisfied */
+     no_signal,                     /* signal */
+     no_get_fd,                     /* get_fd */
+@@ -100,6 +101,7 @@ static const struct object_ops debug_ctx_ops =
+     add_queue,                     /* add_queue */
+     remove_queue,                  /* remove_queue */
+     debug_ctx_signaled,            /* signaled */
++    NULL,                          /* get_esync_fd */
+     no_satisfied,                  /* satisfied */
+     no_signal,                     /* signal */
+     no_get_fd,                     /* get_fd */

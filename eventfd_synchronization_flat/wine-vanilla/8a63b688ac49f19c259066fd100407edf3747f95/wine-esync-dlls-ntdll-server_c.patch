@@ -1,0 +1,29 @@
+diff --git a/dlls/ntdll/server.c b/dlls/ntdll/server.c
+index 64e3b38dfd7..793a586127d 100644
+--- a/dlls/ntdll/server.c
++++ b/dlls/ntdll/server.c
+@@ -92,6 +92,7 @@
+ #include "wine/debug.h"
+ #include "ntdll_misc.h"
+ #include "ddk/wdm.h"
++#include "esync.h"
+ 
+ WINE_DEFAULT_DEBUG_CHANNEL(server);
+ 
+@@ -118,14 +119,14 @@ timeout_t server_start_time = 0;  /* time of server startup */
+ 
+ sigset_t server_block_set;  /* signals to block during server calls */
+ 
+-static RTL_CRITICAL_SECTION fd_cache_section;
++RTL_CRITICAL_SECTION fd_cache_section;
+ static RTL_CRITICAL_SECTION_DEBUG critsect_debug =
+ {
+     0, 0, &fd_cache_section,
+     { &critsect_debug.ProcessLocksList, &critsect_debug.ProcessLocksList },
+       0, 0, { (DWORD_PTR)(__FILE__ ": fd_cache_section") }
+ };
+-static RTL_CRITICAL_SECTION fd_cache_section = { &critsect_debug, -1, 0, 0, 0, 0 };
++RTL_CRITICAL_SECTION fd_cache_section = { &critsect_debug, -1, 0, 0, 0, 0 };
+ 
+ /* atomically exchange a 64-bit value */
+ static inline LONG64 interlocked_xchg64( LONG64 *dest, LONG64 val )
