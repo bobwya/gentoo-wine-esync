@@ -39,7 +39,12 @@ declare -a ARRAY_ESYNC_PATCH_COMMITS=(
 		"9bfbb4866231f9c2e6e22e23037c54c5702dd634" # (34) [wine:5.6]
 		"6d2d3595c0ea08d915df5fef506fe3679ffa8051" # (35) [wine:5.6]
 		"321d26cbb4404ee63df439759cbc5a546434dde6" # (36)  wine:5.6
-		"87012607688f730755ee91de14620e6e3b78395c" # (37) [wine:5.7]
+		"87012607688f730755ee91de14620e6e3b78395c" # (37)  wine:5.7
+		"a1c46c3806a054c16fab9fd9d8388e55eb473536" # (38) [wine:5.9]
+		"2424742d0711914f02864bcfb945605825b199a3" # (39) [wine:5.9]
+		"dec38ffb075314629f2f1d3b86c752415181736a" # (40)  wine:5.9
+		"8a63b688ac49f19c259066fd100407edf3747f95" # (41) [wine:5.10]
+		"1a743c9af39d0224b65ae504ae7e24d9fad56c2b" # (42) [wine:5.10]
 )
 declare ESYNC_ESYNCB4478B7_INDEX=0
 declare ESYNC_ESYNCCE79346_INDEX=8
@@ -181,12 +186,13 @@ function generate_rebased_esync_patchset()
 	(($# == 5)) || die "invalid number of arguments: $# (5)"
 
 	local  _source_directory="${1%/}" _target_directory="${2%/}" \
+			_target_subdirectory="eventfd_synchronization" \
 			_awk_scripts_directory="${3%/}" _esync_rebase_index="${4}" \
 			_staging="${5}" _array_size="${#ARRAY_ESYNC_PATCH_COMMITS[@]}" \
 			_esync_tarball _esync_version _i=0 _min_esync_rebase_index \
 			_patch_file _patch_file_path _patch_number \
 			_source_esync_directory _target_esync_directory \
-			_target_esync_version _target_esync_patch_file _target_patch
+			_target_esync_version
 
 	if ((_staging)); then
 		_min_esync_rebase_index=$((ESYNC_STAGING_SUPPORT_INDEX_MIN))
@@ -208,7 +214,7 @@ function generate_rebased_esync_patchset()
 	_esync_version="${ESYNC_VERSION_ARRAY[_i]}"
 	_esync_tarball="${_esync_version}.${TARBALL_EXT}"
 	_source_esync_directory="${_source_directory}/${_esync_version}/esync"
-	_target_esync_directory="${_target_directory}/${_esync_version}/${_target_esync_version}/${ARRAY_ESYNC_PATCH_COMMITS[_esync_rebase_index]}"
+	_target_esync_directory="${_target_directory}/${_target_subdirectory}/${_target_esync_version}/${ARRAY_ESYNC_PATCH_COMMITS[_esync_rebase_index]}"
 	mkdir -p "${_target_esync_directory}" || die "mkdir -p failed"
 
 	printf "\\nRebasing esync patchset, for app-emulation/${_target_esync_version}, against Wine Git commit: %s\\n" "${ARRAY_ESYNC_PATCH_COMMITS[_esync_rebase_index]}"
@@ -219,7 +225,6 @@ function generate_rebased_esync_patchset()
 	for _patch_file_path in "${_source_esync_directory}/"{0001..0089}*.patch; do
 		_patch_file="$(basename "${_patch_file_path}")"
 		_patch_number="${_patch_file:0:4}"
-		_target_patch="${_patch_number}.patch"
 
 		if "${AWK}" -vstaging="${_staging}" \
 			-vesync_rebase_index="${_esync_rebase_index}" \
@@ -236,21 +241,6 @@ function generate_rebased_esync_patchset()
 			continue
 		else
 			die "preprocessing patch failed: '${_patch_file_path}'"
-		fi
-
-		_target_esync_patch_file="${_target_esync_directory}/${_patch_file}"
-		if [[ ! -f "${_target_esync_patch_file}" ]]; then
-			die "patch file path invalid: '${_target_esync_patch_file}'"
-		fi
-		[[ "${_patch_number}" =~ 008[4-8] ]] && _patch_file_path="null"
-		diff -Nau "${_patch_file_path}" "${_target_esync_patch_file}" > "${_target_esync_directory}/${_target_patch}"
-		[[ -f "${_target_esync_directory}/${_target_patch}" ]] || die "diff failed"
-		rm -f "${_target_esync_patch_file}" || die "rm failed"
-		if [[ ! -s "${_target_esync_directory}/${_target_patch}" ]]; then
-			rm -f "${_target_esync_directory}/${_target_patch}" || die "rm failed"
-		else
-			sed -i -e "s|${_source_esync_directory}|a|g" -e "s|${_target_esync_directory}|b|g" \
-				"${_target_esync_directory}/${_target_patch}" || die "sed failed"
 		fi
 	done
 }
