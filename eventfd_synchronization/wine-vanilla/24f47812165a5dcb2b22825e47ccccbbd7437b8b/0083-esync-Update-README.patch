@@ -1,0 +1,25 @@
+From b4478b7b8bcc147924a06e59396928ac2260ee09 Mon Sep 17 00:00:00 2001
+From: Zebediah Figura <z.figura12@gmail.com>
+Date: Sun, 19 Aug 2018 13:40:05 -0500
+Subject: [PATCH 83/83] esync: Update README.
+
+Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+---
+ README.esync | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/README.esync b/README.esync
+index b64bfef..11d8656 100644
+--- a/README.esync
++++ b/README.esync
+@@ -1,6 +1,5 @@
+ This is eventfd-based synchronization, or 'esync' for short. Turn it on with
+-WINEESYNC=1 (note that it checks the presence and not the value); debug it
+-with +esync.
++WINEESYNC=1; debug it with +esync.
+ 
+ == BUGS AND LIMITATIONS ==
+ 
+-- 
+2.7.4
+

@@ -1,0 +1,79 @@
+From 8d4b9b504e65596209f2374ac976f570ddb7ae85 Mon Sep 17 00:00:00 2001
+From: Zebediah Figura <z.figura12@gmail.com>
+Date: Thu, 7 Jun 2018 21:07:51 -0500
+Subject: [PATCH 06/83] ntdll: Close esync objects.
+
+Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+---
+ dlls/ntdll/esync.c | 19 +++++++++++++++++++
+ dlls/ntdll/esync.h |  1 +
+ dlls/ntdll/om.c    |  4 ++++
+ 3 files changed, 24 insertions(+)
+
+diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
+index e314935..03a627a 100644
+--- a/dlls/ntdll/esync.c
++++ b/dlls/ntdll/esync.c
+@@ -135,6 +135,25 @@ static void *esync_get_object( HANDLE handle )
+     return esync_list[entry][idx];
+ }
+ 
++NTSTATUS esync_close( HANDLE handle )
++{
++    UINT_PTR entry, idx = handle_to_index( handle, &entry );
++    struct esync *obj;
++
++    TRACE("%p.\n", handle);
++
++    if (entry < ESYNC_LIST_ENTRIES && esync_list[entry])
++    {
++        if ((obj = interlocked_xchg_ptr( (void **)&esync_list[entry][idx], 0 )))
++        {
++            close( obj->fd );
++            RtlFreeHeap( GetProcessHeap(), 0, obj );
++            return STATUS_SUCCESS;
++        }
++    }
++
++    return STATUS_INVALID_HANDLE;
++}
+ 
+ static NTSTATUS create_esync(int *fd, HANDLE *handle, ACCESS_MASK access,
+     const OBJECT_ATTRIBUTES *attr, int initval, int flags)
+diff --git a/dlls/ntdll/esync.h b/dlls/ntdll/esync.h
+index fec0b68..a22618d 100644
+--- a/dlls/ntdll/esync.h
++++ b/dlls/ntdll/esync.h
+@@ -19,6 +19,7 @@
+  */
+ 
+ extern int do_esync(void) DECLSPEC_HIDDEN;
++extern NTSTATUS esync_close( HANDLE handle ) DECLSPEC_HIDDEN;
+ 
+ extern NTSTATUS esync_create_semaphore(HANDLE *handle, ACCESS_MASK access,
+     const OBJECT_ATTRIBUTES *attr, LONG initial, LONG max) DECLSPEC_HIDDEN;
+diff --git a/dlls/ntdll/om.c b/dlls/ntdll/om.c
+index 0b56251..6c74ce5 100644
+--- a/dlls/ntdll/om.c
++++ b/dlls/ntdll/om.c
+@@ -37,6 +37,7 @@
+ #include "windef.h"
+ #include "winternl.h"
+ #include "ntdll_misc.h"
++#include "esync.h"
+ #include "wine/server.h"
+ 
+ WINE_DEFAULT_DEBUG_CHANNEL(ntdll);
+@@ -390,6 +391,9 @@ NTSTATUS close_handle( HANDLE handle )
+     NTSTATUS ret;
+     int fd = server_remove_fd_from_cache( handle );
+ 
++    if (do_esync())
++        esync_close( handle );
++
+     SERVER_START_REQ( close_handle )
+     {
+         req->handle = wine_server_obj_handle( handle );
+-- 
+2.7.4
+
