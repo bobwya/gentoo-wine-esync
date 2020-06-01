@@ -1,0 +1,12 @@
+diff --git a/dlls/ntdll/ntdll.spec b/dlls/ntdll/ntdll.spec
+index ae127ed7ece..ae65a6c099d 100644
+--- a/dlls/ntdll/ntdll.spec
++++ b/dlls/ntdll/ntdll.spec
+@@ -1527,5 +1527,7 @@
+ @ cdecl wine_nt_to_unix_file_name(ptr ptr long long)
+ @ cdecl wine_unix_to_nt_file_name(ptr ptr)
+ 
++@ cdecl __wine_esync_set_queue_fd(long)
++
+ # User shared data
+ @ cdecl __wine_user_shared_data()

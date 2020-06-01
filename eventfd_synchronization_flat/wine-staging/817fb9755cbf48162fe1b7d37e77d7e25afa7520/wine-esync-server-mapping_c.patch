@@ -1,0 +1,28 @@
+diff --git a/server/mapping.c b/server/mapping.c
+index 69484837fc3..1a47605d99a 100644
+--- a/server/mapping.c
++++ b/server/mapping.c
+@@ -91,6 +91,7 @@ static const struct object_ops ranges_ops =
+     no_add_queue,              /* add_queue */
+     NULL,                      /* remove_queue */
+     NULL,                      /* signaled */
++    NULL,                      /* get_esync_fd */
+     NULL,                      /* satisfied */
+     no_signal,                 /* signal */
+     no_get_fd,                 /* get_fd */
+@@ -126,6 +127,7 @@ static const struct object_ops shared_map_ops =
+     no_add_queue,              /* add_queue */
+     NULL,                      /* remove_queue */
+     NULL,                      /* signaled */
++    NULL,                      /* get_esync_fd */
+     NULL,                      /* satisfied */
+     no_signal,                 /* signal */
+     no_get_fd,                 /* get_fd */
+@@ -182,6 +184,7 @@ static const struct object_ops mapping_ops =
+     no_add_queue,                /* add_queue */
+     NULL,                        /* remove_queue */
+     NULL,                        /* signaled */
++    NULL,                        /* get_esync_fd */
+     NULL,                        /* satisfied */
+     no_signal,                   /* signal */
+     mapping_get_fd,              /* get_fd */
