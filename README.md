@@ -19,29 +19,25 @@ He created a framework whereby even contended waits could
 be executed in userspace, eliminating a lot of the complexity that Daniel's
 synchronization primitives used.
 
-## ```esync??????/wine-staging/```
+## ```eventfd_synchronization/wine-staging/```
 
 Contains wine-esync patchsets, rebased for Wine Staging, separated into directories by Wine Git commits. These rebased wine-esync patchsets are guaranteed to apply to all child Wine Git commits, on which Wine Staging has been rebased. When a subsequent wine-esync rebase snapshot is necessary, then a new patchset directory is created for this (and so on).
-Based on wine-esync pre-release version **esync**_??????_ (where is _??????_ is the shortened Git Commit hash).
 
-## ```esync??????/wine-vanilla/```
+## ```eventfd_synchronization/wine-vanilla/```
 
 Contains wine-esync patchsets, rebased for Wine, separated into directories by Wine Git commits. These rebased wine-esync patchsets are guaranteed to apply to all child Wine Git commits. When a subsequent wine-esync rebase snapshot is necessary, then a new patchset directory is created for this (and so on).
-Based on wine-esync pre-release version **esync**_??????_ (where is _??????_ is the shortened Git Commit hash).
 
 ## ```wine-esync-common.awk wine-esync-preprocess.awk esync_generate_rebasing_patchsets.sh```
 
-Awk scripts that can be used to process the stock 83 wine-esync patches, so that these apply on any version of **>=app-emulation/wine-vanilla-3.0_rc1** or **>=app-emulation/wine-staging-3.3**.
+Awk scripts that can be used to rebase the stock 83 wine-esync patches, so that these apply on any version of **>=app-emulation/wine-vanilla-3.0_rc1** or **>=app-emulation/wine-staging-3.3**.
 A BASH script that uses the Awk scripts to generate multiple rebased directories. These are separated hierarchically by:
 
-1. root directory: esync version
-2. intermediate directory: package name
-3. leaf directory: Wine Git commit (rebase point for this patchset)
+1. intermediate directory: package name
+2. leaf directory: Wine Git commit (rebase point for this patchset)
 
-The leaf directories contain sets of patches that can be applied to stock 83 wine-esync patches (corresponding wine-esync version). Thereby enabling
-the 83 wine-esync patches to be applied, without any fuzzing, to all current Wine (≥3.0-rc1) and Wine Staging (≥3.3) releases.
+The leaf directories contain patchsets that can be directly applied to all current Wine (≥3.0-rc1) and Wine Staging (≥3.3) releases.
 
-# wine-esync
+# wine-esync (aka eventfd-synchronization)
 
 Full credit, for developing this patchset, must go to the original author Zebediah Figura [@zfigura](https://github.com/zfigura).
 See: [Github: zfigura / wine : README.esync](https://github.com/zfigura/wine/blob/esync/README.esync).
