@@ -1,0 +1,658 @@
+From fbb260420764943b4f583aaa2dd72fcd3e5df327 Mon Sep 17 00:00:00 2001
+From: Zebediah Figura <z.figura12@gmail.com>
+Date: Fri, 8 Jun 2018 18:51:40 -0500
+Subject: [PATCH 13/83] server: Add an object operation to grab the esync file
+ descriptor.
+
+Split off to decrease patch size.
+
+Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+---
+ server/async.c      | 2 ++
+ server/atom.c       | 1 +
+ server/change.c     | 1 +
+ server/clipboard.c  | 1 +
+ server/completion.c | 1 +
+ server/console.c    | 3 +++
+ server/debugger.c   | 2 ++
+ server/device.c     | 4 ++++
+ server/directory.c  | 2 ++
+ server/esync.c      | 1 +
+ server/event.c      | 2 ++
+ server/fd.c         | 4 ++++
+ server/file.c       | 1 +
+ server/handle.c     | 1 +
+ server/hook.c       | 1 +
+ server/mailslot.c   | 3 +++
+ server/mapping.c    | 3 +++
+ server/mutex.c      | 1 +
+ server/named_pipe.c | 4 ++++
+ server/object.h     | 2 ++
+ server/process.c    | 3 +++
+ server/queue.c      | 2 ++
+ server/registry.c   | 1 +
+ server/request.c    | 1 +
+ server/semaphore.c  | 1 +
+ server/serial.c     | 1 +
+ server/signal.c     | 1 +
+ server/snapshot.c   | 1 +
+ server/sock.c       | 2 ++
+ server/symlink.c    | 1 +
+ server/thread.c     | 2 ++
+ server/timer.c      | 1 +
+ server/token.c      | 1 +
+ server/winstation.c | 2 ++
+ 34 files changed, 60 insertions(+)
+
+diff --git a/server/async.c b/server/async.c
+index adbadc5..1e800a7 100644
+--- a/server/async.c
++++ b/server/async.c
+@@ -68,6 +68,7 @@ static const struct object_ops async_ops =
+     add_queue,                 /* add_queue */
+     remove_queue,              /* remove_queue */
+     async_signaled,            /* signaled */
++    NULL,                      /* get_esync_fd */
+     async_satisfied,           /* satisfied */
+     no_signal,                 /* signal */
+     no_get_fd,                 /* get_fd */
+@@ -451,6 +452,7 @@ static const struct object_ops iosb_ops =
+     no_add_queue,             /* add_queue */
+     NULL,                     /* remove_queue */
+     NULL,                     /* signaled */
++    NULL,                     /* get_esync_fd */
+     NULL,                     /* satisfied */
+     no_signal,                /* signal */
+     no_get_fd,                /* get_fd */
+diff --git a/server/atom.c b/server/atom.c
+index 3ff7540..e79296f 100644
+--- a/server/atom.c
++++ b/server/atom.c
+@@ -80,6 +80,7 @@ static const struct object_ops atom_table_ops =
+     no_add_queue,                 /* add_queue */
+     NULL,                         /* remove_queue */
+     NULL,                         /* signaled */
++    NULL,                         /* get_esync_fd */
+     NULL,                         /* satisfied */
+     no_signal,                    /* signal */
+     no_get_fd,                    /* get_fd */
+diff --git a/server/change.c b/server/change.c
+index 1f2f7c5..5ebb82f 100644
+--- a/server/change.c
++++ b/server/change.c
+@@ -162,6 +162,7 @@ static const struct object_ops dir_ops =
+     add_queue,                /* add_queue */
+     remove_queue,             /* remove_queue */
+     default_fd_signaled,      /* signaled */
++    NULL,                     /* get_esync_fd */
+     no_satisfied,             /* satisfied */
+     no_signal,                /* signal */
+     dir_get_fd,               /* get_fd */
+diff --git a/server/clipboard.c b/server/clipboard.c
+index 160eb46..8fee1bf 100644
+--- a/server/clipboard.c
++++ b/server/clipboard.c
+@@ -77,6 +77,7 @@ static const struct object_ops clipboard_ops =
+     no_add_queue,                 /* add_queue */
+     NULL,                         /* remove_queue */
+     NULL,                         /* signaled */
++    NULL,                         /* get_esync_fd */
+     NULL,                         /* satisfied */
+     no_signal,                    /* signal */
+     no_get_fd,                    /* get_fd */
+diff --git a/server/completion.c b/server/completion.c
+index 8b8983a..8585083 100644
+--- a/server/completion.c
++++ b/server/completion.c
+@@ -65,6 +65,7 @@ static const struct object_ops completion_ops =
+     add_queue,                 /* add_queue */
+     remove_queue,              /* remove_queue */
+     completion_signaled,       /* signaled */
++    NULL,                      /* get_esync_fd */
+     no_satisfied,              /* satisfied */
+     no_signal,                 /* signal */
+     no_get_fd,                 /* get_fd */
+diff --git a/server/console.c b/server/console.c
+index e1ae086..b0038d0 100644
+--- a/server/console.c
++++ b/server/console.c
+@@ -77,6 +77,7 @@ static const struct object_ops console_input_ops =
+     no_add_queue,                     /* add_queue */
+     NULL,                             /* remove_queue */
+     NULL,                             /* signaled */
++    NULL,                             /* get_esync_fd */
+     no_satisfied,                     /* satisfied */
+     no_signal,                        /* signal */
+     console_input_get_fd,             /* get_fd */
+@@ -111,6 +112,7 @@ static const struct object_ops console_input_events_ops =
+     add_queue,                        /* add_queue */
+     remove_queue,                     /* remove_queue */
+     console_input_events_signaled,    /* signaled */
++    NULL,                             /* get_esync_fd */
+     no_satisfied,                     /* satisfied */
+     no_signal,                        /* signal */
+     no_get_fd,                        /* get_fd */
+@@ -167,6 +169,7 @@ static const struct object_ops screen_buffer_ops =
+     no_add_queue,                     /* add_queue */
+     NULL,                             /* remove_queue */
+     NULL,                             /* signaled */
++    NULL,                             /* get_esync_fd */
+     NULL,                             /* satisfied */
+     no_signal,                        /* signal */
+     screen_buffer_get_fd,             /* get_fd */
+diff --git a/server/debugger.c b/server/debugger.c
+index 79b7e52..f424562 100644
+--- a/server/debugger.c
++++ b/server/debugger.c
+@@ -74,6 +74,7 @@ static const struct object_ops debug_event_ops =
+     add_queue,                     /* add_queue */
+     remove_queue,                  /* remove_queue */
+     debug_event_signaled,          /* signaled */
++    NULL,                          /* get_esync_fd */
+     no_satisfied,                  /* satisfied */
+     no_signal,                     /* signal */
+     no_get_fd,                     /* get_fd */
+@@ -100,6 +101,7 @@ static const struct object_ops debug_ctx_ops =
+     add_queue,                     /* add_queue */
+     remove_queue,                  /* remove_queue */
+     debug_ctx_signaled,            /* signaled */
++    NULL,                          /* get_esync_fd */
+     no_satisfied,                  /* satisfied */
+     no_signal,                     /* signal */
+     no_get_fd,                     /* get_fd */
+diff --git a/server/device.c b/server/device.c
+index dcc2946..c745726 100644
+--- a/server/device.c
++++ b/server/device.c
+@@ -65,6 +65,7 @@ static const struct object_ops irp_call_ops =
+     add_queue,                        /* add_queue */
+     remove_queue,                     /* remove_queue */
+     irp_call_signaled,                /* signaled */
++    NULL,                             /* get_esync_fd */
+     no_satisfied,                     /* satisfied */
+     no_signal,                        /* signal */
+     no_get_fd,                        /* get_fd */
+@@ -101,6 +102,7 @@ static const struct object_ops device_manager_ops =
+     add_queue,                        /* add_queue */
+     remove_queue,                     /* remove_queue */
+     device_manager_signaled,          /* signaled */
++    NULL,                             /* get_esync_fd */
+     no_satisfied,                     /* satisfied */
+     no_signal,                        /* signal */
+     no_get_fd,                        /* get_fd */
+@@ -142,6 +144,7 @@ static const struct object_ops device_ops =
+     no_add_queue,                     /* add_queue */
+     NULL,                             /* remove_queue */
+     NULL,                             /* signaled */
++    NULL,                             /* get_esync_fd */
+     no_satisfied,                     /* satisfied */
+     no_signal,                        /* signal */
+     no_get_fd,                        /* get_fd */
+@@ -187,6 +190,7 @@ static const struct object_ops device_file_ops =
+     add_queue,                        /* add_queue */
+     remove_queue,                     /* remove_queue */
+     default_fd_signaled,              /* signaled */
++    NULL,                             /* get_esync_fd */
+     no_satisfied,                     /* satisfied */
+     no_signal,                        /* signal */
+     device_file_get_fd,               /* get_fd */
+diff --git a/server/directory.c b/server/directory.c
+index 7ffaedc..14bc17d 100644
+--- a/server/directory.c
++++ b/server/directory.c
+@@ -57,6 +57,7 @@ static const struct object_ops object_type_ops =
+     no_add_queue,                 /* add_queue */
+     NULL,                         /* remove_queue */
+     NULL,                         /* signaled */
++    NULL,                         /* get_esync_fd */
+     NULL,                         /* satisfied */
+     no_signal,                    /* signal */
+     no_get_fd,                    /* get_fd */
+@@ -92,6 +93,7 @@ static const struct object_ops directory_ops =
+     no_add_queue,                 /* add_queue */
+     NULL,                         /* remove_queue */
+     NULL,                         /* signaled */
++    NULL,                         /* get_esync_fd */
+     NULL,                         /* satisfied */
+     no_signal,                    /* signal */
+     no_get_fd,                    /* get_fd */
+diff --git a/server/esync.c b/server/esync.c
+index 66cae24..e761475 100644
+--- a/server/esync.c
++++ b/server/esync.c
+@@ -53,6 +53,7 @@ static const struct object_ops esync_ops =
+     no_add_queue,              /* add_queue */
+     NULL,                      /* remove_queue */
+     NULL,                      /* signaled */
++    NULL,                      /* get_esync_fd */
+     NULL,                      /* satisfied */
+     no_signal,                 /* signal */
+     no_get_fd,                 /* get_fd */
+diff --git a/server/event.c b/server/event.c
+index cfc0f6a..a85be8d 100644
+--- a/server/event.c
++++ b/server/event.c
+@@ -58,6 +58,7 @@ static const struct object_ops event_ops =
+     add_queue,                 /* add_queue */
+     remove_queue,              /* remove_queue */
+     event_signaled,            /* signaled */
++    NULL,                      /* get_esync_fd */
+     event_satisfied,           /* satisfied */
+     event_signal,              /* signal */
+     no_get_fd,                 /* get_fd */
+@@ -91,6 +92,7 @@ static const struct object_ops keyed_event_ops =
+     add_queue,                   /* add_queue */
+     remove_queue,                /* remove_queue */
+     keyed_event_signaled,        /* signaled */
++    NULL,                        /* get_esync_fd */
+     no_satisfied,                /* satisfied */
+     no_signal,                   /* signal */
+     no_get_fd,                   /* get_fd */
+diff --git a/server/fd.c b/server/fd.c
+index 6118f52..3388de9 100644
+--- a/server/fd.c
++++ b/server/fd.c
+@@ -207,6 +207,7 @@ static const struct object_ops fd_ops =
+     no_add_queue,             /* add_queue */
+     NULL,                     /* remove_queue */
+     NULL,                     /* signaled */
++    NULL,                     /* get_esync_fd */
+     NULL,                     /* satisfied */
+     no_signal,                /* signal */
+     no_get_fd,                /* get_fd */
+@@ -246,6 +247,7 @@ static const struct object_ops device_ops =
+     no_add_queue,             /* add_queue */
+     NULL,                     /* remove_queue */
+     NULL,                     /* signaled */
++    NULL,                     /* get_esync_fd */
+     NULL,                     /* satisfied */
+     no_signal,                /* signal */
+     no_get_fd,                /* get_fd */
+@@ -284,6 +286,7 @@ static const struct object_ops inode_ops =
+     no_add_queue,             /* add_queue */
+     NULL,                     /* remove_queue */
+     NULL,                     /* signaled */
++    NULL,                     /* get_esync_fd */
+     NULL,                     /* satisfied */
+     no_signal,                /* signal */
+     no_get_fd,                /* get_fd */
+@@ -324,6 +327,7 @@ static const struct object_ops file_lock_ops =
+     add_queue,                  /* add_queue */
+     remove_queue,               /* remove_queue */
+     file_lock_signaled,         /* signaled */
++    NULL,                       /* get_esync_fd */
+     no_satisfied,               /* satisfied */
+     no_signal,                  /* signal */
+     no_get_fd,                  /* get_fd */
+diff --git a/server/file.c b/server/file.c
+index 446621a..ef8d1e3 100644
+--- a/server/file.c
++++ b/server/file.c
+@@ -85,6 +85,7 @@ static const struct object_ops file_ops =
+     add_queue,                    /* add_queue */
+     remove_queue,                 /* remove_queue */
+     default_fd_signaled,          /* signaled */
++    NULL,                         /* get_esync_fd */
+     no_satisfied,                 /* satisfied */
+     no_signal,                    /* signal */
+     file_get_fd,                  /* get_fd */
+diff --git a/server/handle.c b/server/handle.c
+index 35ab860..b8fdfff 100644
+--- a/server/handle.c
++++ b/server/handle.c
+@@ -123,6 +123,7 @@ static const struct object_ops handle_table_ops =
+     no_add_queue,                    /* add_queue */
+     NULL,                            /* remove_queue */
+     NULL,                            /* signaled */
++    NULL,                            /* get_esync_fd */
+     NULL,                            /* satisfied */
+     no_signal,                       /* signal */
+     no_get_fd,                       /* get_fd */
+diff --git a/server/hook.c b/server/hook.c
+index 3a0e4b4..1845d96 100644
+--- a/server/hook.c
++++ b/server/hook.c
+@@ -81,6 +81,7 @@ static const struct object_ops hook_table_ops =
+     no_add_queue,                 /* add_queue */
+     NULL,                         /* remove_queue */
+     NULL,                         /* signaled */
++    NULL,                         /* get_esync_fd */
+     NULL,                         /* satisfied */
+     no_signal,                    /* signal */
+     no_get_fd,                    /* get_fd */
+diff --git a/server/mailslot.c b/server/mailslot.c
+index f4c7007..812b471 100644
+--- a/server/mailslot.c
++++ b/server/mailslot.c
+@@ -79,6 +79,7 @@ static const struct object_ops mailslot_ops =
+     add_queue,                 /* add_queue */
+     remove_queue,              /* remove_queue */
+     default_fd_signaled,       /* signaled */
++    NULL,                      /* get_esync_fd */
+     no_satisfied,              /* satisfied */
+     no_signal,                 /* signal */
+     mailslot_get_fd,           /* get_fd */
+@@ -135,6 +136,7 @@ static const struct object_ops mail_writer_ops =
+     no_add_queue,               /* add_queue */
+     NULL,                       /* remove_queue */
+     NULL,                       /* signaled */
++    NULL,                       /* get_esync_fd */
+     NULL,                       /* satisfied */
+     no_signal,                  /* signal */
+     mail_writer_get_fd,         /* get_fd */
+@@ -192,6 +194,7 @@ static const struct object_ops mailslot_device_ops =
+     no_add_queue,                   /* add_queue */
+     NULL,                           /* remove_queue */
+     NULL,                           /* signaled */
++    NULL,                           /* get_esync_fd */
+     no_satisfied,                   /* satisfied */
+     no_signal,                      /* signal */
+     mailslot_device_get_fd,         /* get_fd */
+diff --git a/server/mapping.c b/server/mapping.c
+index 2955766..58f2686 100644
+--- a/server/mapping.c
++++ b/server/mapping.c
+@@ -67,6 +67,7 @@ static const struct object_ops ranges_ops =
+     no_add_queue,              /* add_queue */
+     NULL,                      /* remove_queue */
+     NULL,                      /* signaled */
++    NULL,                      /* get_esync_fd */
+     NULL,                      /* satisfied */
+     no_signal,                 /* signal */
+     no_get_fd,                 /* get_fd */
+@@ -101,6 +102,7 @@ static const struct object_ops shared_map_ops =
+     no_add_queue,              /* add_queue */
+     NULL,                      /* remove_queue */
+     NULL,                      /* signaled */
++    NULL,                      /* get_esync_fd */
+     NULL,                      /* satisfied */
+     no_signal,                 /* signal */
+     no_get_fd,                 /* get_fd */
+@@ -156,6 +158,7 @@ static const struct object_ops mapping_ops =
+     no_add_queue,                /* add_queue */
+     NULL,                        /* remove_queue */
+     NULL,                        /* signaled */
++    NULL,                        /* get_esync_fd */
+     NULL,                        /* satisfied */
+     no_signal,                   /* signal */
+     mapping_get_fd,              /* get_fd */
+diff --git a/server/mutex.c b/server/mutex.c
+index d1887e4..fa5c365 100644
+--- a/server/mutex.c
++++ b/server/mutex.c
+@@ -61,6 +61,7 @@ static const struct object_ops mutex_ops =
+     add_queue,                 /* add_queue */
+     remove_queue,              /* remove_queue */
+     mutex_signaled,            /* signaled */
++    NULL,                      /* get_esync_fd */
+     mutex_satisfied,           /* satisfied */
+     mutex_signal,              /* signal */
+     no_get_fd,                 /* get_fd */
+diff --git a/server/named_pipe.c b/server/named_pipe.c
+index ae2f2de..b836e41 100644
+--- a/server/named_pipe.c
++++ b/server/named_pipe.c
+@@ -118,6 +118,7 @@ static const struct object_ops named_pipe_ops =
+     no_add_queue,                 /* add_queue */
+     NULL,                         /* remove_queue */
+     NULL,                         /* signaled */
++    NULL,                         /* get_esync_fd */
+     NULL,                         /* satisfied */
+     no_signal,                    /* signal */
+     no_get_fd,                    /* get_fd */
+@@ -160,6 +161,7 @@ static const struct object_ops pipe_server_ops =
+     add_queue,                    /* add_queue */
+     remove_queue,                 /* remove_queue */
+     default_fd_signaled,          /* signaled */
++    NULL,                         /* get_esync_fd */
+     no_satisfied,                 /* satisfied */
+     no_signal,                    /* signal */
+     pipe_end_get_fd,              /* get_fd */
+@@ -201,6 +203,7 @@ static const struct object_ops pipe_client_ops =
+     add_queue,                    /* add_queue */
+     remove_queue,                 /* remove_queue */
+     default_fd_signaled,          /* signaled */
++    NULL,                         /* get_esync_fd */
+     no_satisfied,                 /* satisfied */
+     no_signal,                    /* signal */
+     pipe_end_get_fd,              /* get_fd */
+@@ -249,6 +252,7 @@ static const struct object_ops named_pipe_device_ops =
+     no_add_queue,                     /* add_queue */
+     NULL,                             /* remove_queue */
+     NULL,                             /* signaled */
++    NULL,                             /* get_esync_fd */
+     no_satisfied,                     /* satisfied */
+     no_signal,                        /* signal */
+     named_pipe_device_get_fd,         /* get_fd */
+diff --git a/server/object.h b/server/object.h
+index b5c50e1..b3d4e33 100644
+--- a/server/object.h
++++ b/server/object.h
+@@ -68,6 +68,8 @@ struct object_ops
+     void (*remove_queue)(struct object *,struct wait_queue_entry *);
+     /* is object signaled? */
+     int  (*signaled)(struct object *,struct wait_queue_entry *);
++    /* return the esync fd for this object */
++    int (*get_esync_fd)(struct object *);
+     /* wait satisfied */
+     void (*satisfied)(struct object *,struct wait_queue_entry *);
+     /* signal an object */
+diff --git a/server/process.c b/server/process.c
+index b512141..0e52304 100644
+--- a/server/process.c
++++ b/server/process.c
+@@ -74,6 +74,7 @@ static const struct object_ops process_ops =
+     add_queue,                   /* add_queue */
+     remove_queue,                /* remove_queue */
+     process_signaled,            /* signaled */
++    NULL,                        /* get_esync_fd */
+     no_satisfied,                /* satisfied */
+     no_signal,                   /* signal */
+     no_get_fd,                   /* get_fd */
+@@ -123,6 +124,7 @@ static const struct object_ops startup_info_ops =
+     add_queue,                     /* add_queue */
+     remove_queue,                  /* remove_queue */
+     startup_info_signaled,         /* signaled */
++    NULL,                          /* get_esync_fd */
+     no_satisfied,                  /* satisfied */
+     no_signal,                     /* signal */
+     no_get_fd,                     /* get_fd */
+@@ -166,6 +168,7 @@ static const struct object_ops job_ops =
+     add_queue,                     /* add_queue */
+     remove_queue,                  /* remove_queue */
+     job_signaled,                  /* signaled */
++    NULL,                          /* get_esync_fd */
+     no_satisfied,                  /* satisfied */
+     no_signal,                     /* signal */
+     no_get_fd,                     /* get_fd */
+diff --git a/server/queue.c b/server/queue.c
+index c479b38..cb164d6 100644
+--- a/server/queue.c
++++ b/server/queue.c
+@@ -171,6 +171,7 @@ static const struct object_ops msg_queue_ops =
+     msg_queue_add_queue,       /* add_queue */
+     msg_queue_remove_queue,    /* remove_queue */
+     msg_queue_signaled,        /* signaled */
++    NULL,                      /* get_esync_fd */
+     msg_queue_satisfied,       /* satisfied */
+     no_signal,                 /* signal */
+     no_get_fd,                 /* get_fd */
+@@ -206,6 +207,7 @@ static const struct object_ops thread_input_ops =
+     no_add_queue,                 /* add_queue */
+     NULL,                         /* remove_queue */
+     NULL,                         /* signaled */
++    NULL,                         /* get_esync_fd */
+     NULL,                         /* satisfied */
+     no_signal,                    /* signal */
+     no_get_fd,                    /* get_fd */
+diff --git a/server/registry.c b/server/registry.c
+index 8ad97d4..ae1e354 100644
+--- a/server/registry.c
++++ b/server/registry.c
+@@ -160,6 +160,7 @@ static const struct object_ops key_ops =
+     no_add_queue,            /* add_queue */
+     NULL,                    /* remove_queue */
+     NULL,                    /* signaled */
++    NULL,                    /* get_esync_fd */
+     NULL,                    /* satisfied */
+     no_signal,               /* signal */
+     no_get_fd,               /* get_fd */
+diff --git a/server/request.c b/server/request.c
+index c10c4e6..7420e4a 100644
+--- a/server/request.c
++++ b/server/request.c
+@@ -97,6 +97,7 @@ static const struct object_ops master_socket_ops =
+     no_add_queue,                  /* add_queue */
+     NULL,                          /* remove_queue */
+     NULL,                          /* signaled */
++    NULL,                          /* get_esync_fd */
+     NULL,                          /* satisfied */
+     no_signal,                     /* signal */
+     no_get_fd,                     /* get_fd */
+diff --git a/server/semaphore.c b/server/semaphore.c
+index 08ff153..82fc870 100644
+--- a/server/semaphore.c
++++ b/server/semaphore.c
+@@ -58,6 +58,7 @@ static const struct object_ops semaphore_ops =
+     add_queue,                     /* add_queue */
+     remove_queue,                  /* remove_queue */
+     semaphore_signaled,            /* signaled */
++    NULL,                          /* get_esync_fd */
+     semaphore_satisfied,           /* satisfied */
+     semaphore_signal,              /* signal */
+     no_get_fd,                     /* get_fd */
+diff --git a/server/serial.c b/server/serial.c
+index bb976a1..cea0f9c 100644
+--- a/server/serial.c
++++ b/server/serial.c
+@@ -92,6 +92,7 @@ static const struct object_ops serial_ops =
+     add_queue,                    /* add_queue */
+     remove_queue,                 /* remove_queue */
+     default_fd_signaled,          /* signaled */
++    NULL,                         /* get_esync_fd */
+     no_satisfied,                 /* satisfied */
+     no_signal,                    /* signal */
+     serial_get_fd,                /* get_fd */
+diff --git a/server/signal.c b/server/signal.c
+index 74416fa..281304e 100644
+--- a/server/signal.c
++++ b/server/signal.c
+@@ -67,6 +67,7 @@ static const struct object_ops handler_ops =
+     no_add_queue,             /* add_queue */
+     NULL,                     /* remove_queue */
+     NULL,                     /* signaled */
++    NULL,                     /* get_esync_fd */
+     NULL,                     /* satisfied */
+     no_signal,                /* signal */
+     no_get_fd,                /* get_fd */
+diff --git a/server/snapshot.c b/server/snapshot.c
+index e35588a..c5da451 100644
+--- a/server/snapshot.c
++++ b/server/snapshot.c
+@@ -61,6 +61,7 @@ static const struct object_ops snapshot_ops =
+     no_add_queue,                 /* add_queue */
+     NULL,                         /* remove_queue */
+     NULL,                         /* signaled */
++    NULL,                         /* get_esync_fd */
+     NULL,                         /* satisfied */
+     no_signal,                    /* signal */
+     no_get_fd,                    /* get_fd */
+diff --git a/server/sock.c b/server/sock.c
+index 84f54f6..057b561 100644
+--- a/server/sock.c
++++ b/server/sock.c
+@@ -145,6 +145,7 @@ static const struct object_ops sock_ops =
+     add_queue,                    /* add_queue */
+     remove_queue,                 /* remove_queue */
+     sock_signaled,                /* signaled */
++    NULL,                         /* get_esync_fd */
+     no_satisfied,                 /* satisfied */
+     no_signal,                    /* signal */
+     sock_get_fd,                  /* get_fd */
+@@ -970,6 +971,7 @@ static const struct object_ops ifchange_ops =
+     add_queue,               /* add_queue */
+     NULL,                    /* remove_queue */
+     NULL,                    /* signaled */
++    NULL,                    /* get_esync_fd */
+     no_satisfied,            /* satisfied */
+     no_signal,               /* signal */
+     ifchange_get_fd,         /* get_fd */
+diff --git a/server/symlink.c b/server/symlink.c
+index 9199bc5..ce8db56 100644
+--- a/server/symlink.c
++++ b/server/symlink.c
+@@ -60,6 +60,7 @@ static const struct object_ops symlink_ops =
+     no_add_queue,                 /* add_queue */
+     NULL,                         /* remove_queue */
+     NULL,                         /* signaled */
++    NULL,                         /* get_esync_fd */
+     NULL,                         /* satisfied */
+     no_signal,                    /* signal */
+     no_get_fd,                    /* get_fd */
+diff --git a/server/thread.c b/server/thread.c
+index 7162fc3..e671ad8 100644
+--- a/server/thread.c
++++ b/server/thread.c
+@@ -110,6 +110,7 @@ static const struct object_ops thread_apc_ops =
+     add_queue,                  /* add_queue */
+     remove_queue,               /* remove_queue */
+     thread_apc_signaled,        /* signaled */
++    NULL,                       /* get_esync_fd */
+     no_satisfied,               /* satisfied */
+     no_signal,                  /* signal */
+     no_get_fd,                  /* get_fd */
+@@ -141,6 +142,7 @@ static const struct object_ops thread_ops =
+     add_queue,                  /* add_queue */
+     remove_queue,               /* remove_queue */
+     thread_signaled,            /* signaled */
++    NULL,                       /* get_esync_fd */
+     no_satisfied,               /* satisfied */
+     no_signal,                  /* signal */
+     no_get_fd,                  /* get_fd */
+diff --git a/server/timer.c b/server/timer.c
+index 3a786fb..810349a 100644
+--- a/server/timer.c
++++ b/server/timer.c
+@@ -65,6 +65,7 @@ static const struct object_ops timer_ops =
+     add_queue,                 /* add_queue */
+     remove_queue,              /* remove_queue */
+     timer_signaled,            /* signaled */
++    NULL,                      /* get_esync_fd */
+     timer_satisfied,           /* satisfied */
+     no_signal,                 /* signal */
+     no_get_fd,                 /* get_fd */
+diff --git a/server/token.c b/server/token.c
+index 0810a61..9998645 100644
+--- a/server/token.c
++++ b/server/token.c
+@@ -145,6 +145,7 @@ static const struct object_ops token_ops =
+     no_add_queue,              /* add_queue */
+     NULL,                      /* remove_queue */
+     NULL,                      /* signaled */
++    NULL,                      /* get_esync_fd */
+     NULL,                      /* satisfied */
+     no_signal,                 /* signal */
+     no_get_fd,                 /* get_fd */
+diff --git a/server/winstation.c b/server/winstation.c
+index a0be058..58e2213 100644
+--- a/server/winstation.c
++++ b/server/winstation.c
+@@ -65,6 +65,7 @@ static const struct object_ops winstation_ops =
+     no_add_queue,                 /* add_queue */
+     NULL,                         /* remove_queue */
+     NULL,                         /* signaled */
++    NULL,                         /* get_esync_fd */
+     NULL,                         /* satisfied */
+     no_signal,                    /* signal */
+     no_get_fd,                    /* get_fd */
+@@ -88,6 +89,7 @@ static const struct object_ops desktop_ops =
+     no_add_queue,                 /* add_queue */
+     NULL,                         /* remove_queue */
+     NULL,                         /* signaled */
++    NULL,                         /* get_esync_fd */
+     NULL,                         /* satisfied */
+     no_signal,                    /* signal */
+     no_get_fd,                    /* get_fd */
+-- 
+2.7.4
+

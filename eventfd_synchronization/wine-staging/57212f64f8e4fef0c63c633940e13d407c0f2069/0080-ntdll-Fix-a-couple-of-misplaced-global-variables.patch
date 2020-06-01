@@ -1,0 +1,39 @@
+From 7fce5871e9679f4dd9688f13e0886a308f9215a8 Mon Sep 17 00:00:00 2001
+From: Zebediah Figura <z.figura12@gmail.com>
+Date: Tue, 14 Aug 2018 20:00:54 -0500
+Subject: [PATCH 80/83] ntdll: Fix a couple of misplaced global variables.
+
+There's no reason these should be global, and in particular, this means that esync_pulse_event() might end up writing 0, which raises the likelihood of a missed wakeup from "probable" to "certain".
+
+Fixes #10.
+
+Signed-off-by: Zebediah Figura <z.figura12@gmail.com>
+---
+ dlls/ntdll/esync.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/dlls/ntdll/esync.c b/dlls/ntdll/esync.c
+index 0ca8896..304e498 100644
+--- a/dlls/ntdll/esync.c
++++ b/dlls/ntdll/esync.c
+@@ -585,7 +585,7 @@ NTSTATUS esync_set_event( HANDLE handle, LONG *prev )
+ 
+ NTSTATUS esync_reset_event( HANDLE handle, LONG *prev )
+ {
+-    static uint64_t value;
++    uint64_t value;
+     struct esync *obj;
+     struct event *event;
+     LONG current;
+@@ -614,7 +614,7 @@ NTSTATUS esync_reset_event( HANDLE handle, LONG *prev )
+ 
+ NTSTATUS esync_pulse_event( HANDLE handle, LONG *prev )
+ {
+-    static uint64_t value = 1;
++    uint64_t value = 1;
+     struct esync *obj;
+     struct event *event;
+     LONG current;
+-- 
+2.7.4
+
