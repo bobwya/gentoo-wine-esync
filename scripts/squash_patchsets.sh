@@ -12,19 +12,11 @@ SCRIPT_NAME="$(basename "${SCRIPT_NAME}")"
 AWK="$(command -v "mawk" || command -v "awk")"
 
 declare PATCHSET_START="0001"
-declare PATCHSET_END="0084"
+declare PATCHSET_END="0089"
 declare PATCHSET_TOTAL="$((10#${PATCHSET_END}-10#${PATCHSET_START}+1))"
 declare PATCHFILE_PREFIX="wine-esync"
-declare ESYNC_BASE_URL="https://github.com/zfigura/wine/releases/download"
-declare ESYNC_VERSION_ARRAY=(
-    "esyncb4478b7"
-    "esyncce79346"
-)
-declare ESYNC_SHA256_ARRAY=(
-    "2cacc317e07531987c41c5aceb41862b06d4717840916dfc01c11513b359a962"
-    "c2a8dd2afc7be4d3ddaf3eeb4c4302e0ea80e1542eb11d6484290de5d36b9a78"
-)
-declare TARBALL_EXT="tgz"
+declare EVENTFD_SYNC_SUBDIRECTORY="eventfd_synchronization"
+declare FLATTENED_SUBDIRECTORY="${EVENTFD_SYNC_SUBDIRECTORY}_flat"
 
 # download_unpack_esync_patchsets()
 #
@@ -44,9 +36,8 @@ die()
 		printf "Usage: %s WINE-GIT-TREE WINE-STAGING-GIT-TREE SOURCE-ROOT REBASE-PATCHSETS-ROOT DESTINATION-ROOT\\n\\n" "${SCRIPT_NAME}" >&2
 		printf "  WINE-GIT-TREE          : Wine git tree clone (root directory)\\n" >&2
 		printf "  WINE-STAGING-GIT-TREE  : Wine Staging git tree clone (root directory)\\n" >&2
-		printf "  SOURCE-ROOT            : Source wine-esync source(s) (root directory)\\n" >&2
-		printf "  REBASE-PATCHSETS-ROOT  : wine-esync rebasing patchsets (root directory)\\n" >&2
-		printf "  DESTINATION-ROOT       : Destination for squashed wine-esync rebased patchsets (root directory)\\n" >&2
+		printf "  REBASE-PATCHSETS-ROOT  : eventfd_synchronization rebased patchsets (root directory)\\n" >&2
+		printf "  DESTINATION-ROOT       : Destination for squashed/flattened eventfd_synchronization rebased patchsets (root directory)\\n" >&2
 	fi
 	printf "\\n%s : %s : %s\\n" "${SCRIPT_NAME}" "${FUNCNAME[1]}()" "${1}" >&2
 
@@ -121,10 +112,10 @@ git_garbage_collect()
 	local __git_tree="${1}"
 
 	pushd "${__git_tree}" >/dev/null || die "pushd failed"
+	printf "git_garbage_collect()\\n"
 	git am --abort &>/dev/null
-	git gc --auto || die "git gc failed"
-	#git prune || die "git prune failed"
 	rm -f ".git/gc.log" &>/dev/null
+	git gc --auto || die "git gc failed"
 	popd >/dev/null || die "popd failed"
 }
 
@@ -374,42 +365,6 @@ convert_wine_to_wine_staging_commit()
 	((__match)) || die "unable to locate Wine Staging git commit, correpsonding to Wine git commit: '${wine_git_commit}'"
 }
 
-# download_unpack_esync_patchsets()
-#
-# Parameters:
-#   1>   source_directory   :  root directory, in which to unpack esync tarball (string)
-#
-# Description:
-#   Download (if necessary) and esync tarball(s) have valid sha256sum(s).
-#   Then unpack all esync tarball(s).
-#
-function download_unpack_esync_patchsets()
-{
-	(($# == 1)) || die "invalid number of arguments: $# (1)"
-
-	local _source_directory="${1%/}" \
-		_esync_directory _esync_tarball _i
-
-	pushd "${_source_directory}" >/dev/null || die "pushd failed"
-	for _i in "${!ESYNC_VERSION_ARRAY[@]}"; do
-		_esync_directory="${ESYNC_VERSION_ARRAY[_i]}"
-		_esync_tarball="${_esync_directory}.${TARBALL_EXT}"
-		if ! sha256sum -c --quiet <<< "${ESYNC_SHA256_ARRAY[_i]} ${_esync_tarball}"; then
-			wget "${ESYNC_BASE_URL}/${ESYNC_VERSION_ARRAY[_i]}/esync.${TARBALL_EXT}" -O "${_esync_tarball}" || die "wget failed"
-			if ! sha256sum -c --quiet <<< "${ESYNC_SHA256_ARRAY[_i]} ${_esync_tarball}"; then
-				die "sha256sum failed on esync tarball: '${_esync_tarball}'"
-			fi
-		fi
-		rm -rf "${_source_directory:?}/${_esync_directory}" \
-			|| die "rm -rf '${_source_directory}/${_esync_directory}' failed"
-		mkdir -p "${_source_directory:?}/${_esync_directory}" \
-			|| die "mkdir -p '${_source_directory}/${_esync_directory}' failed"
-		tar xvfa "${_source_directory}/${_esync_tarball}" -C "${_source_directory}/${_esync_directory}" \
-			|| die "tar xvfa '${_source_directory}/${_esync_tarball}' -C '${_source_directory}/${_esync_directory}' failed"
-	done
-	popd >/dev/null || die "popd failed"
-}
-
 # apply_esync_rebasing_patchset()
 #
 # Parameters:
@@ -474,7 +429,7 @@ git_am_wine_staging_patchset()
 	git reset --hard "${__wine_git_commit}" || die "git reset failed"
 	tmp_file="$(mktemp)"
 	printf "\\nApplying Wine Staging patchset ...\\n"
-	if ! "${patch_install_script}" --backend=git-am --all 2>"${tmp_file}"; then
+	if ! "${patch_install_script}" --backend=git-am --all &>"${tmp_file}"; then
 		cat "${tmp_file}"
 		[[ -f "${tmp_file}" ]] && rm -f "${tmp_file}" 2>/dev/null
 		die "'${patch_install_script}' failed"
@@ -518,7 +473,8 @@ git_am_esync_patchset()
 	printf "\\nApplying (using git am) esync patchset from directory: '%s' ...\\n" "${__source_directory}/"
 	for __i_patch in $(seq -w "${PATCHSET_START}" "${PATCHSET_END}"); do
 		__esync_patch="$(find "${__source_directory}" -name "${__i_patch}*.patch" -printf '%f' 2>/dev/null)"
-		[[ -f "${__source_directory}/${__esync_patch}" ]] || die "patch: '${__esync_patch}' ; invalid"
+		[[ -f "${__source_directory}/${__esync_patch}" ]] || continue
+
 		printf "Applying esync patch: '%s' ...\\n" "${__esync_patch}"
 		if patch_error="$( patch -F0 -p1 --verbose --dry-run < "${__source_directory}/${__esync_patch}" )" \
 		&& __git_error="$( git am --ignore-whitespace "${__source_directory}/${__esync_patch}" )"; then
@@ -543,48 +499,37 @@ git_am_esync_patchset()
 # Parameters:
 #   1>   wine-git-tree                    :  Wine Git tree root directory                                        (string)
 #   2>   wine-staging-git-tree            :  Wine Staging Git tree root directory                                (string)
-#   3>   esync-sources-directory          :  Root directory containing all (required) esync sources              (string)
-#   4>   esync-rebasing-patches-directory :  Specific rebasing patches to use with the current esync version     (string)
-#   5>   destination-directory            :  Target directory in which to store squashed, rebased esync patchset (string)
+#   3>   esync-rebasing-patches-directory :  Specific rebasing patches to use with the current esync version     (string)
+#   4>   destination-directory            :  Target directory in which to store squashed, rebased esync patchset (string)
 #
 # Description:
 #   Ensure the destination-directory exists. Then reset the Wine Git tree (wine-git-tree)
 #   to the commit, embedded in the esync-rebasing-patches-directory path. If rebasing against Wine Staging
 #   then convert this commit to a valid Wine Staging Git commit and apply the Wine Staging patchset.
-#   Then apply the rebased esync patchset from a subdirectory of the: esync-sources-directory ;
-#   based on the esync version embedded in the esync-rebasing-patches-directory path.
-#   Finally regenerate a reduced, rebased esync patchset, from the Wine Git tree. Each
+#   Generate a reduced, rebased esync patchset, from the Wine Git tree. Each
 #   esync patch corresponds to the diff for a single Wine Source file at this point.
 #   This enables the esync patchset to applied out-of-order and, in addition, reduces the size of the
 #   resulting patchset.
 #
 squash_esync_patchset()
 {
-	(($# == 5)) || die "invalid parameter count: ${#} (5)"
+	(($# == 4)) || die "invalid parameter count: ${#} (4)"
 
 	local 	__wine_git_tree="${1}" \
 			__wine_staging_git_tree="${2}" \
-			__esync_sources_directory="${3}" \
-			__esync_rebasing_patches_directory="${4}" \
-			__destination_directory="${5}"
+			__esync_rebasing_patches_directory="${3}" \
+			__destination_directory="${4}"
 
-	local __base_wine_git_commit __esync_source_directory \
+	local __base_wine_git_commit \
 		__patch_file __patch_file_mangled \
 		__target_patch_file __target_patch_path \
 		__wine_git_commit __wine_staging_git_commit
 
 	mkdir -p "${__destination_directory}" || die "mkdir -p failed"
 	__wine_git_commit="$(basename "${__esync_rebasing_patches_directory}")"
-	__esync_version="$(basename "$(dirname "$(dirname "${__esync_rebasing_patches_directory}")")")"
-	__esync_source_directory="${__esync_sources_directory}/${__esync_version}/esync"
-	printf "\\nApplying esync rebasing patches from: '%s'\\n" "${__esync_rebasing_patches_directory}"
-	printf "Applying esync rebasing patches to esync source directory: '%s'\\n" "${__esync_source_directory}"
-	apply_esync_rebasing_patchset "${__esync_source_directory}" "${__esync_rebasing_patches_directory}"
 	__base_wine_git_commit="${__wine_git_commit}"
-	git_garbage_collect "${__wine_git_tree}"
 	reset_git_tree "${__wine_git_tree}" "${__wine_git_commit}"
 	if [[ "${__wine_staging_git_tree}" != "." ]]; then
-		git_garbage_collect "${__wine_staging_git_tree}"
 		convert_wine_to_wine_staging_commit "${__wine_git_tree}" "${__wine_staging_git_tree}" \
 											"__wine_git_commit" "__wine_staging_git_commit"
 		printf "Wine git commit: %s\\n" "${__wine_git_commit}"
@@ -599,13 +544,14 @@ squash_esync_patchset()
 		printf "\\nBase Wine commit: %s ( Working with Wine git commit: %s )\\n" "${__base_wine_git_commit}" "${__wine_git_commit}"
 	fi
 
-	git_am_esync_patchset "${__wine_git_tree}" "${__esync_source_directory}"
+ 	git_am_esync_patchset "${__wine_git_tree}" "${__esync_rebasing_patches_directory}"
 
 	pushd "${__wine_git_tree}" >/dev/null || die "pushd failed"
-	printf "\\nSquashing esync patchset, in directory: '%s'\\n" "${__esync_source_directory}"
-	printf "Squashing esync patchset, targetting directory: '%s'\\n" "${__destination_directory}"
-	awk '{ if (($1=="diff") && ($NF !~ "^[[:blank:]]*$")) { sub("^[[:alpha:]]*/","/",$NF); printf("%s\n",$NF) } }' "${__esync_source_directory}"/{0001..0083}*.patch \
-	| sort -V | uniq | while read -r __patch_file; do
+	printf "Squashing esync patchset, targeting directory: '%s'\\n" "${__destination_directory}"
+	printf "Squashing esync patchset, using source directory: '%s'\\n" "${__esync_rebasing_patches_directory}"
+	awk '{ if (($1=="diff") && ($NF !~ "^[[:blank:]]*$")) { sub("^[[:alpha:]]*/","/",$NF); printf("%s\n",$NF) } }' "${__esync_rebasing_patches_directory}"/{0001..0089}*.patch \
+| sort -V | uniq | while read -r __patch_file; do
+
 		mangle_path "${__patch_file}" __patch_file_mangled
 		__target_patch_file="${PATCHFILE_PREFIX}${__patch_file_mangled}.patch"
 		__target_patch_path="${__destination_directory}/${__target_patch_file}"
@@ -624,18 +570,17 @@ squash_esync_patchset()
 
 main()
 {
-	(($# == 5)) || die "invalid parameter count: ${#} (5)" 1
+	(($# == 4)) || die "invalid parameter count: ${#} (4)" 1
 
 	local 	__wine_git_tree __wine_staging_git_tree \
-			__esync_sources_root __destination_root __i=0 \
+			__destination_root __i=0 \
 			__staging_directory \
 			__patchset_subdirectory __patchset_total __target_patchset_subdirectory
 
 	__wine_git_tree="$(readlink -f "${1}" 2>/dev/null)"
 	__wine_staging_git_tree="$(readlink -f "${2}" 2>/dev/null)"
-	__esync_sources_root="$(readlink -f "${3}" 2>/dev/null)"
-	__esync_rebase_patches_root="$(readlink -f "${4}" 2>/dev/null)"
-	__destination_root="$(readlink -f "${5}" 2>/dev/null)"
+	__esync_rebase_patches_root="$(readlink -f "${3}" 2>/dev/null)"
+	__destination_root="$(readlink -f "${4}" 2>/dev/null)"
 
 	if [[ -z "${__wine_git_tree}" || ! -d "${__wine_git_tree}" ]]; then
 		die "Wine git tree path: '${__wine_git_tree}' ; is not a valid directory"
@@ -647,12 +592,10 @@ main()
 	elif [[ ! -d "${__wine_staging_git_tree}/.git" ]]; then
 		die "Wine Staging git tree path: '${__wine_staging_git_tree}' ; is not a valid git clone directory"
 	fi
-	if [[ -z "${__esync_sources_root}" || ! -d "${__esync_sources_root}" ]]; then
-		die "Source root path: '${__esync_sources_root}' ; is not a valid directory"
-	fi
 	if [[ -z "${__esync_rebase_patches_root}" || ! -d "${__esync_rebase_patches_root}" ]]; then
 		die "Source root path: '${__esync_rebase_patches_root}' ; is not a valid directory"
 	fi
+	
 	if [[ -z "${__destination_root}" ]]; then
 		die "Destination root path: '${__destination_root}' ; is not a valid directory"
 	elif [[ ! -d "${__destination_root}" ]]; then
@@ -667,8 +610,8 @@ main()
 	fi
 
 	printf "__esync_rebase_patches_root=%s\\n" "${__esync_rebase_patches_root}"
-	__patchset_total="$(find "${__esync_rebase_patches_root}" -mindepth 3 -type d -regextype posix-awk -regex ".*/${SHA1_REGEXP}" | wc  -l)"
-	find "${__esync_rebase_patches_root}" -mindepth 3 -type d -regextype posix-awk -regex ".*/${SHA1_REGEXP}" -print0 | \
+	__patchset_total="$(find "${__esync_rebase_patches_root}/${EVENTFD_SYNC_SUBDIRECTORY}" -mindepth 2 -type d -regextype posix-awk -regex ".*/${SHA1_REGEXP}" | wc  -l)"
+	find "${__esync_rebase_patches_root}/${EVENTFD_SYNC_SUBDIRECTORY}" -mindepth 2 -type d -regextype posix-awk -regex ".*/${SHA1_REGEXP}" -print0 | \
 	while IFS= read -r -d '' __patchset_subdirectory; do
 		__patchset_subdirectory="${__patchset_subdirectory#${__esync_rebase_patches_root}}"
 		__patchset_subdirectory="${__patchset_subdirectory#/}"
@@ -676,7 +619,6 @@ main()
 		__target_patchset_subdirectory="${__patchset_subdirectory#*/}"
 		printf "\\n\\nProcessing directory %02d / %02d : '%s' ...\\n\\n" \
 				"$((++__i))" "$((__patchset_total))" "${__patchset_subdirectory}"
-		download_unpack_esync_patchsets "${__esync_sources_root}"
 		if [[ "${__target_patchset_subdirectory}" =~ ^wine[-]staging ]]; then
 			__staging_directory="${__wine_staging_git_tree}"
 		elif [[ "${__target_patchset_subdirectory}" =~ ^wine[-]vanilla ]]; then
@@ -685,9 +627,12 @@ main()
 			die "unknown Wine package base: ${__patchset_subdirectory}"
 		fi
 		squash_esync_patchset "${__wine_git_tree}" "${__staging_directory}" \
-						"${__esync_sources_root}" \
 						"${__esync_rebase_patches_root}/${__patchset_subdirectory}" \
-						"${__destination_root}/${__target_patchset_subdirectory}"
+						"${__destination_root}/${FLATTENED_SUBDIRECTORY}/${__target_patchset_subdirectory}"
+		git_garbage_collect "${__wine_git_tree}"
+		if [[ "${__wine_staging_git_tree}" != "." ]]; then
+			git_garbage_collect "${__wine_staging_git_tree}"
+		fi
 	done
 }
 
